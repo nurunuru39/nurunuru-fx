@@ -145,13 +145,15 @@ def analyze(name, d1h, d15):
         ret = (price - lo) / (hi - lo) * 100 if hi > lo else 0.0
     item["ret"] = round(ret, 1)
     item["swing_hi"], item["swing_lo"] = hi, lo
-    item["signal"] = signal(closed.iloc[-2], closed.iloc[-1], item["dir"])
+    sig = signal(closed.iloc[-2], closed.iloc[-1], item["dir"])
 
+    # サインは押し目ゾーンに入っているときだけ数える(浅い押しでの反発は高値づかみになりやすい)
     if ret > RET_MAX:
         item["status"] = "対象外"
         item["reason"] = "戻りが深すぎる(トレンド崩れの可能性)"
     elif ret >= RET_MIN:
-        item["status"] = "エントリー候補" if item["signal"] else "押し目ゾーン"
+        item["signal"] = sig
+        item["status"] = "エントリー候補" if sig else "押し目ゾーン"
     else:
         item["status"] = "監視"
     return item

@@ -54,6 +54,11 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .tabs { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
 .tabs button { width:auto; margin:0; padding:6px 14px; font-size:.85rem; background:#0f172a; color:#cbd5e1; border:1px solid #334155; }
 .tabs button.on { background:#38bdf8; color:#0f172a; border-color:#38bdf8; }
+@keyframes flash { 0%,100% { background:rgba(74,222,128,.32); } 50% { background:rgba(74,222,128,0); } }
+@keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(74,222,128,.9); } 50% { box-shadow:0 0 10px 3px rgba(74,222,128,.9); } }
+tr.blink td { animation:flash 1s ease-in-out infinite; font-weight:bold; }
+tr.blink .badge { animation:pulse 1s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { tr.blink td { animation:none; background:rgba(74,222,128,.25); } tr.blink .badge { animation:none; } }
 footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 @media (max-width:560px){ .row3 { grid-template-columns:1fr; } }
 </style>
@@ -88,10 +93,11 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <h2>いまの狙い目(15分ごとに自動更新)</h2>
       <span class="live-time" id="liveTime">読み込み中…</span>
     </div>
-    <p class="note">28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。</p>
+    <p class="note">28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。<b>エントリー候補</b>が出ると、その行がチカチカ光ります。</p>
     <div class="tabs">
       <button class="on" data-f="pick">狙い目だけ</button>
-      <button data-f="all">対象外も表示</button>
+      <button data-f="watch">監視も表示</button>
+      <button data-f="all">すべて表示</button>
     </div>
     <div class="live-wrap">
       <table>
@@ -99,7 +105,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
         <tbody id="liveBody"><tr><td colspan="7" class="note">読み込み中…</td></tr></tbody>
       </table>
     </div>
-    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -124,38 +130,6 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   </div>
 
   <div class="card">
-    <h2>押し目チェッカー</h2>
-    <p class="note">チャートを見ながら数値を入れると、条件がそろっているか判定します。</p>
-
-    <div class="row">
-      <label>4時間足のトレンド
-        <select id="d1"><option value="up">上昇(EMA20 > EMA50)</option><option value="down">下降(EMA20 < EMA50)</option><option value="none">はっきりしない</option></select>
-      </label>
-      <label>1時間足のトレンド
-        <select id="h4"><option value="up">上昇(EMA20 > EMA50)</option><option value="down">下降(EMA20 < EMA50)</option><option value="none">はっきりしない</option></select>
-      </label>
-    </div>
-    <div class="row3">
-      <label>ADX(4時間足)<input id="adxD" type="number" value="28"></label>
-      <label>ADX(1時間足)<input id="adxH" type="number" value="25"></label>
-      <label>ADXの基準<input id="adxMin" type="number" value="20"></label>
-    </div>
-    <div class="row3">
-      <label>15分足の直近高値<input id="hi" type="number" step="any" placeholder="例 158.40"></label>
-      <label>15分足の直近安値<input id="lo" type="number" step="any" placeholder="例 157.60"></label>
-      <label>現在値<input id="now" type="number" step="any" placeholder="例 158.00"></label>
-    </div>
-    <div class="row">
-      <label>戻り率の目安(%)<input id="retMin" type="number" value="50"></label>
-      <label>反転サイン
-        <select id="sig"><option value="">まだ出ていない</option><option value="反発">反発</option><option value="包み足">包み足</option><option value="ピンバー">ピンバー</option></select>
-      </label>
-    </div>
-    <button onclick="check()">判定する</button>
-    <div class="result" id="result">数値を入れて「判定する」を押してください。</div>
-  </div>
-
-  <div class="card">
     <h2>注意点</h2>
     <div class="warnbox">このツールは「見るべきチャートをしぼりこむ」ためのものです。条件がそろっても勝てるとは限りません。過去データでの検証(バックテスト)はまだ途中です。</div>
     <p>エントリーするときは、損切りを押し目の安値(戻りの高値)の少し外に置いて、その幅から<a href="money.html" style="color:#38bdf8;">資金管理ページ</a>でロットを計算してください。</p>
@@ -165,81 +139,6 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <footer>※本サイトは個人の記録であり、投資助言ではありません。</footer>
 
 <script>
-function v(id){ return document.getElementById(id).value; }
-function li(cls, text){ return '<li class="' + cls + '">' + (cls === 'ok' ? '✔ ' : cls === 'ng' ? '✖ ' : '… ') + text + '</li>'; }
-
-function check(){
-  var d1 = v('d1'), h4 = v('h4');
-  var adxD = Number(v('adxD')), adxH = Number(v('adxH')), adxMin = Number(v('adxMin'));
-  var hi = Number(v('hi')), lo = Number(v('lo')), now = Number(v('now'));
-  var retMin = Number(v('retMin')), sig = v('sig');
-  var out = document.getElementById('result');
-  var items = [], fail = false, wait = false;
-
-  // 1. 方向
-  var dir = null;
-  if (d1 !== 'none' && d1 === h4) {
-    dir = d1;
-    items.push(li('ok', '4時間足と1時間足がそろって' + (dir === 'up' ? '上昇' : '下降') + '(' + (dir === 'up' ? '押し目買い' : '戻り売り') + 'の候補)'));
-  } else {
-    fail = true;
-    items.push(li('ng', '4時間足と1時間足の向きがそろっていません'));
-  }
-
-  // 2. ADX
-  if (adxD >= adxMin && adxH >= adxMin) {
-    items.push(li('ok', 'ADXが基準(' + adxMin + ')以上で、トレンドに勢いがあります'));
-  } else {
-    fail = true;
-    items.push(li('ng', 'ADXが基準(' + adxMin + ')未満。レンジの可能性があります'));
-  }
-
-  // 3. 戻り率
-  var ret = null, barHtml = '';
-  if (!hi || !lo || !now || hi <= lo) {
-    wait = true;
-    items.push(li('wait', '15分足の高値・安値・現在値を入れてください(高値は安値より大きく)'));
-  } else {
-    var range = hi - lo;
-    ret = (dir === 'down') ? (now - lo) / range * 100 : (hi - now) / range * 100;
-    var r = Math.round(ret * 10) / 10;
-    if (ret > 100) {
-      fail = true;
-      items.push(li('ng', '戻り率 ' + r + '%。押し目を超えてトレンドが崩れています'));
-    } else if (ret > 78.6) {
-      fail = true;
-      items.push(li('ng', '戻り率 ' + r + '%。深すぎて、トレンドが崩れかけている可能性があります'));
-    } else if (ret >= retMin) {
-      items.push(li('ok', '戻り率 ' + r + '%。押し目ゾーンに入っています'));
-    } else if (ret >= 0) {
-      wait = true;
-      items.push(li('wait', '戻り率 ' + r + '%。まだ浅いので、' + retMin + '%付近まで待つのが目安です'));
-    } else {
-      wait = true;
-      items.push(li('wait', '現在値が高値(安値)を更新中。押してくるのを待ちましょう'));
-    }
-    var pos = Math.max(0, Math.min(100, ret));
-    barHtml = '<div class="bar">'
-      + '<span style="left:' + retMin + '%;width:' + Math.max(0, 78.6 - retMin) + '%;background:rgba(74,222,128,.35);"></span>'
-      + '<span style="left:calc(' + pos + '% - 2px);width:4px;background:#facc15;"></span>'
-      + '</div><div class="note">緑の帯=押し目ゾーン(' + retMin + '〜78.6%)/黄色の線=今の位置</div>';
-  }
-
-  // 4. サイン
-  if (sig) {
-    items.push(li('ok', '反転サイン「' + sig + '」が出ています'));
-  } else {
-    wait = true;
-    items.push(li('wait', '反転サインはまだ。反発・包み足・ピンバーを待ちましょう'));
-  }
-
-  var verdict;
-  if (fail) verdict = '<div class="verdict ng">見送り</div>';
-  else if (wait) verdict = '<div class="verdict wait">監視リストへ(条件待ち)</div>';
-  else verdict = '<div class="verdict ok">条件がそろいました</div><div class="note">損切り位置を決めて、資金管理ページでロットを計算してからエントリーを検討してください。</div>';
-
-  out.innerHTML = verdict + '<ul>' + items.join('') + '</ul>' + barHtml;
-}
 // ===== いまの狙い目(自動スキャン結果) =====
 var LIVE_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json';
 var liveData = null, liveFilter = 'pick';
@@ -251,7 +150,8 @@ function drawLive(){
   var body = document.getElementById('liveBody');
   body.innerHTML = '';
   if (!liveData) return;
-  var rows = liveData.items.filter(function(x){ return liveFilter === 'all' || x.status !== '対象外'; });
+  var show = { pick: ['エントリー候補', '押し目ゾーン'], watch: ['エントリー候補', '押し目ゾーン', '監視'] }[liveFilter];
+  var rows = liveData.items.filter(function(x){ return !show || show.indexOf(x.status) >= 0; });
   if (!rows.length) {
     var tr = document.createElement('tr');
     var td = cell('いまは条件にそろう銘柄がありません。焦らず待つのもトレードです。', 'note');
@@ -259,6 +159,7 @@ function drawLive(){
   }
   rows.forEach(function(x){
     var tr = document.createElement('tr');
+    if (x.status === 'エントリー候補') tr.className = 'blink';
     var st = document.createElement('td');
     var b = document.createElement('span');
     b.textContent = x.status;
@@ -269,7 +170,8 @@ function drawLive(){
     tr.appendChild(cell(x.name));
     tr.appendChild(x.dir ? cell(x.dir === 'up' ? '上昇(押し目買い)' : '下降(戻り売り)', x.dir) : cell('-'));
     tr.appendChild(cell(x.ret == null ? '-' : x.ret < 0 ? (x.dir === 'up' ? '高値更新中' : '安値更新中') : x.ret + '%'));
-    tr.appendChild(cell(x.signal || '-'));
+    var zone = x.status === 'エントリー候補' || x.status === '押し目ゾーン';
+    tr.appendChild(cell(zone && x.signal ? x.signal : '-'));
     tr.appendChild(cell(x.adx4 + ' / ' + x.adx1));
     tr.appendChild(cell(fmtPrice(x.price)));
     body.appendChild(tr);
