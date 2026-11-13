@@ -1,0 +1,43 @@
+name: 押し目スキャン
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # 15分ごと(GitHubの混み具合で数分遅れることがあります)
+  workflow_dispatch:          # 「Run workflow」ボタンで手動実行もできる
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ライブラリを入れる
+        run: pip install --quiet yfinance pandas
+
+      - name: スキャンする
+        run: python scan.py scan.json
+
+      # 結果は「data」という別の置き場(ブランチ)に置く。
+      # サイト本体(main)は変わらないので、15分ごとにNetlifyの公開は走らない。
+      - name: 結果を data ブランチに置く
+        run: |
+          mkdir -p /tmp/out && cp scan.json /tmp/out/
+          cd /tmp/out
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scan.json
+          git commit -q -m "scan $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" data
