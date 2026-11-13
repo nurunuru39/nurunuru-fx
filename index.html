@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3M6WC991MG"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-3M6WC991MG');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ヌルヌルFX</title>
+<style>
+:root { --bg: #0f172a; --fg: #e2e8f0; --card: #1e293b; --accent: #38bdf8; --muted: #94a3b8; --on-grad: #ffffff; --shade: rgba(0,0,0,0.55); color-scheme: dark; }
+body { margin:0; font-family:sans-serif; background:var(--bg); color:var(--fg); }
+header { position:relative; overflow:hidden; min-height:150px; display:flex; flex-direction:column; justify-content:center; padding:28px 20px; text-align:center; color:var(--on-grad); background:linear-gradient(180deg,#0b1a33,var(--bg)); }
+header .gloss { position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 35%, transparent 55%, rgba(255,255,255,0.06) 80%, transparent 100%); }
+#flow { position:absolute; inset:0; width:100%; height:100%; display:block; }
+header .veil { position:absolute; inset:0; background:radial-gradient(ellipse at center, var(--shade) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.5) 100%); pointer-events:none; }
+header > h1, header > p { position:relative; z-index:1; text-shadow:0 2px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9); }
+header h1 { margin:0; font-size:2.6rem; letter-spacing:.06em; }
+header p { margin:10px 0 0; }
+main { max-width:800px; margin:auto; padding:20px 16px; display:flex; flex-direction:column; gap:16px; }
+.card { background:var(--card); border-radius:12px; padding:20px; }
+.card h2 { color:var(--accent); margin:0 0 8px; }
+.card p { margin:0; line-height:1.7; }
+.wip { display:inline-block; margin-left:8px; padding:2px 10px; border-radius:999px; font-size:.8rem; vertical-align:middle; color:#0f172a; background:repeating-linear-gradient(45deg,#facc15 0 10px,#f59e0b 10px 20px); font-weight:bold; }
+.new { display:inline-block; margin-left:8px; padding:2px 10px; border-radius:999px; font-size:.8rem; vertical-align:middle; color:#0f172a; background:#4ade80; font-weight:bold; }
+.card.soon { opacity:.75; }
+footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16px; }
+</style>
+</head>
+<body>
+<header>
+<canvas id="flow" aria-hidden="true"></canvas>
+<div class="gloss"></div>
+<div class="veil"></div>
+<h1>ヌルヌルFX</h1>
+<p>なめらかに、淡々と。トレードの記録と学び</p>
+</header>
+<main>
+<div class="card soon"><h2>トレード日記<span class="wip">工事中</span></h2><p>ただいま準備中です。もうしばらくお待ちください。</p></div>
+<div class="card"><h2><a href="ob.html" style="color:inherit">OB・FVGの考え方</a></h2><p>オーダーブロックとフェアバリューギャップを図解で解説。</p></div>
+<div class="card"><h2><a href="pullback.html" style="color:inherit">押し目スキャナーの考え方</a><span class="new">NEW</span></h2><p>4時間足・1時間足・15分足で押し目を見つける手順と、条件をチェックできる押し目チェッカー。</p></div>
+<div class="card"><h2><a href="money.html" style="color:inherit">資金管理</a></h2><p>損切り幅からロットを決めるシンプルな考え方。通貨ペア・ゴールド対応のロット計算ツール付き。</p></div>
+</main>
+<footer>※本サイトは個人の記録であり、投資助言ではありません。</footer>
+<script>
+(function () {
+const canvas = document.getElementById('flow');
+const ctx = canvas.getContext('2d');
+const W = 180, H = 100;
+const off = document.createElement('canvas'); off.width = W; off.height = H;
+const octx = off.getContext('2d');
+const img = octx.createImageData(W, H);
+const P = new Uint8Array(512);
+for (let i = 0; i < 256; i++) P[i] = i;
+for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [P[i], P[j]] = [P[j], P[i]]; }
+for (let i = 0; i < 256; i++) P[i + 256] = P[i];
+const fade = t => t * t * (3 - 2 * t);
+function noise(x, y) { const xi = Math.floor(x), yi = Math.floor(y); const xf = x - xi, yf = y - yi; const X = xi & 255, Y = yi & 255; const a = P[P[X] + Y] / 255, b = P[P[X + 1] + Y] / 255; const c = P[P[X] + Y + 1] / 255, d = P[P[X + 1] + Y + 1] / 255; const u = fade(xf), v = fade(yf); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
+function fbm(x, y) { return noise(x, y) * 0.6 + noise(x * 2.1, y * 2.1) * 0.3 + noise(x * 4.3, y * 4.3) * 0.1; }
+const stops = [ [0.00, [4, 14, 40]], [0.30, [15, 60, 150]], [0.50, [40, 140, 240]], [0.62, [210, 230, 40]], [0.72, [235, 120, 20]], [0.80, [210, 30, 25]], [0.88, [20, 70, 170]], [0.95, [60, 220, 240]], [1.00, [5, 20, 50]] ];
+function color(t) { t = t - Math.floor(t); for (let i = 1; i < stops.length; i++) { if (t <= stops[i][0]) { const [t0, c0] = stops[i - 1], [t1, c1] = stops[i]; const k = (t - t0) / (t1 - t0); return [c0[0] + (c1[0] - c0[0]) * k, c0[1] + (c1[1] - c0[1]) * k, c0[2] + (c1[2] - c0[2]) * k]; } } return stops[0][1]; }
+function size() { const r = canvas.getBoundingClientRect(); const dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.max(1, Math.round(r.width * dpr)); canvas.height = Math.max(1, Math.round(r.height * dpr)); }
+function frame(time) {
+const t = time * 0.00012; const d = img.data; let p = 0;
+for (let y = 0; y < H; y++) { for (let x = 0; x < W; x++) {
+const nx = x * 0.045, ny = y * 0.012;
+const wx = fbm(nx + t * 0.7, ny - t * 2.2);
+const wy = fbm(nx * 1.3 - t * 0.5, ny + t * 1.5 + 5.2);
+const v = fbm(nx + wx * 2.2, ny + wy * 1.6 - t * 3.0);
+const scale = 0.5 + 0.5 * Math.sin(x * 0.9 + y * 0.55 + v * 18 + t * 20);
+const [r, g, b] = color(v * 1.7 + wx * 0.4);
+const s = 0.72 + 0.28 * scale;
+const bluish = Math.max(0, Math.min(1, (b - Math.max(r, g * 0.6)) / 140));
+const a = 235 - bluish * 175 - (1 - scale) * 25;
+d[p++] = r * s; d[p++] = g * s; d[p++] = b * s; d[p++] = a;
+} }
+octx.putImageData(img, 0, 0);
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
+const cw = canvas.width, ch = canvas.height;
+const seams = [0.18, 0.43, 0.71, 0.9];
+ctx.fillStyle = 'rgba(0,0,0,0.45)';
+for (const sx of seams) ctx.fillRect(sx * cw, 0, Math.max(2, cw * 0.006), ch);
+ctx.fillStyle = 'rgba(255,255,255,0.08)';
+ctx.fillRect(0, ch * 0.08, cw, Math.max(1, ch * 0.004));
+ctx.fillRect(0, ch * 0.9, cw, Math.max(1, ch * 0.004));
+}
+const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+size();
+window.addEventListener('resize', () => { size(); if (reduce) frame(4000); });
+if (reduce) { frame(4000); return; }
+let last = 0;
+function loop(now) { if (now - last > 33) { frame(now); last = now; } requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

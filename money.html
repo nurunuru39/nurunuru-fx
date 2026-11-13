@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3M6WC991MG"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-3M6WC991MG');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>資金管理 | ヌルヌルFX</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#0f172a; color:#e2e8f0; line-height:1.7; }
+header { padding:28px 20px; text-align:center; background:linear-gradient(120deg,#0b1a33,#1d4ed8,#0b1a33); }
+header a { color:#bae6fd; text-decoration:none; font-size:.9rem; }
+header h1 { margin:6px 0 0; }
+main { max-width:800px; margin:auto; padding:20px 16px; }
+.card { background:#1e293b; border-radius:12px; padding:20px; margin-bottom:16px; }
+.card h2 { color:#38bdf8; margin:0 0 8px; font-size:1.2rem; }
+label { display:block; margin-top:12px; font-size:.9rem; color:#cbd5e1; }
+input, select { width:100%; box-sizing:border-box; padding:10px; margin-top:4px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:#e2e8f0; font-size:1rem; }
+.row { display:flex; gap:10px; }
+.row > label { flex:1; }
+.hint { font-size:.8rem; color:#94a3b8; margin-top:2px; }
+.status { font-size:.85rem; margin-top:8px; padding:8px 10px; border-radius:8px; background:#0f172a; color:#94a3b8; }
+.status.ok { color:#4ade80; }
+.status.ng { color:#fb923c; }
+.small-btn { width:auto; margin-top:8px; padding:6px 12px; font-size:.85rem; background:#334155; color:#e2e8f0; }
+button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px; background:#38bdf8; color:#0f172a; font-weight:bold; font-size:1rem; cursor:pointer; }
+.result { margin-top:16px; padding:14px; border-radius:8px; background:#0f172a; font-size:1.05rem; }
+.result strong { color:#facc15; font-size:1.4rem; }
+.warn { color:#fb923c; font-size:.9rem; }
+table { width:100%; border-collapse:collapse; font-size:.9rem; margin-top:8px; }
+th, td { border-bottom:1px solid #334155; padding:8px 6px; text-align:left; }
+th { color:#94a3b8; font-weight:normal; }
+footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
+</style>
+</head>
+<body>
+<header>
+<a href="index.html">← ヌルヌルFX トップへ</a>
+<h1>資金管理</h1>
+</header>
+<main>
+
+<div class="card">
+<h2>基本の考え方</h2>
+<p>勝ち負けより先に「1回でいくら負けていいか」を決める。1回の損失は口座資金の1〜2%までに抑えると、連敗しても退場しにくくなります。</p>
+</div>
+
+<div class="card">
+<h2>決める順番</h2>
+<p>① 損切りラインをチャートで決める<br>② 許容損失額を決める(資金 × リスク%)<br>③ 損切り幅と許容損失額からロットを逆算する</p>
+</div>
+
+<div class="card">
+<h2>ロット計算ツール(通貨ペア・ゴールド対応)</h2>
+<p class="hint">海外FXの一般的な基準で計算します:1ロット=10万通貨、ゴールドは1ロット=100オンス(変更可)。</p>
+
+<div class="status" id="rateStatus">レートを読み込み中…</div>
+<button class="small-btn" onclick="loadRates()">レートを読み込み直す</button>
+
+<div class="row">
+<label>口座資金(円)<input id="balance" type="number" value="1000000"></label>
+<label>1回のリスク(%)<input id="risk" type="number" value="1" step="0.1"></label>
+</div>
+
+<label>銘柄
+<select id="pair" onchange="changePair()">
+<optgroup label="クロス円">
+<option value="USDJPY">USD/JPY(ドル円)</option>
+<option value="EURJPY">EUR/JPY(ユーロ円)</option>
+<option value="GBPJPY">GBP/JPY(ポンド円)</option>
+<option value="AUDJPY">AUD/JPY(豪ドル円)</option>
+<option value="NZDJPY">NZD/JPY(NZドル円)</option>
+<option value="CADJPY">CAD/JPY(カナダドル円)</option>
+<option value="CHFJPY">CHF/JPY(スイスフラン円)</option>
+</optgroup>
+<optgroup label="ドルストレート">
+<option value="EURUSD">EUR/USD(ユーロドル)</option>
+<option value="GBPUSD">GBP/USD(ポンドドル)</option>
+<option value="AUDUSD">AUD/USD(豪ドル米ドル)</option>
+<option value="NZDUSD">NZD/USD(NZドル米ドル)</option>
+<option value="USDCHF">USD/CHF(ドルスイス)</option>
+<option value="USDCAD">USD/CAD(ドルカナダ)</option>
+</optgroup>
+<optgroup label="ゴールド">
+<option value="XAUUSD">XAU/USD(ゴールド)</option>
+</optgroup>
+</select>
+</label>
+
+<label id="stopLabel">損切り幅(pips)<input id="stop" type="number" value="20" step="0.1"></label>
+<div class="hint" id="stopHint">クロス円は1pips=0.01円です。</div>
+
+<label id="usdjpyBox" style="display:none">ドル円レート(自動入力・手で変更もできます)<input id="usdjpy" type="number" value="155" step="0.01">
+<span class="hint">円以外で決済される銘柄は、損失を円に直すために使います。</span></label>
+
+<label id="priceBox" style="display:none">いまの銘柄のレート(自動入力・手で変更もできます)<input id="price" type="number" step="0.0001">
+<span class="hint">USD/CHF・USD/CAD は損益がCHF・CADで出るので、その換算に使います。</span></label>
+
+<label id="ozBox" style="display:none">ゴールド1ロットのオンス数<input id="oz" type="number" value="100">
+<span class="hint">ほとんどの海外FXは100オンス。口座の仕様で違うときは変えてください。</span></label>
+
+<button onclick="calc()">計算する</button>
+<div class="result" id="result">数値を入れて「計算する」を押してください。</div>
+</div>
+
+<div class="card">
+<h2>1ロットで1pips動くといくら?(目安)</h2>
+<table>
+<tr><th>銘柄</th><th>1pipsの幅</th><th>1ロットの1pips価値</th></tr>
+<tr><td>クロス円(USD/JPYなど)</td><td>0.01円</td><td>1,000円</td></tr>
+<tr><td>EUR/USD・GBP/USD など</td><td>0.0001</td><td>10ドル(円に換算)</td></tr>
+<tr><td>USD/CHF・USD/CAD</td><td>0.0001</td><td>10CHF・10CAD(円に換算)</td></tr>
+<tr><td>XAU/USD(100オンス)</td><td>1ドル動くと</td><td>100ドル(円に換算)</td></tr>
+</table>
+<p class="hint">ゴールドの「pips」の数え方は業者によって違うので、このツールでは損切り幅を「価格差(ドル)」で入れます。</p>
+</div>
+
+</main>
+<footer>※本サイトは個人の記録であり、投資助言ではありません。計算結果は目安です。実際の取引条件はお使いの口座でご確認ください。<br>為替レート:<a href="https://www.exchangerate-api.com" style="color:#94a3b8">Rates By Exchange Rate API</a>(1日1回更新の参考値)</footer>
+
+<script>
+function $(id){ return document.getElementById(id); }
+let rates = null; // USD基準のレート(例:rates.JPY = 1ドルあたりの円)
+
+function loadRates() {
+  $('rateStatus').className = 'status';
+  $('rateStatus').textContent = 'レートを読み込み中…';
+  fetch('https://open.er-api.com/v6/latest/USD')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.result !== 'success' || !d.rates || !d.rates.JPY) throw new Error();
+      rates = d.rates;
+      const t = new Date(d.time_last_update_unix * 1000);
+      $('rateStatus').className = 'status ok';
+      $('rateStatus').textContent = 'レート取得OK:ドル円 ' + rates.JPY.toFixed(2)
+        + '(' + t.toLocaleString('ja-JP') + ' 更新・1日1回更新の参考値)';
+      fillRates();
+    })
+    .catch(function(){
+      $('rateStatus').className = 'status ng';
+      $('rateStatus').textContent = 'レートを取得できませんでした。下の欄にいまのレートを手で入れてください。';
+    });
+}
+
+function fillRates() {
+  if (!rates) return;
+  const p = $('pair').value;
+  $('usdjpy').value = rates.JPY.toFixed(2);
+  if (p === 'USDCHF' && rates.CHF) $('price').value = rates.CHF.toFixed(4);
+  if (p === 'USDCAD' && rates.CAD) $('price').value = rates.CAD.toFixed(4);
+}
+
+function changePair() {
+  const p = $('pair').value;
+  const isJPY = p.endsWith('JPY');
+  const isGold = p === 'XAUUSD';
+  const isUSDbase = (p === 'USDCHF' || p === 'USDCAD');
+  $('usdjpyBox').style.display = isJPY ? 'none' : 'block';
+  $('priceBox').style.display = isUSDbase ? 'block' : 'none';
+  $('ozBox').style.display = isGold ? 'block' : 'none';
+  if (isGold) {
+    $('stopLabel').firstChild.textContent = '損切り幅(価格差・ドル)';
+    $('stop').value = 5;
+    $('stopHint').textContent = '例:2,650.00ドルで買って2,645.00ドルで損切りなら「5」。';
+  } else {
+    $('stopLabel').firstChild.textContent = '損切り幅(pips)';
+    $('stop').value = 20;
+    $('stopHint').textContent = isJPY ? 'クロス円は1pips=0.01円です。' : 'この銘柄は1pips=0.0001です。';
+  }
+  if (!rates) {
+    if (p === 'USDCHF') $('price').value = 0.88;
+    if (p === 'USDCAD') $('price').value = 1.38;
+  }
+  fillRates();
+  $('result').textContent = '数値を入れて「計算する」を押してください。';
+}
+
+function calc() {
+  const p = $('pair').value;
+  const balance = Number($('balance').value);
+  const risk = Number($('risk').value);
+  const stop = Number($('stop').value);
+  const usdjpy = Number($('usdjpy').value);
+  const price = Number($('price').value);
+  const oz = Number($('oz').value);
+
+  if (!balance || !risk || !stop) { $('result').textContent = '口座資金・リスク・損切り幅を入れてください。'; return; }
+
+  let perLot; // 1ロットで損切りまで行ったときの損失(円)
+  if (p.endsWith('JPY')) {
+    perLot = stop * 1000;
+  } else {
+    if (!usdjpy) { $('result').textContent = 'ドル円レートを入れてください。'; return; }
+    if (p === 'XAUUSD') {
+      if (!oz) { $('result').textContent = 'オンス数を入れてください。'; return; }
+      perLot = stop * oz * usdjpy;
+    } else if (p === 'USDCHF' || p === 'USDCAD') {
+      if (!price) { $('result').textContent = 'いまの銘柄のレートを入れてください。'; return; }
+      perLot = stop * 10 / price * usdjpy;
+    } else {
+      perLot = stop * 10 * usdjpy;
+    }
+  }
+
+  const loss = balance * risk / 100;
+  const lots = Math.floor(loss / perLot * 100) / 100;
+  const real = lots * perLot;
+
+  let html = '許容損失額:' + Math.round(loss).toLocaleString() + '円<br>'
+    + 'ロット数:<strong>' + lots.toFixed(2) + 'ロット</strong><br>';
+  if (p !== 'XAUUSD') html += '(' + (lots * 10).toFixed(1) + '万通貨)<br>';
+  html += '損切りになったときの損失:約' + Math.round(real).toLocaleString() + '円';
+  if (lots < 0.01) html += '<br><span class="warn">最小ロット(0.01)未満です。損切り幅を狭くするか、取引を見送るのも選択肢です。</span>';
+  $('result').innerHTML = html;
+}
+
+loadRates();
+</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3M6WC991MG"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-3M6WC991MG');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>押し目スキャナーの考え方 | ヌルヌルFX</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#0f172a; color:#e2e8f0; line-height:1.7; }
+header { padding:28px 20px; text-align:center; background:linear-gradient(120deg,#0b1a33,#1d4ed8,#0b1a33); }
+header a { color:#bae6fd; text-decoration:none; font-size:.9rem; }
+header h1 { margin:6px 0 0; }
+main { max-width:800px; margin:auto; padding:20px 16px; }
+.card { background:#1e293b; border-radius:12px; padding:20px; margin-bottom:16px; }
+.card h2 { color:#38bdf8; margin:0 0 8px; font-size:1.2rem; }
+.card h3 { color:#bae6fd; margin:16px 0 4px; font-size:1rem; }
+.step { display:flex; gap:12px; margin-top:12px; }
+.num { flex:0 0 32px; height:32px; border-radius:50%; background:#38bdf8; color:#0f172a; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+.tf { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; text-align:center; }
+.tf div { background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px 4px; font-size:.9rem; }
+.tf b { display:block; color:#facc15; }
+table { width:100%; border-collapse:collapse; margin-top:10px; font-size:.9rem; }
+th, td { border-bottom:1px solid #334155; padding:8px 6px; text-align:left; vertical-align:top; }
+th { color:#94a3b8; font-weight:normal; }
+label { display:block; margin-top:12px; font-size:.9rem; color:#cbd5e1; }
+input, select { width:100%; box-sizing:border-box; padding:10px; margin-top:4px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:#e2e8f0; font-size:1rem; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px; background:#38bdf8; color:#0f172a; font-weight:bold; font-size:1rem; cursor:pointer; }
+.result { margin-top:16px; padding:14px; border-radius:8px; background:#0f172a; }
+.result ul { margin:8px 0 0; padding-left:0; list-style:none; }
+.result li { margin:4px 0; }
+.ok { color:#4ade80; } .ng { color:#f87171; } .wait { color:#facc15; }
+.verdict { font-size:1.3rem; font-weight:bold; }
+.bar { position:relative; height:14px; background:#334155; border-radius:7px; margin-top:10px; overflow:hidden; }
+.bar span { position:absolute; top:0; bottom:0; }
+.note { font-size:.82rem; color:#94a3b8; }
+.warnbox { border:1px solid #facc15; background:rgba(250,204,21,.08); color:#fde68a; border-radius:8px; padding:12px; }
+footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
+@media (max-width:560px){ .row3 { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html">← ヌルヌルFX トップへ</a>
+  <h1>押し目スキャナーの考え方</h1>
+</header>
+
+<main>
+  <div class="card">
+    <h2>押し目買い・戻り売りが基本といわれる理由</h2>
+    <p>トレードの基本は「押し目買い・戻り売り」とよくいわれます。そもそも物の売買は、安いときに買って高いときに売るのが基本です。FXのトレードも同じ理屈で成り立っています。</p>
+    <p>FXのトレードは、大きく分けると「ブレイクアウト」と「反発を狙う」の2種類です。ブレイクアウトは上昇の勢いがある相場では有効ですが、やってみるとわかるとおり、ブレイクアウトで勝ち続けるのはとても難しいものです。勝つトレードには、押し目買い・戻り売りの戦術が欠かせません。</p>
+    <p>ただ、どこで反発するかを前もって知るのは簡単ではありません。前回の高値・安値、ピボットライン、トレンドライン、キリ番など、見るべき要素がたくさんあるからです。特に初心者には、いまどの通貨が押し目買い・戻り売りを狙えるのかを探すのは難しいと思います。</p>
+    <p>そこで、この押し目スキャナーを使って、反発しやすい狙い目の通貨を見つけましょう。そのうえで、反転サインやチャートパターンが出たときにエントリーして、勝率を高めてください。</p>
+  </div>
+
+  <div class="card">
+    <h2>何をするツール？</h2>
+    <p>たくさんの通貨ペアやゴールドの中から、<b>「大きな流れがはっきりしていて、いま小さく押している銘柄」</b>だけを見つけるための考え方です。全部のチャートを毎回見なくても、見るべき銘柄をしぼりこめます。</p>
+    <div class="tf">
+      <div><b>4時間足</b>大きな流れ</div>
+      <div><b>1時間足</b>流れの確認</div>
+      <div><b>15分足</b>押し目を待つ</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>判定の流れ</h2>
+    <div class="step"><div class="num">1</div><div><b>4時間足と1時間足が同じ方向か</b><br>EMA20がEMA50より上で、価格もその上なら上昇。逆なら下降。2つの時間足の向きがそろっていることが条件です。</div></div>
+    <div class="step"><div class="num">2</div><div><b>トレンドに勢いがあるか(ADX)</b><br>ADXはトレンドの強さを表す指標です。数値が低いとレンジ(もみ合い)の可能性が高いので見送ります。</div></div>
+    <div class="step"><div class="num">3</div><div><b>15分足で押し目(戻り)を作っているか</b><br>直近の上げ幅(下げ幅)に対して、どれくらい戻したかを「戻り率」で見ます。目安は<b>50%</b>。浅すぎると高値づかみ、深すぎるとトレンドが崩れている可能性があります。</div></div>
+    <div class="step"><div class="num">4</div><div><b>反転のサインが出たか</b><br>押し目で止まったことを確かめるサインを待ちます。</div></div>
+    <table>
+      <tr><th>サイン</th><th>形</th></tr>
+      <tr><td>反発</td><td>押したあと、トレンド方向の足で確定した</td></tr>
+      <tr><td>包み足</td><td>前の足をまるごと包むトレンド方向の大きな足</td></tr>
+      <tr><td>ピンバー</td><td>押し目方向に長いヒゲを残して戻した足</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>戻り率の見方</h2>
+    <p>上昇トレンドなら、直近の安値から高値までの上げ幅を100%として、高値からどれだけ下げたかを計算します。</p>
+    <p style="text-align:center;font-size:1.05rem;">戻り率 = (高値 − 現在値) ÷ (高値 − 安値) × 100</p>
+    <p class="note">下降トレンドなら上下を逆にして、安値からどれだけ戻したかを計算します。フィボナッチの38.2%・50%・61.8%あたりが押し目の候補としてよく使われます。</p>
+  </div>
+
+  <div class="card">
+    <h2>押し目チェッカー</h2>
+    <p class="note">チャートを見ながら数値を入れると、条件がそろっているか判定します。</p>
+
+    <div class="row">
+      <label>4時間足のトレンド
+        <select id="d1"><option value="up">上昇(EMA20 > EMA50)</option><option value="down">下降(EMA20 < EMA50)</option><option value="none">はっきりしない</option></select>
+      </label>
+      <label>1時間足のトレンド
+        <select id="h4"><option value="up">上昇(EMA20 > EMA50)</option><option value="down">下降(EMA20 < EMA50)</option><option value="none">はっきりしない</option></select>
+      </label>
+    </div>
+    <div class="row3">
+      <label>ADX(4時間足)<input id="adxD" type="number" value="28"></label>
+      <label>ADX(1時間足)<input id="adxH" type="number" value="25"></label>
+      <label>ADXの基準<input id="adxMin" type="number" value="20"></label>
+    </div>
+    <div class="row3">
+      <label>15分足の直近高値<input id="hi" type="number" step="any" placeholder="例 158.40"></label>
+      <label>15分足の直近安値<input id="lo" type="number" step="any" placeholder="例 157.60"></label>
+      <label>現在値<input id="now" type="number" step="any" placeholder="例 158.00"></label>
+    </div>
+    <div class="row">
+      <label>戻り率の目安(%)<input id="retMin" type="number" value="50"></label>
+      <label>反転サイン
+        <select id="sig"><option value="">まだ出ていない</option><option value="反発">反発</option><option value="包み足">包み足</option><option value="ピンバー">ピンバー</option></select>
+      </label>
+    </div>
+    <button onclick="check()">判定する</button>
+    <div class="result" id="result">数値を入れて「判定する」を押してください。</div>
+  </div>
+
+  <div class="card">
+    <h2>注意点</h2>
+    <div class="warnbox">このツールは「見るべきチャートをしぼりこむ」ためのものです。条件がそろっても勝てるとは限りません。過去データでの検証(バックテスト)はまだ途中です。</div>
+    <p>エントリーするときは、損切りを押し目の安値(戻りの高値)の少し外に置いて、その幅から<a href="money.html" style="color:#38bdf8;">資金管理ページ</a>でロットを計算してください。</p>
+  </div>
+</main>
+
+<footer>※本サイトは個人の記録であり、投資助言ではありません。</footer>
+
+<script>
+function v(id){ return document.getElementById(id).value; }
+function li(cls, text){ return '<li class="' + cls + '">' + (cls === 'ok' ? '✔ ' : cls === 'ng' ? '✖ ' : '… ') + text + '</li>'; }
+
+function check(){
+  var d1 = v('d1'), h4 = v('h4');
+  var adxD = Number(v('adxD')), adxH = Number(v('adxH')), adxMin = Number(v('adxMin'));
+  var hi = Number(v('hi')), lo = Number(v('lo')), now = Number(v('now'));
+  var retMin = Number(v('retMin')), sig = v('sig');
+  var out = document.getElementById('result');
+  var items = [], fail = false, wait = false;
+
+  // 1. 方向
+  var dir = null;
+  if (d1 !== 'none' && d1 === h4) {
+    dir = d1;
+    items.push(li('ok', '4時間足と1時間足がそろって' + (dir === 'up' ? '上昇' : '下降') + '(' + (dir === 'up' ? '押し目買い' : '戻り売り') + 'の候補)'));
+  } else {
+    fail = true;
+    items.push(li('ng', '4時間足と1時間足の向きがそろっていません'));
+  }
+
+  // 2. ADX
+  if (adxD >= adxMin && adxH >= adxMin) {
+    items.push(li('ok', 'ADXが基準(' + adxMin + ')以上で、トレンドに勢いがあります'));
+  } else {
+    fail = true;
+    items.push(li('ng', 'ADXが基準(' + adxMin + ')未満。レンジの可能性があります'));
+  }
+
+  // 3. 戻り率
+  var ret = null, barHtml = '';
+  if (!hi || !lo || !now || hi <= lo) {
+    wait = true;
+    items.push(li('wait', '15分足の高値・安値・現在値を入れてください(高値は安値より大きく)'));
+  } else {
+    var range = hi - lo;
+    ret = (dir === 'down') ? (now - lo) / range * 100 : (hi - now) / range * 100;
+    var r = Math.round(ret * 10) / 10;
+    if (ret > 100) {
+      fail = true;
+      items.push(li('ng', '戻り率 ' + r + '%。押し目を超えてトレンドが崩れています'));
+    } else if (ret > 78.6) {
+      fail = true;
+      items.push(li('ng', '戻り率 ' + r + '%。深すぎて、トレンドが崩れかけている可能性があります'));
+    } else if (ret >= retMin) {
+      items.push(li('ok', '戻り率 ' + r + '%。押し目ゾーンに入っています'));
+    } else if (ret >= 0) {
+      wait = true;
+      items.push(li('wait', '戻り率 ' + r + '%。まだ浅いので、' + retMin + '%付近まで待つのが目安です'));
+    } else {
+      wait = true;
+      items.push(li('wait', '現在値が高値(安値)を更新中。押してくるのを待ちましょう'));
+    }
+    var pos = Math.max(0, Math.min(100, ret));
+    barHtml = '<div class="bar">'
+      + '<span style="left:' + retMin + '%;width:' + Math.max(0, 78.6 - retMin) + '%;background:rgba(74,222,128,.35);"></span>'
+      + '<span style="left:calc(' + pos + '% - 2px);width:4px;background:#facc15;"></span>'
+      + '</div><div class="note">緑の帯=押し目ゾーン(' + retMin + '〜78.6%)/黄色の線=今の位置</div>';
+  }
+
+  // 4. サイン
+  if (sig) {
+    items.push(li('ok', '反転サイン「' + sig + '」が出ています'));
+  } else {
+    wait = true;
+    items.push(li('wait', '反転サインはまだ。反発・包み足・ピンバーを待ちましょう'));
+  }
+
+  var verdict;
+  if (fail) verdict = '<div class="verdict ng">見送り</div>';
+  else if (wait) verdict = '<div class="verdict wait">監視リストへ(条件待ち)</div>';
+  else verdict = '<div class="verdict ok">条件がそろいました</div><div class="note">損切り位置を決めて、資金管理ページでロットを計算してからエントリーを検討してください。</div>';
+
+  out.innerHTML = verdict + '<ul>' + items.join('') + '</ul>' + barHtml;
+}
+</script>
+</body>
+</html>
