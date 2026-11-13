@@ -42,6 +42,18 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .bar span { position:absolute; top:0; bottom:0; }
 .note { font-size:.82rem; color:#94a3b8; }
 .warnbox { border:1px solid #facc15; background:rgba(250,204,21,.08); color:#fde68a; border-radius:8px; padding:12px; }
+.live-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:8px; }
+.live-time { font-size:.82rem; color:#94a3b8; }
+.live-wrap { overflow-x:auto; }
+.live-wrap table { min-width:560px; }
+.badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:.78rem; font-weight:bold; white-space:nowrap; }
+.b-entry { background:#4ade80; color:#0f172a; }
+.b-zone { background:#38bdf8; color:#0f172a; }
+.b-watch { border:1px solid #facc15; color:#facc15; }
+.up { color:#4ade80; } .down { color:#f87171; }
+.tabs { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.tabs button { width:auto; margin:0; padding:6px 14px; font-size:.85rem; background:#0f172a; color:#cbd5e1; border:1px solid #334155; }
+.tabs button.on { background:#38bdf8; color:#0f172a; border-color:#38bdf8; }
 footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 @media (max-width:560px){ .row3 { grid-template-columns:1fr; } }
 </style>
@@ -69,6 +81,25 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <div><b>1時間足</b>流れの確認</div>
       <div><b>15分足</b>押し目を待つ</div>
     </div>
+  </div>
+
+  <div class="card" id="live">
+    <div class="live-head">
+      <h2>いまの狙い目(15分ごとに自動更新)</h2>
+      <span class="live-time" id="liveTime">読み込み中…</span>
+    </div>
+    <p class="note">28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。</p>
+    <div class="tabs">
+      <button class="on" data-f="pick">狙い目だけ</button>
+      <button data-f="all">対象外も表示</button>
+    </div>
+    <div class="live-wrap">
+      <table>
+        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>戻り率</th><th>サイン</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
+        <tbody id="liveBody"><tr><td colspan="7" class="note">読み込み中…</td></tr></tbody>
+      </table>
+    </div>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -209,6 +240,67 @@ function check(){
 
   out.innerHTML = verdict + '<ul>' + items.join('') + '</ul>' + barHtml;
 }
+// ===== いまの狙い目(自動スキャン結果) =====
+var LIVE_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json';
+var liveData = null, liveFilter = 'pick';
+
+function cell(text, cls){ var td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; return td; }
+function fmtPrice(p){ return p >= 100 ? p.toFixed(2) : p.toFixed(p >= 10 ? 3 : 5); }
+
+function drawLive(){
+  var body = document.getElementById('liveBody');
+  body.innerHTML = '';
+  if (!liveData) return;
+  var rows = liveData.items.filter(function(x){ return liveFilter === 'all' || x.status !== '対象外'; });
+  if (!rows.length) {
+    var tr = document.createElement('tr');
+    var td = cell('いまは条件にそろう銘柄がありません。焦らず待つのもトレードです。', 'note');
+    td.colSpan = 7; tr.appendChild(td); body.appendChild(tr); return;
+  }
+  rows.forEach(function(x){
+    var tr = document.createElement('tr');
+    var st = document.createElement('td');
+    var b = document.createElement('span');
+    b.textContent = x.status;
+    b.className = 'badge ' + ({'エントリー候補':'b-entry','押し目ゾーン':'b-zone','監視':'b-watch'}[x.status] || '');
+    st.appendChild(b);
+    if (x.status === '対象外' && x.reason) { var r = document.createElement('div'); r.className = 'note'; r.textContent = x.reason; st.appendChild(r); }
+    tr.appendChild(st);
+    tr.appendChild(cell(x.name));
+    tr.appendChild(x.dir ? cell(x.dir === 'up' ? '上昇(押し目買い)' : '下降(戻り売り)', x.dir) : cell('-'));
+    tr.appendChild(cell(x.ret == null ? '-' : x.ret < 0 ? (x.dir === 'up' ? '高値更新中' : '安値更新中') : x.ret + '%'));
+    tr.appendChild(cell(x.signal || '-'));
+    tr.appendChild(cell(x.adx4 + ' / ' + x.adx1));
+    tr.appendChild(cell(fmtPrice(x.price)));
+    body.appendChild(tr);
+  });
+}
+
+function loadLive(){
+  fetch(LIVE_URL + '?t=' + Date.now(), { cache: 'no-store' })
+    .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){
+      liveData = d;
+      var age = (Date.now() / 1000 - d.updated_ts) / 60;
+      var t = '最終更新 ' + d.updated + '(日本時間)';
+      if (age > 60) t += ' ― 市場が閉まっているか、更新が止まっています';
+      document.getElementById('liveTime').textContent = t;
+      drawLive();
+    })
+    .catch(function(){
+      document.getElementById('liveTime').textContent = 'スキャン結果を読み込めませんでした';
+      document.getElementById('liveBody').innerHTML = '<tr><td colspan="7" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
+    });
+}
+
+document.querySelectorAll('.tabs button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tabs button').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on'); liveFilter = btn.getAttribute('data-f'); drawLive();
+  });
+});
+loadLive();
+setInterval(loadLive, 5 * 60 * 1000);
 </script>
 </body>
 </html>
