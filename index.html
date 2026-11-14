@@ -11,6 +11,7 @@ gtag('config', 'G-3M6WC991MG');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ヌルヌルFX</title>
+<link rel="icon" href="ojisan.svg" type="image/svg+xml">
 <style>
 :root {
   --bg: #0f172a;
@@ -43,7 +44,9 @@ header > h1, header > p {
   position:relative; z-index:1;
   text-shadow:0 2px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
 }
-header h1 { margin:0; font-size:2.6rem; letter-spacing:.06em; }
+header h1 { margin:0; font-size:2.6rem; letter-spacing:.06em; display:flex; align-items:center; justify-content:center; gap:14px; }
+header h1 .oji { width:96px; height:96px; flex:none; border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,.5); }
+@media (max-width:480px){ header h1 { font-size:2rem; gap:10px; } header h1 .oji { width:72px; height:72px; } }
 header p { margin:10px 0 0; }
 main { max-width:800px; margin:auto; padding:20px 16px; display:flex; flex-direction:column; gap:16px; }
 .card { background:var(--card); border-radius:12px; padding:20px; }
@@ -60,6 +63,10 @@ main { max-width:800px; margin:auto; padding:20px 16px; display:flex; flex-direc
   font-size:.8rem; vertical-align:middle; color:#0f172a; background:#4ade80; font-weight:bold;
 }
 .card.soon { opacity:.75; }
+a.card.link { display:block; color:inherit; text-decoration:none; border:1px solid transparent; transition:background .15s, border-color .15s, transform .15s; }
+a.card.link h2::after { content:" →"; font-size:.9em; opacity:.6; }
+a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:var(--accent); transform:translateY(-2px); outline:none; }
+.gold { color:#facc15; font-weight:bold; text-shadow:0 0 8px rgba(250,204,21,.45); }
 footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16px; }
 </style>
 </head>
@@ -68,15 +75,15 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   <canvas id="flow" aria-hidden="true"></canvas>
   <div class="gloss"></div>
   <div class="veil"></div>
-  <h1>ヌルヌルFX</h1>
+  <h1><img class="oji" src="ojisan-anim.svg" alt="波に乗るヌルヌルおじさん"><span>ヌルヌルFX</span></h1>
   <p>なめらかに、淡々と。トレードの記録と学び</p>
 </header>
 
 <main>
   <div class="card soon"><h2>トレード日記<span class="wip">工事中</span></h2><p>ただいま準備中です。もうしばらくお待ちください。</p></div>
-  <div class="card"><h2><a href="ob.html" style="color:inherit">OB・FVGの考え方</a></h2><p>オーダーブロックとフェアバリューギャップを図解で解説。</p></div>
-  <div class="card"><h2><a href="pullback.html" style="color:inherit">ヌルヌル押し目スキャナー</a><span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる神機能。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></div>
-  <div class="card"><h2><a href="money.html" style="color:inherit">資金管理</a></h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算に対応。</p></div>
+  <a class="card link" href="ob.html"><h2>OB・FVGの考え方</h2><p>オーダーブロックとフェアバリューギャップを図解で解説。</p></a>
+  <a class="card link" href="pullback.html"><h2>ヌルヌル押し目スキャナー<span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる<span class="gold">神機能</span>。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></a>
+  <a class="card link" href="money.html"><h2>資金管理</h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算に対応。</p></a>
 </main>
 
 <footer>※本サイトは個人の記録であり、投資助言ではありません。</footer>

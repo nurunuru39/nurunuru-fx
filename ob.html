@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3M6WC991MG"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-3M6WC991MG');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OB・FVGの考え方 | ヌルヌルFX</title>
+<link rel="icon" href="ojisan.svg" type="image/svg+xml">
+<style>
+body { margin:0; font-family:sans-serif; background:#0f172a; color:#e2e8f0; line-height:1.8; }
+header { padding:28px 20px; text-align:center; background:linear-gradient(120deg,#0b1a33,#1d4ed8,#0b1a33); }
+header a { color:#bae6fd; text-decoration:none; font-size:.9rem; }
+header h1 { margin:6px 0 0; }
+main { max-width:800px; margin:auto; padding:20px 16px; }
+.card { background:#1e293b; border-radius:12px; padding:20px; margin-bottom:16px; }
+.card h2 { color:#38bdf8; margin:0 0 8px; font-size:1.2rem; }
+.card h3 { color:#facc15; margin:16px 0 4px; font-size:1rem; }
+.card p { margin:0 0 8px; }
+svg { display:block; width:100%; max-width:420px; margin:12px auto; background:#0f172a; border-radius:8px; }
+.note { font-size:.85rem; color:#94a3b8; }
+a.inline { color:#38bdf8; }
+.toc { display:flex; flex-wrap:wrap; gap:8px; }
+.toc a { color:#bae6fd; text-decoration:none; font-size:.85rem; padding:4px 12px; border:1px solid #334155; border-radius:999px; }
+.toc a:hover { border-color:#38bdf8; color:#38bdf8; }
+.steps { counter-reset:st; list-style:none; padding:0; margin:8px 0 0; }
+.steps li { counter-increment:st; position:relative; padding-left:40px; margin-bottom:12px; }
+.steps li::before { content:counter(st); position:absolute; left:0; top:2px; width:28px; height:28px; border-radius:50%; background:#38bdf8; color:#0f172a; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+.ng-list { list-style:none; padding:0; margin:8px 0 0; }
+.ng-list li { padding:8px 12px; margin-bottom:8px; border-left:4px solid #f87171; background:#0f172a; border-radius:0 8px 8px 0; }
+.ng-list b { color:#fca5a5; }
+.check { list-style:none; padding:0; margin:8px 0 0; }
+.check li { padding-left:28px; position:relative; margin-bottom:6px; }
+.check li::before { content:"✔"; position:absolute; left:4px; color:#4ade80; font-weight:bold; }
+.warnbox { border:1px solid #facc15; background:rgba(250,204,21,.08); color:#fde68a; border-radius:8px; padding:12px; margin-top:8px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px; }
+.grid2 div { background:#0f172a; border-radius:8px; padding:12px; font-size:.92rem; }
+.grid2 b { color:#facc15; }
+@media (max-width:560px){ .grid2 { grid-template-columns:1fr; } }
+footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html">← ヌルヌルFX トップへ</a>
+  <h1>OB・FVGの考え方</h1>
+</header>
+
+<main>
+  <div class="card">
+    <div class="toc">
+      <a href="#why">なぜできる？</a><a href="#ob">OB</a><a href="#fvg">FVG</a><a href="#combo">組み合わせ</a>
+      <a href="#entry">エントリーと損切り</a><a href="#ng">ダマシに注意</a><a href="#scanner">スキャナーと使う</a><a href="#origin">由来</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>そもそも何を見ているの?</h2>
+    <p>相場が一気に動いた場所には、大口の注文が残っていたり、取引が薄いまま通り過ぎた「すき間」ができたりします。OBとFVGは、その痕跡をチャート上で見つけるための考え方です。</p>
+  </div>
+
+  <div class="card" id="why">
+    <h2>なぜOBやFVGができるの？</h2>
+    <p>銀行やファンドのような大口は、一度に何百億円分もの注文を出します。そのまま1回で出すと値段が大きく飛んでしまうので、注文を小分けにして少しずつ入れていきます。</p>
+    <p>すると、全部の注文が入り切る前に相場が走り出してしまうことがあります。<b>入り切らなかった注文が残っている場所</b>がOBです。大口は残りの注文を同じ値段で入れたいので、価格がそこまで戻ってくると、また買い(売り)が入って反発しやすくなります。</p>
+    <p>一方、FVGは大口の注文で一気に値段が動き、<b>売り買いがほとんど成立しないまま通り過ぎた価格帯</b>です。取引が薄い「すき間」なので、あとで価格が戻ってきて埋めにいくことがよくあります。</p>
+    <p class="note">※大口の注文の中身は外からは見えません。OB・FVGは「そう考えると値動きを説明しやすい」という見方の一つです。</p>
+  </div>
+
+  <div class="card" id="ob">
+    <h2>OB(オーダーブロック)</h2>
+    <p>強く上がる直前にある「最後の陰線」、または強く下がる直前にある「最後の陽線」のこと。大口が注文を入れた場所と考えられ、価格が戻ってきたときに反発しやすいゾーンとして見ます。</p>
+    <svg viewBox="0 0 400 200" role="img" aria-label="上昇オーダーブロックの図">
+      <rect x="40" y="110" width="250" height="35" fill="#38bdf8" opacity="0.18"/>
+      <text x="300" y="132" fill="#38bdf8" font-size="13">OBゾーン</text>
+      <line x1="60" y1="70" x2="60" y2="120" stroke="#ef4444" stroke-width="2"/><rect x="52" y="80" width="16" height="30" fill="#ef4444"/>
+      <line x1="95" y1="90" x2="95" y2="150" stroke="#ef4444" stroke-width="2"/><rect x="87" y="110" width="16" height="35" fill="#ef4444"/>
+      <line x1="130" y1="40" x2="130" y2="148" stroke="#22c55e" stroke-width="2"/><rect x="122" y="50" width="16" height="92" fill="#22c55e"/>
+      <line x1="165" y1="20" x2="165" y2="60" stroke="#22c55e" stroke-width="2"/><rect x="157" y="25" width="16" height="30" fill="#22c55e"/>
+      <line x1="200" y1="30" x2="200" y2="80" stroke="#ef4444" stroke-width="2"/><rect x="192" y="35" width="16" height="40" fill="#ef4444"/>
+      <line x1="235" y1="70" x2="235" y2="125" stroke="#ef4444" stroke-width="2"/><rect x="227" y="75" width="16" height="40" fill="#ef4444"/>
+      <line x1="270" y1="60" x2="270" y2="118" stroke="#22c55e" stroke-width="2"/><rect x="262" y="70" width="16" height="42" fill="#22c55e"/>
+      <text x="70" y="180" fill="#e2e8f0" font-size="12">最後の陰線</text>
+      <text x="215" y="180" fill="#e2e8f0" font-size="12">戻って反発</text>
+    </svg>
+    <h3>見つけ方のポイント</h3>
+    <p>・そのあとの値動きが「勢いよく」伸びているか<br>・直近の高値や安値をブレイクしているか<br>・まだ一度も価格が戻っていない、手つかずのゾーンか</p>
+    <h3>ゾーンの引き方</h3>
+    <p>基本は「最後の陰線の高値から安値まで」を1つのゾーンにします。ゾーンが広すぎると損切りが遠くなるので、実体部分(始値〜終値)だけで引く人もいます。</p>
+  </div>
+
+  <div class="card" id="fvg">
+    <h2>FVG(フェアバリューギャップ)</h2>
+    <p>ローソク足3本で見るすき間のこと。上昇なら「1本目の高値」と「3本目の安値」が重なっていない部分です。急に動いて取引が薄いまま通り過ぎた場所なので、あとで価格が埋めにくることがよくあります。</p>
+    <svg viewBox="0 0 400 200" role="img" aria-label="上昇フェアバリューギャップの図">
+      <rect x="60" y="95" width="230" height="35" fill="#facc15" opacity="0.18"/>
+      <text x="300" y="117" fill="#facc15" font-size="13">FVG</text>
+      <line x1="100" y1="130" x2="100" y2="185" stroke="#22c55e" stroke-width="2"/><rect x="92" y="140" width="16" height="35" fill="#22c55e"/>
+      <line x1="160" y1="45" x2="160" y2="170" stroke="#22c55e" stroke-width="2"/><rect x="152" y="55" width="16" height="105" fill="#22c55e"/>
+      <line x1="220" y1="20" x2="220" y2="95" stroke="#22c55e" stroke-width="2"/><rect x="212" y="30" width="16" height="45" fill="#22c55e"/>
+      <text x="80" y="198" fill="#e2e8f0" font-size="11">1本目の高値</text>
+      <text x="200" y="14" fill="#e2e8f0" font-size="11">3本目の安値</text>
+    </svg>
+    <h3>見つけ方のポイント</h3>
+    <p>・真ん中の2本目が大きく伸びているか<br>・1本目と3本目のヒゲがかぶっていないか<br>・まだ埋められていないギャップか</p>
+    <h3>埋め方にも2種類</h3>
+    <p>FVGの途中(半分くらい)まで戻って反発することもあれば、全部埋めてから反発することもあります。FVGをまるごと下に抜けて終値が確定したら、そのFVGは役目を終えたと考えます。</p>
+  </div>
+
+  <div class="card" id="combo">
+    <h2>OBとFVGを組み合わせる</h2>
+    <p>OBとFVGが重なっているゾーンは、注目する人が多く根拠が重なる場所です。強いOBのすぐ上にFVGができていることはよくあり、「FVGを埋めながらOBまで戻る」動きがよく見られます。</p>
+    <p>ただし「ゾーンに来たら必ず反発する」わけではありません。上位足の流れに沿っているかを確認し、ゾーンを抜けたら素直に損切りすることが大切です。</p>
+  </div>
+
+  <div class="card" id="entry">
+    <h2>エントリーと損切り・利確の置き方(買いの例)</h2>
+    <svg viewBox="0 0 400 230" role="img" aria-label="エントリー、損切り、利確の位置の図">
+      <rect x="30" y="140" width="340" height="30" fill="#38bdf8" opacity="0.18"/>
+      <text x="36" y="166" fill="#38bdf8" font-size="12">OB+FVGゾーン</text>
+      <line x1="30" y1="40" x2="370" y2="40" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="290" y="34" fill="#4ade80" font-size="12">利確(前の高値)</text>
+      <line x1="30" y1="150" x2="370" y2="150" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="300" y="146" fill="#e2e8f0" font-size="12">エントリー</text>
+      <line x1="30" y1="185" x2="370" y2="185" stroke="#f87171" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="300" y="200" fill="#f87171" font-size="12">損切り</text>
+      <polyline points="40,120 80,60 110,45 140,70 170,105 200,135 225,160 245,150 270,120 300,85 330,55 355,42" fill="none" stroke="#facc15" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="245" cy="150" r="6" fill="none" stroke="#e2e8f0" stroke-width="2"/>
+      <text x="196" y="222" fill="#94a3b8" font-size="11">ゾーンで止まって反転サイン</text>
+    </svg>
+    <ol class="steps">
+      <li><b>上位足で流れを確認</b><br>4時間足・1時間足が上向きか。流れに逆らうゾーンは使いません。</li>
+      <li><b>ゾーンを引いて待つ</b><br>手つかずのOB・FVGに線を引き、価格が戻ってくるまで待ちます。追いかけないのがコツです。</li>
+      <li><b>ゾーンで反転サインを確認</b><br>ゾーンにタッチしただけで入らず、下の時間足(5分・15分)で反発・包み足・ピンバーなどが出てから入ります。</li>
+      <li><b>損切りはゾーンの外</b><br>OBの安値の少し下に置きます。ゾーンを抜けたら「考えが外れた」と割り切って切ります。</li>
+      <li><b>利確は直近の高値</b><br>前の高値か、リスクリワード1:2以上を目安にします。損切り幅が決まったら<a class="inline" href="money.html">資金管理のページ</a>でロットを計算しましょう。</li>
+    </ol>
+    <p class="note">売りの場合は上下をすべて逆にして考えます。</p>
+  </div>
+
+  <div class="card" id="ng">
+    <h2>ダマシになりやすいパターン・使わないほうがいい場面</h2>
+    <ul class="ng-list">
+      <li><b>上位足の流れに逆らっている</b><br>4時間足が下向きなのに、15分足のOBで買うと負けやすくなります。</li>
+      <li><b>何度もタッチされたゾーン</b><br>残っていた注文はタッチのたびに使われていきます。2回目、3回目と回数が増えるほど抜けやすくなります。</li>
+      <li><b>重要な指標・ニュースの前後</b><br>雇用統計や政策金利の発表前後は、ゾーンを無視して一気に動くことがあります。</li>
+      <li><b>はっきりしたレンジ相場</b><br>流れがない相場では、あちこちにOB・FVGらしきものができて意味が薄くなります。</li>
+      <li><b>ゾーンが広すぎる</b><br>損切りが遠くなり、リスクリワードが悪くなります。下の時間足でゾーンを絞るか、見送りましょう。</li>
+      <li><b>小さすぎる時間足だけで判断</b><br>1分足のFVGなどは数が多く、ほとんどがすぐ埋まって終わります。</li>
+    </ul>
+  </div>
+
+  <div class="card" id="scanner">
+    <h2>ヌルヌル押し目スキャナーと組み合わせる</h2>
+    <p><a class="inline" href="pullback.html">ヌルヌル押し目スキャナー</a>は「流れがそろっていて、いま押している通貨」を見つけてくれます。そこにOB・FVGを重ねると、どこで待てばいいかがはっきりします。</p>
+    <div class="grid2">
+      <div><b>① スキャナーで探す</b><br>「押し目ゾーン」や「エントリー候補」になった通貨をチェック。</div>
+      <div><b>② 15分足でゾーンを引く</b><br>戻り率50〜78.6%の間に、OBやFVGがあるか探します。</div>
+      <div><b>③ 重なりを待つ</b><br>押し目ゾーンとOB・FVGが重なる場所は、根拠が多い狙い目です。</div>
+      <div><b>④ サインで入る</b><br>反転サインが出たら、損切りをゾーンの外に置いてエントリーを検討。</div>
+    </div>
+  </div>
+
+  <div class="card" id="origin">
+    <h2>この考え方はどこから来たの？</h2>
+    <p>OBやFVGという呼び方を広めたのは、「ICT(Inner Circle Trader)」という名前で活動するアメリカのトレーダー、マイケル・J・ハドルストン氏として知られています。YouTubeやSNSでの解説が人気になり、世界中の個人トレーダーに広まりました。</p>
+    <p>ただ、本人の実際の取引成績は公開されておらず、「この手法で大金持ちになった」という話の多くは確かめようがありません。考え方は便利な道具の一つとして使い、うまい話や高額な教材には気をつけましょう。</p>
+    <div class="warnbox">どんな手法でも負けるときは負けます。大切なのは、1回の損失を小さく抑えて続けることです。</div>
+  </div>
+
+  <div class="card">
+    <h2>エントリー前のチェックリスト</h2>
+    <ul class="check">
+      <li>上位足(4時間足・1時間足)の流れに沿っている</li>
+      <li>まだ一度も戻っていない、手つかずのゾーン</li>
+      <li>ゾーンで反転サインが出た</li>
+      <li>損切りをゾーンの外に置いた</li>
+      <li>リスクリワードが1:2以上ある</li>
+      <li>大きな指標発表の直前ではない</li>
+      <li>資金管理ページでロットを計算した</li>
+    </ul>
+  </div>
+</main>
+
+<footer>※本サイトは個人の記録であり、投資助言ではありません。</footer>
+</body>
+</html>

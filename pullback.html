@@ -11,6 +11,7 @@ gtag('config', 'G-3M6WC991MG');
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ヌルヌル押し目スキャナー | ヌルヌルFX</title>
+<link rel="icon" href="ojisan.svg" type="image/svg+xml">
 <style>
 body { margin:0; font-family:sans-serif; background:#0f172a; color:#e2e8f0; line-height:1.7; }
 header { padding:28px 20px; text-align:center; background:linear-gradient(120deg,#0b1a33,#1d4ed8,#0b1a33); }
@@ -43,6 +44,9 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .note { font-size:.82rem; color:#94a3b8; }
 .warnbox { border:1px solid #facc15; background:rgba(250,204,21,.08); color:#fde68a; border-radius:8px; padding:12px; }
 .live-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:8px; }
+.scan-title { line-height:1.35; }
+.scan-name { font-size:1.75rem; letter-spacing:.04em; color:#7dd3fc; }
+@media (max-width:560px){ .scan-name { font-size:1.4rem; } }
 .live-time { font-size:.82rem; color:#94a3b8; }
 .live-wrap { overflow-x:auto; }
 .live-wrap table { min-width:560px; }
@@ -90,7 +94,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 
   <div class="card" id="live">
     <div class="live-head">
-      <h2>ヌルヌル押し目スキャナー 今の狙い目</h2>
+      <h2 class="scan-title"><span class="scan-name">ヌルヌル押し目スキャナー</span><br>今の狙い目</h2>
       <span class="live-time" id="liveTime">読み込み中…</span>
     </div>
     <p class="note">15分ごとに自動更新。28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。<b>エントリー候補</b>が出ると、その行がチカチカ光ります。</p>
