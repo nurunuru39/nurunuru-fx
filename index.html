@@ -20,7 +20,7 @@ gtag('config', 'G-3M6WC991MG');
   --accent: #38bdf8;
   --muted: #94a3b8;
   --on-grad: #0b3a5e;
-  --shade: rgba(255,255,255,0.75);
+  --shade: rgba(255,255,255,0.55);
   color-scheme: dark;
 }
 body { margin:0; font-family:sans-serif; background:var(--bg); color:var(--fg); }
@@ -28,16 +28,16 @@ header {
   position:relative; overflow:hidden; min-height:150px;
   display:flex; flex-direction:column; justify-content:center;
   padding:28px 20px; text-align:center; color:var(--on-grad);
-  background:linear-gradient(180deg,#f0f9ff,#d6f0fd);
+  background:linear-gradient(180deg,#d5ebf8,#b4dcf3);
 }
 header .gloss {
   position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(115deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 35%, transparent 55%, rgba(255,255,255,0.2) 80%, transparent 100%);
+  background:linear-gradient(115deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 35%, transparent 55%, rgba(255,255,255,0.1) 80%, transparent 100%);
 }
 #flow { position:absolute; inset:0; width:100%; height:100%; display:block; }
 header .veil {
   position:absolute; inset:0;
-  background:radial-gradient(ellipse 60% 75% at center, var(--shade) 0%, rgba(255,255,255,0.25) 55%, rgba(255,255,255,0) 100%);
+  background:radial-gradient(ellipse 60% 75% at center, var(--shade) 0%, rgba(255,255,255,0.15) 55%, rgba(255,255,255,0) 100%);
   pointer-events:none;
 }
 header > h1, header > p {
@@ -118,15 +118,15 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
 
   // 白と水色だけの明るい色
   const stops = [
-    [0.00, [255, 255, 255]],
-    [0.30, [214, 240, 253]],
-    [0.50, [165, 220, 250]],
-    [0.62, [240, 250, 255]],
-    [0.72, [186, 230, 253]],
-    [0.80, [125, 205, 245]],
-    [0.88, [224, 244, 255]],
-    [0.95, [150, 225, 250]],
-    [1.00, [255, 255, 255]]
+    [0.00, [222, 238, 249]],
+    [0.30, [180, 215, 240]],
+    [0.50, [132, 190, 233]],
+    [0.62, [205, 228, 245]],
+    [0.72, [156, 205, 238]],
+    [0.80, [102, 170, 222]],
+    [0.88, [190, 222, 243]],
+    [0.95, [125, 195, 233]],
+    [1.00, [222, 238, 249]]
   ];
   function color(t) {
     t = t - Math.floor(t);
@@ -159,7 +159,7 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
         const v = fbm(nx + wx * 2.2, ny + wy * 1.6 - t * 3.0);
         const scale = 0.5 + 0.5 * Math.sin(x * 0.9 + y * 0.55 + v * 18 + t * 20);
         const [r, g, b] = color(v * 1.7 + wx * 0.4);
-        const s = 0.9 + 0.1 * scale;
+        const s = 0.86 + 0.1 * scale;
         const a = 255 - (1 - scale) * 30;
         d[p++] = r * s; d[p++] = g * s; d[p++] = b * s; d[p++] = a;
       }
@@ -173,7 +173,7 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
     const seams = [0.18, 0.43, 0.71, 0.9];
     ctx.fillStyle = 'rgba(56,189,248,0.22)';
     for (const sx of seams) ctx.fillRect(sx * cw, 0, Math.max(2, cw * 0.006), ch);
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.fillRect(0, ch * 0.08, cw, Math.max(1, ch * 0.004));
     ctx.fillRect(0, ch * 0.9, cw, Math.max(1, ch * 0.004));
     drawBubbles(time, cw, ch);
