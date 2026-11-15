@@ -9,6 +9,12 @@
   4. 直前に確定した15分足に反転サイン(反発・包み足・ピンバー)
 
 結果は scan.json に書き出し、ワークフローが data ブランチに置く。
+
+あわせて、money.html のタートルズ方式ロット計算で使う ATR も scan.json の "atr" に入れる:
+  d1    日足ATR(20)(確定した日足だけで計算)
+  h1    1時間足ATR(20)(確定した1時間足だけで計算)
+  today 今日の値動き(今日の日足の真の値幅)
+  ratio today ÷ d1(1.5を超えたら「荒れている」注意)
 """
 import json
 import math
@@ -22,6 +28,7 @@ ADX_MIN = 20          # ADXの基準
 RET_MIN = 50.0        # 押し目ゾーンの下限(%)
 RET_MAX = 78.6        # 押し目ゾーンの上限(%)
 SWING_BARS = 48       # 押し目を測る15分足の本数(48本=12時間)
+ATR_N = 20            # タートルズのN(ATR)の期間
 
 PAIRS = [
     "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD",
@@ -55,6 +62,39 @@ def adx(df, n=14):
     mdi = 100 * minus_dm.ewm(alpha=a, adjust=False).mean() / atr
     dx = 100 * (pdi - mdi).abs() / (pdi + mdi).replace(0, float("nan"))
     return dx.ewm(alpha=a, adjust=False).mean()
+
+
+def atr(df, n=ATR_N):
+    """ATR(真の値幅の平均)。タートルズと同じく N = (前のN × 19 + 今日の値幅) ÷ 20 の平滑化"""
+    h, l, c = df["High"], df["Low"], df["Close"]
+    tr = pd.concat([h - l, (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(axis=1)
+    return tr.ewm(alpha=1.0 / n, adjust=False).mean(), tr
+
+
+def sig5(x):
+    """有効数字5けたに丸める(銘柄ごとに桁がちがうため)"""
+    return float(f"{x:.5g}")
+
+
+def atr_info(dd, d1h):
+    """日足・1時間足のATRと、今日の値動き。足りなければ None"""
+    dd = dd[["Open", "High", "Low", "Close"]].dropna()
+    d1h = d1h[["Open", "High", "Low", "Close"]].dropna()
+    if len(dd) < ATR_N + 2 or len(d1h) < ATR_N + 2:
+        return None
+    a_d, tr_d = atr(dd)
+    a_h, _ = atr(d1h)
+    d1 = float(a_d.iloc[-2])      # 最後の日足は今日(作成中)なので、その前日までの確定値
+    h1 = float(a_h.iloc[-2])      # 最後の1時間足も作成中のことがあるので除く
+    today = float(tr_d.iloc[-1])
+    if not (d1 > 0 and h1 > 0) or math.isnan(today):
+        return None
+    return {
+        "d1": sig5(d1), "h1": sig5(h1), "today": sig5(today),
+        "ratio": round(today / d1, 2),
+        "close": sig5(float(dd["Close"].iloc[-1])),
+        "day": dd.index[-1].strftime("%Y-%m-%d"),
+    }
 
 
 def trend(df):
@@ -165,12 +205,18 @@ def fetch():
     kw = dict(group_by="ticker", progress=False, auto_adjust=True, threads=True)
     h1 = yf.download(tickers, period="60d", interval="1h", **kw)
     m15 = yf.download(tickers, period="5d", interval="15m", **kw)
-    return h1, m15
+    try:
+        d1 = yf.download(tickers, period="6mo", interval="1d", **kw)
+    except Exception as e:  # 日足が取れなくても押し目スキャンは続ける
+        print("daily error:", e, file=sys.stderr)
+        d1 = None
+    return h1, m15, d1
 
 
 def main(out="scan.json"):
-    h1, m15 = fetch()
+    h1, m15, d1 = fetch()
     items, errors = [], []
+    atrs = {}
     for name, tk in SYMBOLS.items():
         try:
             r = analyze(name, h1[tk], m15[tk])
@@ -181,6 +227,13 @@ def main(out="scan.json"):
         except Exception as e:  # 1銘柄の失敗で全体を止めない
             errors.append(name)
             print(name, "error:", e, file=sys.stderr)
+        try:
+            if d1 is not None:
+                a = atr_info(d1[tk], h1[tk])
+                if a:
+                    atrs[name] = a
+        except Exception as e:
+            print(name, "atr error:", e, file=sys.stderr)
     order = {"エントリー候補": 0, "押し目ゾーン": 1, "監視": 2, "対象外": 3}
     items.sort(key=lambda x: (order[x["status"]], -(x["adx4"] or 0)))
     data = {
@@ -188,10 +241,11 @@ def main(out="scan.json"):
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
         "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX},
         "items": items, "errors": errors,
+        "atr_n": ATR_N, "atr": atrs,
     }
     with open(out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
-    print(f"ok: {len(items)}銘柄 / 取得失敗 {len(errors)}")
+    print(f"ok: {len(items)}銘柄 / 取得失敗 {len(errors)} / ATR {len(atrs)}銘柄")
     if not items:
         sys.exit(1)
 

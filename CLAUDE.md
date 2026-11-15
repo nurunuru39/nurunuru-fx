@@ -16,17 +16,17 @@ FXのトレードの記録と学びをまとめた静的サイト。キャッチ
 | `ob.html` | OB(オーダーブロック)・FVG(フェアバリューギャップ)の図解つき解説 |
 | `ob.htm` | `ob.html` の古い版。どこからもリンクされていない |
 | `pullback.html` | ヌルヌル押し目スキャナー。考え方の説明と、スキャン結果の表示(`#live` のカード) |
-| `money.html` | 資金管理の考え方、ロット計算ツール、バルサラの破産確率(計算ツール+勝率×リスクリワードの色分け早見表) |
+| `money.html` | 資金管理の考え方、ロット計算ツール、タートルズのうんちく+タートルズ方式のロット計算(`scan.json` の ATR を自動入力)、バルサラの破産確率(計算ツール+勝率×リスクリワードの色分け早見表) |
 | `ojisan.svg` | ヌルヌルおじさんのイラスト(ファビコン) |
 | `ojisan-anim.svg` | ヌルヌルおじさんのアニメ版(トップの見出しに表示) |
-| `scan.py` | 押し目スキャナー本体(Python, yfinance + pandas) |
+| `scan.py` | 押し目スキャナー本体(Python, yfinance + pandas)。各銘柄の日足ATR(20)・1時間足ATR(20)・今日の値動きも `scan.json` の `atr` に入れる |
 | `.github/workflows/scan.yml` | `scan.py` を15分ごとに自動実行する GitHub Actions |
 
 ## しくみ
 
 - サイトは Netlify で公開。`main` を更新すると公開ページに反映される。
 - スキャン結果は GitHub Actions が `data` ブランチの `scan.json` に置く(`main` は変わらない)。
-- `pullback.html` は `https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json` を読みこんで表示する。
+- `pullback.html` は `https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json` を読みこんで表示する。`money.html` のタートルズ方式ロット計算も同じファイルの `atr` を読む。
 - スキャンの判定ルールは `scan.py` と `pullback.html` の「判定の流れ」で同じ内容にそろえる。片方を変えたら、もう片方も直す。
 
 ## デザインのきまり

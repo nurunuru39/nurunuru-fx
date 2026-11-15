@@ -36,6 +36,14 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 table { width:100%; border-collapse:collapse; font-size:.9rem; margin-top:8px; }
 th, td { border-bottom:1px solid #334155; padding:8px 6px; text-align:left; }
 th { color:#94a3b8; font-weight:normal; }
+/* タートルズ */
+.card h3 { color:#7dd3fc; font-size:1rem; margin:18px 0 4px; }
+.card ul { margin:6px 0; padding-left:1.3em; }
+.example { margin-top:8px; padding:10px 12px; border-radius:8px; background:#0f172a; border-left:3px solid #38bdf8; font-size:.92rem; }
+.alert { margin-top:12px; padding:12px 14px; border-radius:8px; background:#431407; border:1px solid #fb923c; color:#fed7aa; font-size:.95rem; }
+.alert b { color:#fdba74; }
+.calm { margin-top:12px; padding:10px 14px; border-radius:8px; background:#0f172a; color:#94a3b8; font-size:.9rem; }
+.nline { font-size:.85rem; color:#94a3b8; }
 /* バルサラの破産確率 */
 .ror-wrap { overflow-x:auto; margin-top:8px; -webkit-overflow-scrolling:touch; }
 table.ror { min-width:520px; text-align:center; font-variant-numeric:tabular-nums; }
@@ -139,6 +147,73 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <p class="hint">ゴールドの「pips」の数え方は業者によって違うので、このツールでは損切り幅を「価格差(ドル)」で入れます。</p>
 </div>
 
+<div class="card" id="turtle-story">
+<h2>タートルズのお話(資金管理のうんちく)</h2>
+<p>1983年、アメリカの大物トレーダー<b>リチャード・デニス</b>と、仲間の<b>ウィリアム・エックハート</b>が、ひとつの賭けをしました。テーマは「トレードは、教えれば誰でもできるようになるのか?」です。</p>
+<ul>
+<li>デニス:「ルールを教えれば、誰でも勝てるトレーダーに育てられる」</li>
+<li>エックハート:「いや、トレードは生まれつきの才能だ。教えてもムリ」</li>
+</ul>
+<p>デニスはシンガポールでカメ(タートル)の養殖場を見て、「カメを育てるように、トレーダーも育てられる」と思ったそうです。そこから、育てられた人たちは<b>「タートルズ」</b>と呼ばれるようになりました。</p>
+<p>新聞に「トレーダー募集」の広告を出すと、1,000人をこえる応募が来ました。選ばれたのは、職業も年齢もばらばらで、トレードの経験がほとんどない人もふくむ20人ほど。たった2週間ほどルールを教わっただけで、本物のお金をまかされました。</p>
+<p>結果、タートルズは数年で合計1億ドル以上の利益を出したと言われています。賭けはデニスの勝ち。ただ、同じルールを教わっても、ルールどおりに淡々と続けられた人ほど成績がよかったそうです。手法そのものより、<b>「ロットの決め方」と「ルールを守ること」</b>が大事だったんですね。</p>
+
+<h3>N(エヌ)でロットを決める</h3>
+<p>タートルズは、その銘柄が「1日にだいたいどれくらい動くか」を<b>N</b>と呼びました。中身はATR(真の値幅の平均)で、ふつうは過去20日分で計算します。</p>
+<ul>
+<li><b>1Nで資金の1%</b>:価格が1N動いたときの損益が、ちょうど資金の1%になるロットを「1ユニット」にします。</li>
+<li>よく動く銘柄はロットが小さく、静かな銘柄はロットが大きくなります。だから、<b>どの銘柄でもリスクがそろう</b>んです。</li>
+<li><b>損切りは2N</b>:エントリーから2N逆に動いたら損切り。1ユニットなら、損失は資金の約2%です。</li>
+</ul>
+<div class="example">例:資金100万円、ドル円のNが1.00円(100pips)のとき<br>
+1Nで資金の1% = 1万円 → 1万円 ÷(100pips × 1ロットの1pips価値1,000円)= <b>0.1ロット</b><br>
+損切りは2N = 200pips先。そこまで行くと損失は約2万円(資金の2%)です。</div>
+
+<h3>資金が10%減ったら、ロットを下げる</h3>
+<p>タートルズには、負けが続いたときのルールもありました。<b>資金が10%減ったら、ロット計算に使う資金を20%小さくする</b>、というものです。</p>
+<div class="example">例:100万円でスタートして、90万円まで減ったら(−10%)<br>
+→ 90万円ではなく、<b>80万円</b>あるものとしてロットを計算する<br>
+さらに減ったら、またそこから同じように小さくしていきます。</div>
+<p>こうすると、調子が悪いときほど自動でブレーキがかかって、大きく負けにくくなります。資金が戻ってきたら、計算に使う資金も元に戻していきます。</p>
+</div>
+
+<div class="card" id="turtle">
+<h2>タートルズ方式のロット計算</h2>
+<p class="hint">銘柄を選ぶと、押し目スキャナーが15分ごとに計算している日足ATR(20)と1時間足ATR(20)が自動で入ります。<b>日足と1時間足のATRの大きいほう</b>をNとして使います(ふだんは日足のほうが大きいので、たいてい日足になります)。</p>
+
+<div class="status" id="tStatus">ATRを読み込み中…</div>
+<button class="small-btn" onclick="loadAtr()">ATRを読み込み直す</button>
+
+<div class="row">
+<label>口座資金(円)<input id="tBalance" type="number" value="1000000"></label>
+<label>1Nのリスク(%)<input id="tRisk" type="number" value="1" step="0.1"></label>
+</div>
+
+<label>銘柄
+<select id="tPair" onchange="tChangePair()"></select>
+</label>
+
+<div class="row">
+<label>日足ATR(20)<input id="tAtrD" type="number" step="any"></label>
+<label>1時間足ATR(20)<input id="tAtrH" type="number" step="any"></label>
+</div>
+<div class="hint" id="tAtrHint">ATRは価格の幅で入ります(ドル円なら 1.25 = 1.25円 = 125pips)。手で書きかえることもできます。</div>
+
+<div class="row">
+<label>今日の値動き<input id="tToday" type="number" step="any"></label>
+<label>いまのレート<input id="tPrice" type="number" step="any"></label>
+</div>
+<div class="hint">「1Nのリスク」は、価格が1N動いたときに失ってもいい資金の%(タートルズは1%)。「今日の値動き」は今日の高値〜安値の幅(前日の終値からの窓も含む)です。</div>
+
+<label id="tUsdjpyBox" style="display:none">ドル円レート<input id="tUsdjpy" type="number" value="155" step="0.01">
+<span class="hint">円以外で決済される銘柄は、損失を円に直すために使います。</span></label>
+
+<label id="tOzBox" style="display:none">ゴールド1ロットのオンス数<input id="tOz" type="number" value="100"></label>
+
+<button onclick="calcTurtle()">計算する</button>
+<div class="result" id="tResult">銘柄を選んで「計算する」を押してください。</div>
+</div>
+
 <div class="card" id="ror">
 <h2>バルサラの破産確率</h2>
 <p>「勝率」「リスクリワード(勝ったときの利益 ÷ 負けたときの損失)」「1回のリスク%」の3つから、資金がなくなってしまう確率の目安を出します。同じ手法でも、1回のリスクを小さくするだけで破産確率はぐっと下がります。</p>
@@ -189,6 +264,7 @@ function loadRates() {
       $('rateStatus').textContent = 'レート取得OK:ドル円 ' + rates.JPY.toFixed(2)
         + '(' + t.toLocaleString('ja-JP') + ' 更新・1日1回更新の参考値)';
       fillRates();
+      if (!(atrData && atrData.USDJPY)) $('tUsdjpy').value = rates.JPY.toFixed(2);
     })
     .catch(function(){
       $('rateStatus').className = 'status ng';
@@ -267,6 +343,145 @@ function calc() {
   if (lots < 0.01) html += '<br><span class="warn">最小ロット(0.01)未満です。損切り幅を狭くするか、取引を見送るのも選択肢です。</span>';
   $('result').innerHTML = html;
 }
+
+// ===== タートルズ方式のロット計算 =====
+const ATR_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json';
+let atrUpdated = '';
+let atrData = null; // scan.json の atr(銘柄 → {d1, h1, today, ratio, close, day})
+$('tPair').innerHTML = $('pair').innerHTML;
+
+function tKind(p) {
+  if (p === 'XAUUSD') return 'gold';
+  if (p.endsWith('JPY')) return 'jpy';
+  if (p === 'USDCHF' || p === 'USDCAD') return 'usdbase';
+  return 'usdquote';
+}
+function tDigits(p) { return p === 'XAUUSD' ? 2 : (p.endsWith('JPY') ? 3 : 5); }
+// 価格の幅 → pips の表示(ゴールドは「ドル」)
+function tWidth(p, d) {
+  if (p === 'XAUUSD') return d.toFixed(2) + 'ドル';
+  const pip = p.endsWith('JPY') ? 0.01 : 0.0001;
+  return (d / pip).toFixed(1) + 'pips';
+}
+function tUsdjpyNow() {
+  if (atrData && atrData.USDJPY) return atrData.USDJPY.close;
+  if (rates && rates.JPY) return rates.JPY;
+  return null;
+}
+
+function loadAtr() {
+  $('tStatus').className = 'status';
+  $('tStatus').textContent = 'ATRを読み込み中…';
+  fetch(ATR_URL + '?t=' + Date.now(), { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.atr || !Object.keys(d.atr).length) throw new Error('noatr');
+      atrData = d.atr;
+      atrUpdated = 'ATR取得OK(' + d.updated + ' 日本時間 更新・スキャナーが15分ごとに計算)';
+      $('tStatus').className = 'status ok';
+      $('tStatus').textContent = atrUpdated;
+      tFill();
+    })
+    .catch(function(e){
+      $('tStatus').className = 'status ng';
+      $('tStatus').textContent = e && e.message === 'noatr'
+        ? 'まだATRのデータがありません(スキャナーの次の更新を待ってください)。ATRを手で入れても計算できます。'
+        : 'ATRを読み込めませんでした。ATRを手で入れても計算できます。';
+    });
+}
+
+function tFill() {
+  const p = $('tPair').value;
+  const a = atrData && atrData[p];
+  const dg = tDigits(p);
+  if (a) {
+    $('tAtrD').value = a.d1.toFixed(dg);
+    $('tAtrH').value = a.h1.toFixed(dg);
+    $('tToday').value = a.today.toFixed(dg);
+    $('tPrice').value = a.close.toFixed(dg);
+  } else if (atrData) {
+    $('tAtrD').value = $('tAtrH').value = $('tToday').value = '';
+    $('tStatus').className = 'status ng';
+    $('tStatus').textContent = 'この銘柄のATRがまだありません。手で入れてください。';
+  }
+  const uj = tUsdjpyNow();
+  if (uj) $('tUsdjpy').value = uj.toFixed(2);
+  if (a) calcTurtle(); else $('tResult').textContent = '銘柄を選んで「計算する」を押してください。';
+}
+
+function tChangePair() {
+  const k = tKind($('tPair').value);
+  $('tUsdjpyBox').style.display = k === 'jpy' ? 'none' : 'block';
+  $('tOzBox').style.display = k === 'gold' ? 'block' : 'none';
+  $('tAtrHint').textContent = k === 'gold'
+    ? 'ATRは価格の幅(ドル)で入ります(25.4 = 25.4ドル)。手で書きかえることもできます。'
+    : 'ATRは価格の幅で入ります(' + (k === 'jpy' ? 'ドル円なら 1.25 = 1.25円 = 125pips' : 'ユーロドルなら 0.0080 = 80pips') + ')。手で書きかえることもできます。';
+  if (atrData) {
+    $('tStatus').className = 'status ok';
+    $('tStatus').textContent = atrUpdated;
+  }
+  tFill();
+}
+
+// 1ロットで、価格が d 動いたときの損益(円)
+function tPerLot(p, d) {
+  const k = tKind(p);
+  const uj = Number($('tUsdjpy').value);
+  if (k === 'jpy') return d * 100000;
+  if (!uj) return NaN;
+  if (k === 'gold') return d * Number($('tOz').value) * uj;
+  if (k === 'usdbase') return d * 100000 / Number($('tPrice').value) * uj;
+  return d * 100000 * uj;
+}
+
+function calcTurtle() {
+  const p = $('tPair').value;
+  const balance = Number($('tBalance').value);
+  const risk = Number($('tRisk').value);
+  const ad = Number($('tAtrD').value);
+  const ah = Number($('tAtrH').value);
+  const today = Number($('tToday').value);
+  const price = Number($('tPrice').value);
+  const k = tKind(p);
+  if (!balance || !risk) { $('tResult').textContent = '口座資金と%を入れてください。'; return; }
+  if (!(ad > 0) && !(ah > 0)) { $('tResult').textContent = 'ATRを入れてください。'; return; }
+  if (k !== 'jpy' && !Number($('tUsdjpy').value)) { $('tResult').textContent = 'ドル円レートを入れてください。'; return; }
+  if (k === 'usdbase' && !price) { $('tResult').textContent = 'いまのレートを入れてください。'; return; }
+  if (k === 'gold' && !Number($('tOz').value)) { $('tResult').textContent = 'オンス数を入れてください。'; return; }
+
+  const useD = (ad || 0) >= (ah || 0);
+  const N = useD ? ad : ah;
+  const perLotN = tPerLot(p, N);
+  const loss1N = balance * risk / 100;
+  const lots = Math.floor(loss1N / perLotN * 100) / 100;
+  const dg = tDigits(p);
+
+  let html = '<span class="nline">日足ATR ' + (ad > 0 ? tWidth(p, ad) : '−') + ' / 1時間足ATR ' + (ah > 0 ? tWidth(p, ah) : '−')
+    + ' → 大きいほうの<b>' + (useD ? '日足' : '1時間足') + '</b>を使います</span><br>'
+    + 'N:' + tWidth(p, N) + '(1ロットで1N動くと 約' + Math.round(perLotN).toLocaleString() + '円)<br>'
+    + '1Nで資金の' + risk + '%(' + Math.round(loss1N).toLocaleString() + '円)になるロット:<strong>' + lots.toFixed(2) + 'ロット</strong>';
+  if (k !== 'gold') html += '(' + (lots * 10).toFixed(1) + '万通貨)';
+  html += '<br>損切り幅(2N):<b>' + tWidth(p, N * 2) + '</b>'
+    + '(このロットで損切りになると 約' + Math.round(lots * perLotN * 2).toLocaleString() + '円)';
+  if (price > 0) {
+    html += '<br><span class="nline">いまのレート ' + price.toFixed(dg) + ' から2N:買いなら '
+      + (price - N * 2).toFixed(dg) + '、売りなら ' + (price + N * 2).toFixed(dg) + ' が損切りの目安</span>';
+  }
+  if (lots < 0.01) html += '<br><span class="warn">最小ロット(0.01)未満です。この資金だと、この銘柄はタートルズ方式ではまだ大きすぎます。</span>';
+
+  if (ad > 0 && today > 0) {
+    const ratio = today / ad;
+    if (ratio > 1.5) {
+      html += '<div class="alert">⚠ <b>今日は荒れています</b><br>今日の値動き ' + tWidth(p, today) + ' は、日足ATRの<b>' + ratio.toFixed(1)
+        + '倍</b>です(1.5倍をこえています)。ふだんより大きく動いているので、ロットを減らす・様子を見るなど、いつもより慎重にいきましょう。</div>';
+    } else {
+      html += '<div class="calm">今日の値動き ' + tWidth(p, today) + '(日足ATRの' + ratio.toFixed(1) + '倍)。1.5倍をこえたら「荒れている」注意が出ます。</div>';
+    }
+  }
+  $('tResult').innerHTML = html;
+}
+tChangePair();
+loadAtr();
 
 // ===== バルサラの破産確率 =====
 // 勝ち=+RR、負け=-1(リスク1単位)。p·x^(RR+1) − x + (1−p) = 0 の 0<x<1 の解を求め、
