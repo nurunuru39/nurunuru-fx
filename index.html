@@ -19,8 +19,8 @@ gtag('config', 'G-3M6WC991MG');
   --card: #1e293b;
   --accent: #38bdf8;
   --muted: #94a3b8;
-  --on-grad: #ffffff;
-  --shade: rgba(0,0,0,0.55);
+  --on-grad: #0b3a5e;
+  --shade: rgba(255,255,255,0.75);
   color-scheme: dark;
 }
 body { margin:0; font-family:sans-serif; background:var(--bg); color:var(--fg); }
@@ -28,26 +28,26 @@ header {
   position:relative; overflow:hidden; min-height:150px;
   display:flex; flex-direction:column; justify-content:center;
   padding:28px 20px; text-align:center; color:var(--on-grad);
-  background:linear-gradient(180deg,#0b1a33,var(--bg));
+  background:linear-gradient(180deg,#f0f9ff,#d6f0fd);
 }
 header .gloss {
   position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(115deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 35%, transparent 55%, rgba(255,255,255,0.06) 80%, transparent 100%);
+  background:linear-gradient(115deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 35%, transparent 55%, rgba(255,255,255,0.2) 80%, transparent 100%);
 }
 #flow { position:absolute; inset:0; width:100%; height:100%; display:block; }
 header .veil {
   position:absolute; inset:0;
-  background:radial-gradient(ellipse at center, var(--shade) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.5) 100%);
+  background:radial-gradient(ellipse 60% 75% at center, var(--shade) 0%, rgba(255,255,255,0.25) 55%, rgba(255,255,255,0) 100%);
   pointer-events:none;
 }
 header > h1, header > p {
   position:relative; z-index:1;
-  text-shadow:0 2px 12px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
+  text-shadow:0 0 2px #fff, 0 0 6px #fff, 0 0 14px rgba(255,255,255,0.95), 0 2px 18px rgba(255,255,255,0.9);
 }
-header h1 { margin:0; font-size:2.6rem; letter-spacing:.06em; display:flex; align-items:center; justify-content:center; gap:14px; }
-header h1 .oji { width:96px; height:96px; flex:none; border-radius:20px; box-shadow:0 4px 16px rgba(0,0,0,.5); }
+header h1 { margin:0; font-size:2.6rem; color:#07325a; font-weight:900; letter-spacing:.06em; display:flex; align-items:center; justify-content:center; gap:14px; }
+header h1 .oji { width:96px; height:96px; flex:none; border-radius:20px; box-shadow:0 0 0 3px #fff, 0 0 0 5px #38bdf8, 0 6px 20px rgba(14,90,150,.35); }
 @media (max-width:480px){ header h1 { font-size:2rem; gap:10px; } header h1 .oji { width:72px; height:72px; } }
-header p { margin:10px 0 0; }
+header p { margin:10px 0 0; color:#0c4a6e; font-weight:bold; }
 main { max-width:800px; margin:auto; padding:20px 16px; display:flex; flex-direction:column; gap:16px; }
 .card { background:var(--card); border-radius:12px; padding:20px; }
 .card h2 { color:var(--accent); margin:0 0 8px; }
@@ -116,16 +116,17 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
     return noise(x, y) * 0.6 + noise(x * 2.1, y * 2.1) * 0.3 + noise(x * 4.3, y * 4.3) * 0.1;
   }
 
+  // 白と水色だけの明るい色
   const stops = [
-    [0.00, [4, 14, 40]],
-    [0.30, [15, 60, 150]],
-    [0.50, [40, 140, 240]],
-    [0.62, [210, 230, 40]],
-    [0.72, [235, 120, 20]],
-    [0.80, [210, 30, 25]],
-    [0.88, [20, 70, 170]],
-    [0.95, [60, 220, 240]],
-    [1.00, [5, 20, 50]]
+    [0.00, [255, 255, 255]],
+    [0.30, [214, 240, 253]],
+    [0.50, [165, 220, 250]],
+    [0.62, [240, 250, 255]],
+    [0.72, [186, 230, 253]],
+    [0.80, [125, 205, 245]],
+    [0.88, [224, 244, 255]],
+    [0.95, [150, 225, 250]],
+    [1.00, [255, 255, 255]]
   ];
   function color(t) {
     t = t - Math.floor(t);
@@ -158,9 +159,8 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
         const v = fbm(nx + wx * 2.2, ny + wy * 1.6 - t * 3.0);
         const scale = 0.5 + 0.5 * Math.sin(x * 0.9 + y * 0.55 + v * 18 + t * 20);
         const [r, g, b] = color(v * 1.7 + wx * 0.4);
-        const s = 0.72 + 0.28 * scale;
-        const bluish = Math.max(0, Math.min(1, (b - Math.max(r, g * 0.6)) / 140));
-        const a = 235 - bluish * 175 - (1 - scale) * 25;
+        const s = 0.9 + 0.1 * scale;
+        const a = 255 - (1 - scale) * 30;
         d[p++] = r * s; d[p++] = g * s; d[p++] = b * s; d[p++] = a;
       }
     }
@@ -171,11 +171,73 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
     ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
     const cw = canvas.width, ch = canvas.height;
     const seams = [0.18, 0.43, 0.71, 0.9];
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillStyle = 'rgba(56,189,248,0.22)';
     for (const sx of seams) ctx.fillRect(sx * cw, 0, Math.max(2, cw * 0.006), ch);
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.fillRect(0, ch * 0.08, cw, Math.max(1, ch * 0.004));
     ctx.fillRect(0, ch * 0.9, cw, Math.max(1, ch * 0.004));
+    drawBubbles(time, cw, ch);
+  }
+
+  // ヌルヌルの泡:下からぷくぷく浮かんで、ゆらゆら形を変えながら上ではじける
+  const bubbles = [];
+  function newBubble(cw, ch, anywhere) {
+    const unit = Math.min(cw, ch);
+    const r = unit * (0.03 + Math.random() * 0.07);
+    return {
+      x: Math.random() * cw,
+      y: anywhere ? Math.random() * ch : ch + r + Math.random() * ch * 0.3,
+      r,
+      vy: unit * (0.0012 + Math.random() * 0.0016) * (1.4 - r / unit * 4),
+      sway: unit * (0.02 + Math.random() * 0.05),
+      ph: Math.random() * Math.PI * 2,
+      wob: 1.2 + Math.random() * 1.6
+    };
+  }
+  function drawBubbles(time, cw, ch) {
+    const want = Math.round(10 + cw / Math.max(1, ch) * 6);
+    const first = bubbles.length === 0;
+    while (bubbles.length < want) bubbles.push(newBubble(cw, ch, first));
+    bubbles.length = Math.min(bubbles.length, want);
+    const sec = time / 1000;
+    for (let i = 0; i < bubbles.length; i++) {
+      const b = bubbles[i];
+      if (!reduce) b.y -= b.vy * 33 / 16;
+      const top = b.y / ch;
+      if (b.y < -b.r * 2 || top < 0.04) { bubbles[i] = newBubble(cw, ch, false); continue; }
+      const life = Math.min(1, top * 4);           // 上に来るほどうすくなる
+      const x = b.x + Math.sin(sec * 0.9 + b.ph) * b.sway;
+      const sq = Math.sin(sec * b.wob + b.ph) * 0.12; // ぷにぷに伸び縮み
+      ctx.save();
+      ctx.translate(x, b.y);
+      ctx.rotate(Math.sin(sec * 0.7 + b.ph) * 0.4);
+      ctx.scale(1 + sq, 1 - sq);
+      ctx.beginPath();
+      const n = 24;
+      for (let k = 0; k <= n; k++) {
+        const ang = k / n * Math.PI * 2;
+        const rr = b.r * (1 + 0.06 * Math.sin(ang * 3 + sec * 2.3 + b.ph) + 0.04 * Math.sin(ang * 2 - sec * 1.7));
+        const px = Math.cos(ang) * rr, py = Math.sin(ang) * rr;
+        k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.closePath();
+      const g = ctx.createRadialGradient(-b.r * 0.3, -b.r * 0.35, b.r * 0.05, 0, 0, b.r);
+      g.addColorStop(0, `rgba(255,255,255,${0.75 * life})`);
+      g.addColorStop(0.45, `rgba(224,246,255,${0.25 * life})`);
+      g.addColorStop(0.85, `rgba(125,211,252,${0.28 * life})`);
+      g.addColorStop(1, `rgba(56,189,248,${0.5 * life})`);
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, b.r * 0.06);
+      ctx.strokeStyle = `rgba(255,255,255,${0.8 * life})`;
+      ctx.stroke();
+      // ツヤ
+      ctx.beginPath();
+      ctx.ellipse(-b.r * 0.35, -b.r * 0.42, b.r * 0.28, b.r * 0.14, -0.6, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${0.9 * life})`;
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
