@@ -20,7 +20,7 @@ gtag('config', 'G-3M6WC991MG');
   --accent: #38bdf8;
   --muted: #94a3b8;
   --on-grad: #0b3a5e;
-  --shade: rgba(255,255,255,0.55);
+  --shade: rgba(255,255,255,0.45);
   color-scheme: dark;
 }
 body { margin:0; font-family:sans-serif; background:var(--bg); color:var(--fg); }
@@ -28,7 +28,7 @@ header {
   position:relative; overflow:hidden; min-height:150px;
   display:flex; flex-direction:column; justify-content:center;
   padding:28px 20px; text-align:center; color:var(--on-grad);
-  background:linear-gradient(180deg,#d5ebf8,#b4dcf3);
+  background:linear-gradient(180deg,#b9d9ee,#97c6e6);
 }
 header .gloss {
   position:absolute; inset:0; pointer-events:none;
@@ -118,15 +118,15 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
 
   // 白と水色だけの明るい色
   const stops = [
-    [0.00, [222, 238, 249]],
-    [0.30, [180, 215, 240]],
-    [0.50, [132, 190, 233]],
-    [0.62, [205, 228, 245]],
-    [0.72, [156, 205, 238]],
-    [0.80, [102, 170, 222]],
-    [0.88, [190, 222, 243]],
-    [0.95, [125, 195, 233]],
-    [1.00, [222, 238, 249]]
+    [0.00, [196, 222, 240]],
+    [0.30, [152, 196, 228]],
+    [0.50, [104, 166, 216]],
+    [0.62, [178, 210, 235]],
+    [0.72, [128, 184, 225]],
+    [0.80, [78, 146, 204]],
+    [0.88, [164, 204, 232]],
+    [0.95, [100, 172, 218]],
+    [1.00, [196, 222, 240]]
   ];
   function color(t) {
     t = t - Math.floor(t);
@@ -173,7 +173,7 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
     const seams = [0.18, 0.43, 0.71, 0.9];
     ctx.fillStyle = 'rgba(56,189,248,0.22)';
     for (const sx of seams) ctx.fillRect(sx * cw, 0, Math.max(2, cw * 0.006), ch);
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.fillRect(0, ch * 0.08, cw, Math.max(1, ch * 0.004));
     ctx.fillRect(0, ch * 0.9, cw, Math.max(1, ch * 0.004));
     drawBubbles(time, cw, ch);
