@@ -36,6 +36,24 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 table { width:100%; border-collapse:collapse; font-size:.9rem; margin-top:8px; }
 th, td { border-bottom:1px solid #334155; padding:8px 6px; text-align:left; }
 th { color:#94a3b8; font-weight:normal; }
+/* バルサラの破産確率 */
+.ror-wrap { overflow-x:auto; margin-top:8px; -webkit-overflow-scrolling:touch; }
+table.ror { min-width:520px; text-align:center; font-variant-numeric:tabular-nums; }
+table.ror th, table.ror td { text-align:center; padding:7px 4px; border:1px solid #0f172a; }
+table.ror thead th { color:#e2e8f0; background:#334155; font-size:.8rem; }
+table.ror tbody th { color:#e2e8f0; background:#273449; font-size:.85rem; white-space:nowrap; }
+table.ror td { font-weight:bold; font-size:.85rem; }
+table.ror td.now { outline:3px solid #38bdf8; outline-offset:-3px; }
+.lv0 { background:#0c4a6e; color:#bae6fd; }
+.lv1 { background:#166534; color:#dcfce7; }
+.lv2 { background:#713f12; color:#fef08a; }
+.lv3 { background:#7c2d12; color:#fed7aa; }
+.lv4 { background:#7f1d1d; color:#fecaca; }
+.legend { display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:10px; font-size:.8rem; color:#cbd5e1; }
+.legend span { display:inline-flex; align-items:center; gap:4px; }
+.legend i { display:inline-block; width:14px; height:14px; border-radius:3px; }
+.result strong.safe { color:#4ade80; }
+.result strong.danger { color:#f87171; }
 footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 </style>
 </head>
@@ -119,6 +137,36 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <tr><td>XAU/USD(100オンス)</td><td>1ドル動くと</td><td>100ドル(円に換算)</td></tr>
 </table>
 <p class="hint">ゴールドの「pips」の数え方は業者によって違うので、このツールでは損切り幅を「価格差(ドル)」で入れます。</p>
+</div>
+
+<div class="card" id="ror">
+<h2>バルサラの破産確率</h2>
+<p>「勝率」「リスクリワード(勝ったときの利益 ÷ 負けたときの損失)」「1回のリスク%」の3つから、資金がなくなってしまう確率の目安を出します。同じ手法でも、1回のリスクを小さくするだけで破産確率はぐっと下がります。</p>
+
+<div class="row">
+<label>勝率(%)<input id="rorWin" type="number" value="45" step="1" min="1" max="99"></label>
+<label>リスクリワード<input id="rorRR" type="number" value="1.5" step="0.1" min="0.1"></label>
+</div>
+<div class="row">
+<label>1回のリスク(%)<input id="rorRisk" type="number" value="2" step="0.1" min="0.1"></label>
+<label>破産とみなす損失(%)<input id="rorLine" type="number" value="100" step="1" min="1" max="100"></label>
+</div>
+<div class="hint">「破産とみなす損失」は、口座資金を何%失ったら破産とするか。ふつうは100%(全部なくなる)。「半分減ったら終わり」と考えるなら50%にします。</div>
+
+<button onclick="calcRor()">破産確率を計算する</button>
+<div class="result" id="rorResult">数値を入れて「破産確率を計算する」を押してください。</div>
+
+<h2 style="margin-top:20px">早見表(1回のリスク <span id="rorTblRisk">2</span>%・破産ライン <span id="rorTblLine">100</span>%)</h2>
+<p class="hint">たて=勝率、よこ=リスクリワード。上の「1回のリスク」と「破産とみなす損失」を変えると、表も変わります。水色の枠は、いま入れた条件にいちばん近いマスです。スマホでは表を横にスクロールできます。</p>
+<div class="ror-wrap"><table class="ror" id="rorTable"></table></div>
+<div class="legend">
+<span><i class="lv0"></i>0%(ほぼ破産しない)</span>
+<span><i class="lv1"></i>1%未満</span>
+<span><i class="lv2"></i>1〜10%</span>
+<span><i class="lv3"></i>10〜50%</span>
+<span><i class="lv4"></i>50%以上</span>
+</div>
+<p class="hint">※バルサラの破産確率は「毎回同じ金額をリスクにする」前提の計算です。勝ち負けの順番は運しだいなので、結果は目安として使ってください。期待値(勝率 × リスクリワード − 負ける確率)がマイナスやゼロの組み合わせは、長く続けるといつか必ず破産するので100%になります。</p>
 </div>
 
 </main>
@@ -219,6 +267,98 @@ function calc() {
   if (lots < 0.01) html += '<br><span class="warn">最小ロット(0.01)未満です。損切り幅を狭くするか、取引を見送るのも選択肢です。</span>';
   $('result').innerHTML = html;
 }
+
+// ===== バルサラの破産確率 =====
+// 勝ち=+RR、負け=-1(リスク1単位)。p·x^(RR+1) − x + (1−p) = 0 の 0<x<1 の解を求め、
+// 破産確率 = x ^ (破産ライン% ÷ 1回のリスク%)。
+function ruinProb(p, rr, risk, line) {
+  if (p <= 0) return 1;
+  if (p >= 1) return 0;
+  if (p * rr - (1 - p) <= 0) return 1; // 期待値がプラスでないと、いつか必ず破産
+  const f = function(x){ return p * Math.pow(x, rr + 1) - x + (1 - p); };
+  let lo = 0, hi = Math.pow(1 / (p * (rr + 1)), 1 / rr); // f が一番小さくなる点(ここでは f<0)
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    if (f(mid) > 0) lo = mid; else hi = mid;
+  }
+  const x = (lo + hi) / 2;
+  return Math.min(1, Math.pow(x, line / risk));
+}
+function fmtRor(v) {
+  const pct = v * 100;
+  if (pct >= 99.995) return '100%';
+  if (pct < 0.01) return '0%';
+  if (pct < 1) return pct.toFixed(2) + '%';
+  if (pct < 10) return pct.toFixed(1) + '%';
+  return Math.round(pct) + '%';
+}
+function rorLevel(v) {
+  const pct = v * 100;
+  if (pct < 0.01) return 0;
+  if (pct < 1) return 1;
+  if (pct < 10) return 2;
+  if (pct < 50) return 3;
+  return 4;
+}
+const ROR_WINS = [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75];
+const ROR_RRS = [0.5, 0.8, 1, 1.2, 1.5, 2, 2.5, 3];
+function nearest(list, v) {
+  let best = 0;
+  for (let i = 1; i < list.length; i++) if (Math.abs(list[i] - v) < Math.abs(list[best] - v)) best = i;
+  return list[best];
+}
+function drawRorTable() {
+  const risk = Number($('rorRisk').value);
+  const line = Number($('rorLine').value);
+  if (!(risk > 0) || !(line > 0)) return;
+  const nw = nearest(ROR_WINS, Number($('rorWin').value));
+  const nr = nearest(ROR_RRS, Number($('rorRR').value));
+  $('rorTblRisk').textContent = risk;
+  $('rorTblLine').textContent = line;
+  let h = '<thead><tr><th>勝率↓ RR→</th>';
+  ROR_RRS.forEach(function(r){ h += '<th>1 : ' + r + '</th>'; });
+  h += '</tr></thead><tbody>';
+  ROR_WINS.forEach(function(w){
+    h += '<tr><th>' + w + '%</th>';
+    ROR_RRS.forEach(function(r){
+      const v = ruinProb(w / 100, r, risk, line);
+      h += '<td class="lv' + rorLevel(v) + (w === nw && r === nr ? ' now' : '') + '">' + fmtRor(v) + '</td>';
+    });
+    h += '</tr>';
+  });
+  $('rorTable').innerHTML = h + '</tbody>';
+}
+function calcRor() {
+  const win = Number($('rorWin').value);
+  const rr = Number($('rorRR').value);
+  const risk = Number($('rorRisk').value);
+  const line = Number($('rorLine').value);
+  if (!(win > 0 && win < 100) || !(rr > 0) || !(risk > 0) || !(line > 0 && line <= 100)) {
+    $('rorResult').textContent = '勝率は1〜99%、リスクリワード・1回のリスクは0より大きい数、破産とみなす損失は1〜100%で入れてください。';
+    return;
+  }
+  const v = ruinProb(win / 100, rr, risk, line);
+  const ev = (win / 100) * rr - (1 - win / 100);
+  const lv = rorLevel(v);
+  const cls = lv <= 1 ? 'safe' : (lv >= 3 ? 'danger' : '');
+  const msg = [
+    'ほぼ破産しない、安心できる組み合わせです。',
+    'かなり安全な組み合わせです。',
+    '少し危ないかも。1回のリスクを下げると安全になります。',
+    '危険です。1回のリスクを下げるか、勝率・リスクリワードを見直しましょう。',
+    'とても危険です。このままだと破産する可能性が高いです。'
+  ][lv];
+  let html = '破産確率:<strong class="' + cls + '">' + fmtRor(v) + '</strong><br>'
+    + '1回あたりの期待値:' + (ev >= 0 ? '+' : '') + ev.toFixed(2) + 'R'
+    + '<div class="hint">R=1回のリスク。たとえば+0.20Rなら、1回あたり平均でリスクの0.2倍ずつ増えていく計算です。</div>'
+    + '破産までの連敗のめやす:' + Math.ceil(line / risk) + '連敗<br>'
+    + '<span class="' + (lv >= 2 ? 'warn' : 'hint') + '">' + msg + '</span>';
+  if (ev <= 0) html += '<br><span class="warn">期待値がプラスではないので、続けるといつか必ず破産します。</span>';
+  $('rorResult').innerHTML = html;
+  drawRorTable();
+}
+['rorWin', 'rorRR', 'rorRisk', 'rorLine'].forEach(function(id){ $(id).addEventListener('input', drawRorTable); });
+drawRorTable();
 
 loadRates();
 </script>
