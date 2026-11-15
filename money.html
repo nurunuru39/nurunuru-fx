@@ -44,6 +44,9 @@ th { color:#94a3b8; font-weight:normal; }
 .alert b { color:#fdba74; }
 .calm { margin-top:12px; padding:10px 14px; border-radius:8px; background:#0f172a; color:#94a3b8; font-size:.9rem; }
 .nline { font-size:.85rem; color:#94a3b8; }
+.ror-link { margin-top:12px; padding:12px 14px; border-radius:8px; background:#0f172a; border:1px solid #334155; font-size:.95rem; }
+.ror-link a { color:#7dd3fc; font-size:.85rem; }
+.ror-link .pill { display:inline-block; padding:1px 10px; border-radius:999px; font-weight:bold; font-size:1.1rem; }
 /* バルサラの破産確率 */
 .ror-wrap { overflow-x:auto; margin-top:8px; -webkit-overflow-scrolling:touch; }
 table.ror { min-width:520px; text-align:center; font-variant-numeric:tabular-nums; }
@@ -347,6 +350,7 @@ function calc() {
 // ===== タートルズ方式のロット計算 =====
 const ATR_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json';
 let atrUpdated = '';
+let tDone = false; // タートルズの計算を一度でもしたか
 let atrData = null; // scan.json の atr(銘柄 → {d1, h1, today, ratio, close, day})
 $('tPair').innerHTML = $('pair').innerHTML;
 
@@ -435,6 +439,7 @@ function tPerLot(p, d) {
 }
 
 function calcTurtle() {
+  tDone = true;
   const p = $('tPair').value;
   const balance = Number($('tBalance').value);
   const risk = Number($('tRisk').value);
@@ -468,6 +473,7 @@ function calcTurtle() {
       + (price - N * 2).toFixed(dg) + '、売りなら ' + (price + N * 2).toFixed(dg) + ' が損切りの目安</span>';
   }
   if (lots < 0.01) html += '<br><span class="warn">最小ロット(0.01)未満です。この資金だと、この銘柄はタートルズ方式ではまだ大きすぎます。</span>';
+  else html += tRorHtml(lots * perLotN * 2 / balance * 100);
 
   if (ad > 0 && today > 0) {
     const ratio = today / ad;
@@ -480,6 +486,32 @@ function calcTurtle() {
   }
   $('tResult').innerHTML = html;
 }
+// タートルズの結果 → バルサラの破産確率
+// 2Nで損切りしたときの実際のリスク%を、下の「バルサラの破産確率」の勝率・RR・破産ラインで計算する
+function tRorHtml(riskPct) {
+  const win = Number($('rorWin').value);
+  const rr = Number($('rorRR').value);
+  const line = Number($('rorLine').value);
+  let h = '<div class="ror-link">このロットの1回のリスク(2Nで損切り):<b>資金の約' + riskPct.toFixed(2) + '%</b><br>';
+  if (!(win > 0 && win < 100) || !(rr > 0) || !(line > 0 && line <= 100) || !(riskPct > 0)) {
+    return h + '<span class="nline">下の「バルサラの破産確率」に勝率とリスクリワードを入れると、破産確率も出ます。</span></div>';
+  }
+  const v = ruinProb(win / 100, rr, riskPct, line);
+  const lv = rorLevel(v);
+  h += 'バルサラの破産確率:<span class="pill lv' + lv + '">' + fmtRor(v) + '</span>'
+    + '<br><span class="nline">勝率' + win + '%・リスクリワード1:' + rr + '・破産ライン' + line + '%で計算'
+    + '(<a href="#ror">勝率・リスクリワードを変える ↓</a>)</span>';
+  if ((win / 100) * rr - (1 - win / 100) <= 0) {
+    h += '<br><span class="warn">この勝率とリスクリワードだと期待値がプラスにならないので、ロットを下げても破産確率は下がりません。勝率かリスクリワードを見直しましょう。</span>';
+  } else if (lv >= 2) {
+    h += '<br><span class="warn">破産確率が高めです。「1Nのリスク」を下げると、ロットが小さくなって破産確率も下がります。</span>';
+  }
+  return h + '</div>';
+}
+// バルサラの勝率・RR・破産ラインを変えたら、タートルズの結果も計算し直す
+['rorWin', 'rorRR', 'rorLine'].forEach(function(id){
+  $(id).addEventListener('input', function(){ if (tDone) calcTurtle(); });
+});
 tChangePair();
 loadAtr();
 
