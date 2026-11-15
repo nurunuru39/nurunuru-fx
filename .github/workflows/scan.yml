@@ -30,7 +30,7 @@ jobs:
         run: python scan.py scan.json
 
       # 結果は「data」という別の置き場(ブランチ)に置く。
-      # サイト本体(main)は変わらないので、15分ごとにNetlifyの公開は走らない。
+      # サイト本体(main)は変わらないので、15分ごとにサイト(GitHub Pages)の公開は走らない。
       - name: 結果を data ブランチに置く
         run: |
           mkdir -p /tmp/out && cp scan.json /tmp/out/

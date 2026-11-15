@@ -24,7 +24,10 @@ FXのトレードの記録と学びをまとめた静的サイト。キャッチ
 
 ## しくみ
 
-- サイトは Netlify で公開。`main` を更新すると公開ページに反映される。
+- サイトは GitHub Pages で公開(https://nurunuru39.github.io/nurunuru-fx/)。`main` を更新すると、そのまま公開ページに反映される。
+- 公開回数の制限はないので、直したらそのまま `main` に入れてよい。
+- サイトは `/nurunuru-fx/` フォルダの中にあるので、リンクや画像は `money.html` のような相対パスで書く(`/` から始めると壊れる)。
+- 2026-11 に Netlify(nurunuru-fx.netlify.app)から引っ越した。古いアドレスから新しいアドレスへ飛ばす設定は、12月12日に Netlify のクレジットが戻ってからやる予定。
 - スキャン結果は GitHub Actions が `data` ブランチの `scan.json` に置く(`main` は変わらない)。
 - `pullback.html` は `https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json` を読みこんで表示する。`money.html` のタートルズ方式ロット計算も同じファイルの `atr` を読む。
 - スキャンの判定ルールは `scan.py` と `pullback.html` の「判定の流れ」で同じ内容にそろえる。片方を変えたら、もう片方も直す。
