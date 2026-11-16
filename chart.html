@@ -35,6 +35,22 @@ main { max-width:800px; margin:auto; padding:20px 16px; }
   .syms button { padding:5px 11px; font-size:.85rem; }
   #chart { height:62vh; min-height:380px; }
 }
+/* 今日のピボット(低い順に左から。今の値の位置に印を入れる) */
+.pv { margin:0 0 12px; padding:12px; border-radius:8px; background:#0f172a; }
+.pv-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.pv-head b { color:#facc15; }
+.pv-head span { font-size:.75rem; color:#94a3b8; }
+.pv-row { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.pv-lv { text-align:center; padding:6px 4px; border-radius:6px; background:#1e293b; border-top:3px solid; font-variant-numeric:tabular-nums; }
+.pv-lv small { display:block; font-size:.72rem; font-weight:bold; }
+.pv-lv.s { border-color:#4ade80; } .pv-lv.s small { color:#4ade80; }
+.pv-lv.p { border-color:#facc15; } .pv-lv.p small { color:#facc15; }
+.pv-lv.r { border-color:#f87171; } .pv-lv.r small { color:#f87171; }
+.pv-lv.near { outline:2px solid #38bdf8; box-shadow:0 0 10px rgba(56,189,248,.45); }
+.pv-now-line { margin-top:8px; font-size:.82rem; color:#cbd5e1; }
+.pv-now { display:inline-block; margin-right:6px; padding:2px 8px; border-radius:999px; background:#38bdf8; color:#0f172a; font-size:.78rem; font-weight:bold; white-space:nowrap; }
+.pv-msg { font-size:.85rem; color:#94a3b8; }
+@media (max-width:560px){ .pv-row { grid-template-columns:repeat(4,1fr); } .pv-lv { font-size:.85rem; } }
 footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 </style>
 </head>
@@ -47,8 +63,9 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <main>
   <div class="card">
     <h2>銘柄を切り替えて見る</h2>
-    <p class="note">ボタンを押すと銘柄が切り替わります。最初は15分足で、ピボットライン(トラディショナル、前日の値から計算)が出ています。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <p class="note">ボタンを押すと銘柄が切り替わります。最初は15分足です。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
     <div class="syms" id="syms" role="group" aria-label="銘柄"></div>
+    <div class="pv" id="pv" aria-live="polite"></div>
     <div id="chart"></div>
   </div>
 </main>
@@ -68,6 +85,39 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     { key:'AUDJPY', label:'豪ドル円',    tv:'FX:AUDJPY' },
   ];
   const box = document.getElementById('syms');
+  const pvBox = document.getElementById('pv');
+  const PIVOT_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/pivot.json';
+  let pivotData = null, current = null;
+
+  // 今日のピボットの表(左から S3 → R3。今の値が入るところに「今」の印)
+  function showPivot() {
+    if (!current) return;
+    if (current.key === 'XAUUSD') { pvBox.innerHTML = '<p class="pv-msg">ゴールドの今日のピボットは、まだ出していません(現物の値が取れないため)。</p>'; return; }
+    if (!pivotData) { pvBox.innerHTML = '<p class="pv-msg">今日のピボットを読みこみ中…</p>'; return; }
+    const v = (pivotData.pivots || {})[current.key];
+    if (!v) { pvBox.innerHTML = '<p class="pv-msg">この銘柄の今日のピボットは、まだありません。</p>'; return; }
+    const f = x => Number(x).toFixed(v.digits);
+    const names = ['S3', 'S2', 'S1', 'P', 'R1', 'R2', 'R3'];
+    // 今の値の上と下にある線を探す
+    const above = names.find(n => v.price < v.levels[n]);
+    const below = names.slice().reverse().find(n => v.price >= v.levels[n]);
+    const where = !below ? 'S3より下' : !above ? 'R3より上' : below + ' と ' + above + ' の間';
+    let html = '';
+    names.forEach(n => {
+      const near = (n === above || n === below) ? ' near' : '';
+      html += '<div class="pv-lv ' + n[0].toLowerCase() + near + '"><small>' + n + '</small>' + f(v.levels[n]) + '</div>';
+    });
+    const d = new Date(v.from + 'T00:00:00');
+    pvBox.innerHTML = '<div class="pv-head"><b>今日のピボット(トラディショナル)</b><span>'
+      + (d.getMonth() + 1) + '/' + d.getDate() + ' の 高値 ' + f(v.high) + '・安値 ' + f(v.low) + '・終値 ' + f(v.close) + ' から計算</span></div>'
+      + '<div class="pv-row">' + html + '</div>'
+      + '<div class="pv-now-line"><span class="pv-now">今 ' + f(v.price) + '</span>' + where + '(15分ほど遅れることがあります)</div>';
+  }
+  function loadPivot() {
+    fetch(PIVOT_URL + '?t=' + Date.now()).then(r => { if (!r.ok) throw r.status; return r.json(); })
+      .then(d => { pivotData = d; showPivot(); })
+      .catch(() => { if (!pivotData) pvBox.innerHTML = '<p class="pv-msg">今日のピボットを読みこめませんでした。</p>'; });
+  }
   const chart = document.getElementById('chart');
 
   function draw(sym) {
@@ -85,8 +135,6 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       symbol: sym.tv,
       interval: '15',
       hide_volume: true,
-      // ピボット(トラディショナル)。15分足なら前日の高値・安値・終値から計算した日足ピボットになる
-      studies: ['STD;Pivot%1Points%1Standard'],
       timezone: 'Asia/Tokyo',
       theme: 'dark',
       style: '1',
@@ -102,6 +150,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     wrap.appendChild(s);
     chart.appendChild(wrap);
     box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === sym.key)));
+    current = sym; showPivot();
     try { localStorage.setItem('nuru-chart', sym.key); } catch (e) {}
     history.replaceState(null, '', '?s=' + sym.key);
   }
@@ -119,6 +168,8 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   let first = new URLSearchParams(location.search).get('s');
   if (!first) { try { first = localStorage.getItem('nuru-chart'); } catch (e) {} }
   draw(SYMBOLS.find(x => x.key === (first || '').toUpperCase()) || SYMBOLS[0]);
+  loadPivot();
+  setInterval(loadPivot, 15 * 60 * 1000);
 })();
 </script>
 </body>

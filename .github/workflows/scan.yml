@@ -34,12 +34,18 @@ jobs:
         continue-on-error: true
         run: python cal.py calendar.json
 
+      # チャートページの「今日のピボット」。失敗しても押し目スキャンは止めない
+      - name: 今日のピボットを計算する
+        continue-on-error: true
+        run: python pivot.py pivot.json
+
       # 結果は「data」という別の置き場(ブランチ)に置く。
       # サイト本体(main)は変わらないので、15分ごとにサイト(GitHub Pages)の公開は走らない。
       - name: 結果を data ブランチに置く
         run: |
           mkdir -p /tmp/out && cp scan.json /tmp/out/
           if [ -f calendar.json ]; then cp calendar.json /tmp/out/; fi
+          if [ -f pivot.json ]; then cp pivot.json /tmp/out/; fi
           cd /tmp/out
           git init -q -b data
           git config user.name "github-actions[bot]"
