@@ -47,7 +47,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <main>
   <div class="card">
     <h2>銘柄を切り替えて見る</h2>
-    <p class="note">ボタンを押すと銘柄が切り替わります。最初は15分足です。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <p class="note">ボタンを押すと銘柄が切り替わります。最初は15分足で、ピボットライン(トラディショナル、前日の値から計算)が出ています。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
     <div class="syms" id="syms" role="group" aria-label="銘柄"></div>
     <div id="chart"></div>
   </div>
@@ -85,6 +85,8 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       symbol: sym.tv,
       interval: '15',
       hide_volume: true,
+      // ピボット(トラディショナル)。15分足なら前日の高値・安値・終値から計算した日足ピボットになる
+      studies: ['STD;Pivot%1Points%1Standard'],
       timezone: 'Asia/Tokyo',
       theme: 'dark',
       style: '1',
