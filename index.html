@@ -65,6 +65,20 @@ main { max-width:800px; margin:auto; padding:20px 16px; display:flex; flex-direc
 .card.soon { opacity:.75; }
 a.card.link { display:block; color:inherit; text-decoration:none; border:1px solid transparent; transition:background .15s, border-color .15s, transform .15s; }
 a.card.link h2::after { content:" →"; font-size:.9em; opacity:.6; }
+/* 押し目スキャナーにエントリー候補が出たら、カードの右でおじさんがぐるぐる回る */
+.oji-alert { float:right; margin:-4px 0 6px 12px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.oji-alert .ring { perspective:240px; width:64px; height:64px; border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle, rgba(250,204,21,.35) 0%, rgba(56,189,248,.15) 60%, transparent 72%);
+  animation:oji-glow 1.2s ease-in-out infinite alternate; }
+/* おじさんは同じ絵を少しずつ奥にずらして重ね、厚みのある立体にして横回転させる(真横でも消えない) */
+.oji-alert .oji3d { position:relative; width:56px; height:56px; transform-style:preserve-3d; animation:oji-spin 1.4s linear infinite; }
+.oji-alert .oji3d img { position:absolute; inset:0; width:100%; height:100%; backface-visibility:visible; }
+.oji-alert .oji3d img.side { filter:brightness(.62) saturate(1.1); }
+.oji-alert .oji3d img.face { filter:drop-shadow(0 0 3px rgba(255,255,255,.55)); }
+.oji-alert b { font-size:.75rem; color:#0f172a; background:#facc15; padding:1px 8px; border-radius:999px; white-space:nowrap; }
+@keyframes oji-spin { from { transform:rotateY(0deg); } to { transform:rotateY(360deg); } }
+@keyframes oji-glow { from { transform:scale(.92); } to { transform:scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .oji-alert .oji3d, .oji-alert .ring { animation:none; } }
 a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:var(--accent); transform:translateY(-2px); outline:none; }
 .gold { color:#facc15; font-weight:bold; text-shadow:0 0 8px rgba(250,204,21,.45); }
 .calendar .cal-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
@@ -108,7 +122,7 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
 <main>
   <div class="card soon"><h2>トレード日記<span class="wip">工事中</span></h2><p>ただいま準備中です。もうしばらくお待ちください。</p></div>
   <a class="card link" href="ob.html"><h2>OB・FVGの考え方</h2><p>オーダーブロックとフェアバリューギャップを図解で解説。</p></a>
-  <a class="card link" href="pullback.html"><h2>ヌルヌル押し目スキャナー<span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる<span class="gold">神機能</span>。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></a>
+  <a class="card link" href="pullback.html"><span class="oji-alert" id="oji-alert" hidden><span class="ring"><span class="oji3d" id="oji3d"></span></span><b id="oji-count">候補あり</b></span><h2>ヌルヌル押し目スキャナー<span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる<span class="gold">神機能</span>。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></a>
   <a class="card link" href="money.html"><h2>資金管理</h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算、ATRが自動で入るタートルズ方式のロット計算、バルサラの破産確率の計算・早見表つき。</p></a>
   <section class="card calendar" id="calendar">
     <div class="cal-head"><h2>経済指標カレンダー</h2><span class="upd" id="cal-upd"></span></div>
@@ -286,6 +300,32 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
+})();
+</script>
+<script>
+// 押し目スキャナーにエントリー候補があれば、おじさんを出して回す
+(function () {
+  const URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json';
+  const box = document.getElementById('oji-alert'), cnt = document.getElementById('oji-count');
+  // 厚み 12px ぶん、絵を少しずつ奥へずらして重ねる(いちばん手前と奥は明るい表面、間は少し暗い側面)
+  const oji = document.getElementById('oji3d'), LAYERS = 30, DEPTH = 12;
+  for (let i = 0; i < LAYERS; i++) {
+    const img = document.createElement('img');
+    img.src = 'ojisan-spin.svg'; img.alt = '';
+    img.className = (i === 0 || i === LAYERS - 1) ? 'face' : 'side';
+    img.style.transform = 'translateZ(' + (DEPTH / 2 - DEPTH * i / (LAYERS - 1)).toFixed(2) + 'px)';
+    oji.appendChild(img);
+  }
+  function load() {
+    fetch(URL + '?t=' + Date.now()).then(r => { if (!r.ok) throw r.status; return r.json(); }).then(d => {
+      const n = (d.items || []).filter(i => i.status === 'エントリー候補').length;
+      box.hidden = n === 0;
+      cnt.textContent = '候補 ' + n + '件';
+      box.title = n ? 'エントリー候補が ' + n + ' 件あります' : '';
+    }).catch(() => {});
+  }
+  load();
+  setInterval(load, 15 * 60 * 1000);
 })();
 </script>
 <script>
