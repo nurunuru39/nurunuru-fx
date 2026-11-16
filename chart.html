@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3M6WC991MG"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-3M6WC991MG');
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>チャート | ヌルヌルFX</title>
+<link rel="icon" href="ojisan.svg" type="image/svg+xml">
+<style>
+body { margin:0; font-family:sans-serif; background:#0f172a; color:#e2e8f0; line-height:1.8; }
+header { padding:28px 20px; text-align:center; background:linear-gradient(120deg,#0b1a33,#1d4ed8,#0b1a33); }
+header a { color:#bae6fd; text-decoration:none; font-size:.9rem; }
+header h1 { margin:6px 0 0; }
+main { max-width:800px; margin:auto; padding:20px 16px; }
+.card { background:#1e293b; border-radius:12px; padding:20px; margin-bottom:16px; }
+.card h2 { color:#38bdf8; margin:0 0 8px; font-size:1.2rem; }
+.card p { margin:0 0 8px; }
+.note { font-size:.85rem; color:#94a3b8; }
+.syms { display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 14px; }
+.syms button { font:inherit; font-size:.9rem; font-weight:bold; padding:6px 14px; border-radius:999px; cursor:pointer;
+  border:1px solid #38bdf8; background:transparent; color:#38bdf8; }
+.syms button:hover { background:rgba(56,189,248,.12); }
+.syms button[aria-pressed="true"] { background:#38bdf8; color:#0f172a; }
+.syms button small { font-weight:normal; opacity:.8; margin-left:4px; }
+#chart { height:70vh; min-height:440px; border-radius:8px; overflow:hidden; background:#0f172a; }
+#chart .tradingview-widget-container, #chart .tradingview-widget-container__widget { height:100%; }
+@media (max-width:560px){
+  .card { padding:14px; }
+  .syms button { padding:5px 11px; font-size:.85rem; }
+  #chart { height:62vh; min-height:380px; }
+}
+footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html">← ヌルヌルFX トップへ</a>
+  <h1>チャート</h1>
+</header>
+
+<main>
+  <div class="card">
+    <h2>銘柄を切り替えて見る</h2>
+    <p class="note">ボタンを押すと銘柄が切り替わります。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <div class="syms" id="syms" role="group" aria-label="銘柄"></div>
+    <div id="chart"></div>
+  </div>
+</main>
+
+<footer>チャート提供: <a href="https://jp.tradingview.com/" rel="noopener nofollow" target="_blank" style="color:#94a3b8">TradingView</a><br>※本サイトは個人の記録であり、投資助言ではありません。</footer>
+
+<script>
+(function () {
+  // 銘柄の一覧。足したいときはここに1行足す
+  const SYMBOLS = [
+    { key:'USDJPY', label:'ドル円',      tv:'FX:USDJPY' },
+    { key:'EURUSD', label:'ユーロドル',  tv:'FX:EURUSD' },
+    { key:'XAUUSD', label:'ゴールド',    tv:'OANDA:XAUUSD' },
+    { key:'EURJPY', label:'ユーロ円',    tv:'FX:EURJPY' },
+    { key:'GBPJPY', label:'ポンド円',    tv:'FX:GBPJPY' },
+    { key:'GBPUSD', label:'ポンドドル',  tv:'FX:GBPUSD' },
+    { key:'AUDJPY', label:'豪ドル円',    tv:'FX:AUDJPY' },
+  ];
+  const box = document.getElementById('syms');
+  const chart = document.getElementById('chart');
+
+  function draw(sym) {
+    // ウィジェットは作り直さないと銘柄が変わらないので、毎回入れ直す
+    chart.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'tradingview-widget-container';
+    const inner = document.createElement('div');
+    inner.className = 'tradingview-widget-container__widget';
+    const s = document.createElement('script');
+    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    s.async = true;
+    s.textContent = JSON.stringify({
+      autosize: true,
+      symbol: sym.tv,
+      interval: '60',
+      timezone: 'Asia/Tokyo',
+      theme: 'dark',
+      style: '1',
+      locale: 'ja',
+      backgroundColor: '#0f172a',
+      gridColor: 'rgba(148,163,184,0.08)',
+      allow_symbol_change: true,
+      hide_side_toolbar: false,
+      calendar: false,
+      support_host: 'https://www.tradingview.com'
+    });
+    wrap.appendChild(inner);
+    wrap.appendChild(s);
+    chart.appendChild(wrap);
+    box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === sym.key)));
+    try { localStorage.setItem('nuru-chart', sym.key); } catch (e) {}
+    history.replaceState(null, '', '?s=' + sym.key);
+  }
+
+  SYMBOLS.forEach(sym => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.key = sym.key;
+    b.innerHTML = sym.label + '<small>' + sym.key + '</small>';
+    b.addEventListener('click', () => draw(sym));
+    box.appendChild(b);
+  });
+
+  // 最初に出す銘柄: URLの ?s=USDJPY → 前回見ていた銘柄 → ドル円
+  let first = new URLSearchParams(location.search).get('s');
+  if (!first) { try { first = localStorage.getItem('nuru-chart'); } catch (e) {} }
+  draw(SYMBOLS.find(x => x.key === (first || '').toUpperCase()) || SYMBOLS[0]);
+})();
+</script>
+</body>
+</html>
