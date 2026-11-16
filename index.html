@@ -67,6 +67,10 @@ a.card.link { display:block; color:inherit; text-decoration:none; border:1px sol
 a.card.link h2::after { content:" →"; font-size:.9em; opacity:.6; }
 a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:var(--accent); transform:translateY(-2px); outline:none; }
 .gold { color:#facc15; font-weight:bold; text-shadow:0 0 8px rgba(250,204,21,.45); }
+.calendar .tv { margin-top:14px; height:560px; }
+@media (max-width:560px){ .calendar .tv { height:480px; } }
+.calendar .tradingview-widget-copyright { margin-top:6px; font-size:.75rem; color:var(--muted); }
+.calendar .tradingview-widget-copyright a { color:var(--muted); }
 footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16px; }
 </style>
 </head>
@@ -84,6 +88,25 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   <a class="card link" href="ob.html"><h2>OB・FVGの考え方</h2><p>オーダーブロックとフェアバリューギャップを図解で解説。</p></a>
   <a class="card link" href="pullback.html"><h2>ヌルヌル押し目スキャナー<span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる<span class="gold">神機能</span>。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></a>
   <a class="card link" href="money.html"><h2>資金管理</h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算、ATRが自動で入るタートルズ方式のロット計算、バルサラの破産確率の計算・早見表つき。</p></a>
+  <section class="card calendar">
+    <h2>経済指標カレンダー</h2>
+    <p>重要度の高い指標だけを表示しています。発表の前後は値動きが荒くなりやすいので要チェック。</p>
+    <div class="tv tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+      {
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "width": "100%",
+        "height": "100%",
+        "locale": "ja",
+        "importanceFilter": "1",
+        "countryFilter": "us,jp,eu,gb,de,cn,au,ca,nz,ch"
+      }
+      </script>
+    </div>
+    <div class="tradingview-widget-copyright"><a href="https://jp.tradingview.com/" rel="noopener nofollow" target="_blank">TradingView</a> 提供</div>
+  </section>
 </main>
 
 <footer>※本サイトは個人の記録であり、投資助言ではありません。</footer>
