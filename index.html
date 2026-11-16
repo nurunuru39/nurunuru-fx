@@ -67,11 +67,28 @@ a.card.link { display:block; color:inherit; text-decoration:none; border:1px sol
 a.card.link h2::after { content:" →"; font-size:.9em; opacity:.6; }
 a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:var(--accent); transform:translateY(-2px); outline:none; }
 .gold { color:#facc15; font-weight:bold; text-shadow:0 0 8px rgba(250,204,21,.45); }
-.calendar .tv { margin-top:14px; height:560px; border-radius:8px; overflow:hidden; }
-.calendar .tradingview-widget-container__widget { height:100%; }
-@media (max-width:560px){ .calendar .tv { height:480px; } }
-.calendar .tradingview-widget-copyright { margin-top:6px; font-size:.75rem; color:var(--muted); }
-.calendar .tradingview-widget-copyright a { color:var(--muted); }
+.calendar .cal-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.calendar .upd { font-size:.75rem; color:var(--muted); }
+.cal-day { margin:16px 0 6px; font-weight:bold; color:var(--accent); font-size:.95rem; }
+.cal-day.today::after { content:"今日"; margin-left:8px; padding:1px 8px; border-radius:999px; font-size:.75rem; color:#0f172a; background:var(--accent); }
+.cal-row { display:grid; grid-template-columns:3.4em 5.2em 1fr 5em 5em; gap:8px; align-items:center;
+  padding:8px 10px; border-radius:8px; background:#0f172a; margin-bottom:4px; font-size:.9rem; }
+.cal-row.past { opacity:.45; }
+.cal-row.next { outline:1px solid var(--accent); box-shadow:0 0 12px rgba(56,189,248,.35); }
+.cal-row .t { font-variant-numeric:tabular-nums; }
+.cal-row .c { font-size:.75rem; padding:2px 6px; border-radius:6px; background:#334155; text-align:center; white-space:nowrap; }
+.cal-row .n { font-weight:bold; }
+.cal-row .n small { display:block; font-weight:normal; font-size:.72rem; color:var(--muted); }
+.cal-row .v { text-align:right; font-variant-numeric:tabular-nums; }
+.cal-row .v span { display:block; font-size:.68rem; color:var(--muted); }
+.cal-row.hol .n { color:#facc15; }
+.cal-msg { margin-top:12px; color:var(--muted); }
+.cal-note { margin-top:12px; font-size:.75rem; color:var(--muted); }
+@media (max-width:560px){
+  .cal-row { grid-template-columns:3.2em 1fr 4.6em 4.6em; }
+  .cal-row .c { grid-column:2; grid-row:1; justify-self:start; }
+  .cal-row .n { grid-column:1 / -1; grid-row:2; }
+}
 footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16px; }
 </style>
 </head>
@@ -89,24 +106,11 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   <a class="card link" href="ob.html"><h2>OB・FVGの考え方</h2><p>オーダーブロックとフェアバリューギャップを図解で解説。</p></a>
   <a class="card link" href="pullback.html"><h2>ヌルヌル押し目スキャナー<span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる<span class="gold">神機能</span>。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></a>
   <a class="card link" href="money.html"><h2>資金管理</h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算、ATRが自動で入るタートルズ方式のロット計算、バルサラの破産確率の計算・早見表つき。</p></a>
-  <section class="card calendar">
-    <h2>経済指標カレンダー</h2>
-    <p>重要度の高い指標だけを表示しています。発表の前後は値動きが荒くなりやすいので要チェック。</p>
-    <div class="tv tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-      {
-        "colorTheme": "dark",
-        "isTransparent": false,
-        "width": "100%",
-        "height": "100%",
-        "locale": "ja",
-        "importanceFilter": "1",
-        "countryFilter": "us,jp,eu,gb,de,cn,au,ca,nz,ch"
-      }
-      </script>
-    </div>
-    <div class="tradingview-widget-copyright"><a href="https://jp.tradingview.com/" rel="noopener nofollow" target="_blank">TradingView</a> 提供</div>
+  <section class="card calendar" id="calendar">
+    <div class="cal-head"><h2>経済指標カレンダー</h2><span class="upd" id="cal-upd"></span></div>
+    <p>重要度の高い指標だけを日本時間で表示しています。発表の前後は値動きが荒くなりやすいので要チェック。</p>
+    <div id="cal-body"><p class="cal-msg">読みこみ中…</p></div>
+    <p class="cal-note">データ: Forex Factory(15分ごとに自動更新)。予定は変わることがあります。</p>
   </section>
 </main>
 
@@ -274,6 +278,58 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
+})();
+</script>
+<script>
+(function () {
+  const URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/calendar.json';
+  const COUNTRY = { USD:'米国', JPY:'日本', EUR:'ユーロ', GBP:'英国', AUD:'豪州', NZD:'NZ', CAD:'カナダ', CHF:'スイス', CNY:'中国', All:'全体' };
+  const body = document.getElementById('cal-body');
+  const upd = document.getElementById('cal-upd');
+  const jst = (d, o) => new Intl.DateTimeFormat('ja-JP', Object.assign({ timeZone:'Asia/Tokyo' }, o)).format(d);
+  const dayKey = d => jst(d, { year:'numeric', month:'2-digit', day:'2-digit' });
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+
+  function render(data) {
+    const now = new Date();
+    const today = dayKey(now);
+    const evs = (data.events || []).map(e => Object.assign({}, e, { d: new Date(e.date) }))
+      .filter(e => dayKey(e.d) >= today);
+    if (data.updated) upd.textContent = jst(new Date(data.updated), { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }) + ' 更新';
+    if (!evs.length) { body.innerHTML = '<p class="cal-msg">今日から先の重要指標はまだありません。</p>'; return; }
+    const next = evs.find(e => !e.holiday && e.d > now);
+    let html = '', cur = '';
+    for (const e of evs) {
+      const k = dayKey(e.d);
+      if (k !== cur) {
+        cur = k;
+        html += '<div class="cal-day' + (k === today ? ' today' : '') + '">' + jst(e.d, { month:'numeric', day:'numeric', weekday:'short' }) + '</div>';
+      }
+      const cls = ['cal-row'];
+      if (e.holiday) cls.push('hol');
+      else if (e.d <= now) cls.push('past');
+      if (e === next) cls.push('next');
+      const name = e.title_ja && e.title_ja !== e.title ? esc(e.title_ja) + '<small>' + esc(e.title) + '</small>' : esc(e.title);
+      html += '<div class="' + cls.join(' ') + '">'
+        + '<span class="t">' + (e.holiday ? '終日' : jst(e.d, { hour:'2-digit', minute:'2-digit' })) + '</span>'
+        + '<span class="c">' + esc(COUNTRY[e.country] || e.country) + '</span>'
+        + '<span class="n">' + name + '</span>'
+        + '<span class="v"><span>予想</span>' + (esc(e.forecast) || '-') + '</span>'
+        + '<span class="v"><span>前回</span>' + (esc(e.previous) || '-') + '</span>'
+        + '</div>';
+    }
+    body.innerHTML = html;
+  }
+
+  let last = null;
+  function load() {
+    fetch(URL + '?t=' + Date.now()).then(r => { if (!r.ok) throw r.status; return r.json(); })
+      .then(d => { last = d; render(d); })
+      .catch(() => { if (!last) body.innerHTML = '<p class="cal-msg">カレンダーを読みこめませんでした。少し時間をおいて開き直してください。</p>'; });
+  }
+  load();
+  setInterval(() => last && render(last), 60 * 1000);   // 終わった指標を薄くする
+  setInterval(load, 15 * 60 * 1000);
 })();
 </script>
 </body>

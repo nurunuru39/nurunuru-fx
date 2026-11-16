@@ -12,7 +12,7 @@ FXのトレードの記録と学びをまとめた静的サイト。キャッチ
 
 | ファイル | 内容 |
 |---|---|
-| `index.html` | トップページ。各ページへのリンクカード。「トレード日記」は工事中。いちばん下に TradingView の経済指標カレンダー(日本語・重要度「高」だけ) |
+| `index.html` | トップページ。各ページへのリンクカード。「トレード日記」は工事中。いちばん下に自作の経済指標カレンダー(`#calendar`。重要度「高」と祝日だけ、日本時間・日本語名で表示。`calendar.json` を読む) |
 | `ob.html` | OB(オーダーブロック)・FVG(フェアバリューギャップ)の図解つき解説 |
 | `ob.htm` | `ob.html` の古い版。どこからもリンクされていない |
 | `pullback.html` | ヌルヌル押し目スキャナー。考え方の説明と、スキャン結果の表示(`#live` のカード) |
@@ -20,6 +20,7 @@ FXのトレードの記録と学びをまとめた静的サイト。キャッチ
 | `ojisan.svg` | ヌルヌルおじさんのイラスト(ファビコン) |
 | `ojisan-anim.svg` | ヌルヌルおじさんのアニメ版(トップの見出しに表示) |
 | `scan.py` | 押し目スキャナー本体(Python, yfinance + pandas)。各銘柄の日足ATR(20)・1時間足ATR(20)・今日の値動きも `scan.json` の `atr` に入れる |
+| `cal.py` | 経済指標カレンダーのデータ作り。Forex Factory の今週・来週の予定を取り、指標名を日本語にして `calendar.json` に書く。日本語にできなかった指標名は英語のまま出るので、`NAMES` に足していく |
 | `.github/workflows/scan.yml` | `scan.py` を15分ごとに自動実行する GitHub Actions |
 
 ## しくみ
@@ -28,7 +29,7 @@ FXのトレードの記録と学びをまとめた静的サイト。キャッチ
 - 公開回数の制限はないので、直したらそのまま `main` に入れてよい。
 - サイトは `/nurunuru-fx/` フォルダの中にあるので、リンクや画像は `money.html` のような相対パスで書く(`/` から始めると壊れる)。
 - 2026-11 に Netlify(nurunuru-fx.netlify.app)から引っ越した。古いアドレスから新しいアドレスへ飛ばす設定は、12月12日に Netlify のクレジットが戻ってからやる予定。
-- スキャン結果は GitHub Actions が `data` ブランチの `scan.json` に置く(`main` は変わらない)。
+- スキャン結果は GitHub Actions が `data` ブランチの `scan.json` に置く(`main` は変わらない)。経済指標カレンダーの `calendar.json` も同じワークフローで同じ場所に置く(失敗してもスキャンは止めない)。
 - `pullback.html` は `https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json` を読みこんで表示する。`money.html` のタートルズ方式ロット計算も同じファイルの `atr` を読む。
 - スキャンの判定ルールは `scan.py` と `pullback.html` の「判定の流れ」で同じ内容にそろえる。片方を変えたら、もう片方も直す。
 
