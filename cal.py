@@ -3,7 +3,7 @@
 ヌルヌルFX 経済指標カレンダー(GitHub Actionsで15分ごとに自動実行)
 
 Forex Factory が配っている今週・来週の予定(JSON)を取ってきて、
-重要度「高」の指標と祝日だけにしぼり、指標名を日本語にして calendar.json に書き出す。
+アメリカと日本の、重要度「高」の指標と祝日だけにしぼり、指標名を日本語にして calendar.json に書き出す。
 取得に失敗したときは、data ブランチにある前回の calendar.json をそのまま使う。
 
 ※ ファイル名を calendar.py にすると Python の標準ライブラリ calendar とぶつかるので cal.py にしている。
@@ -19,6 +19,8 @@ FEEDS = [
     "https://nfs.faireconomy.media/ff_calendar_nextweek.json",
 ]
 PREV = "https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/calendar.json"
+# 表示する国(通貨)。ふやすときは "EUR", "GBP" などを足す
+COUNTRIES = {"USD", "JPY"}
 UA = {"User-Agent": "Mozilla/5.0 (nurunuru-fx calendar)"}
 
 # ===== 指標名の日本語対応表 =====
@@ -205,7 +207,7 @@ def main(out="calendar.json"):
         seen, rows = set(), []
         for e in events:
             imp = e.get("impact", "")
-            if imp not in ("High", "Holiday"):
+            if imp not in ("High", "Holiday") or e.get("country") not in COUNTRIES:
                 continue
             key = (e.get("date"), e.get("country"), e.get("title"))
             if key in seen:
