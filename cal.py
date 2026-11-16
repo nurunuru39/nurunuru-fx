@@ -55,7 +55,7 @@ NAMES = {
     "GDP": "GDP",
     "GDP Price Index": "GDPデフレーター",
     "Retail Sales": "小売売上高",
-    "Core Retail Sales": "小売売上高(自動車除く)",
+    "Core Retail Sales": "コア小売売上高",
     "ISM Manufacturing PMI": "ISM製造業景況指数",
     "ISM Services PMI": "ISM非製造業景況指数",
     "Manufacturing PMI": "製造業PMI",
@@ -64,7 +64,7 @@ NAMES = {
     "Caixin Manufacturing PMI": "財新 製造業PMI",
     "Caixin Services PMI": "財新 サービス業PMI",
     "Durable Goods Orders": "耐久財受注",
-    "Core Durable Goods Orders": "耐久財受注(輸送用機器除く)",
+    "Core Durable Goods Orders": "コア耐久財受注",
     "Industrial Production": "鉱工業生産",
     "Industrial Production y/y": "鉱工業生産(前年比)",
     "Empire State Manufacturing Index": "NY連銀製造業景気指数",
@@ -84,6 +84,7 @@ NAMES = {
     "CB Consumer Confidence": "コンファレンスボード消費者信頼感指数",
     "UoM Consumer Sentiment": "ミシガン大学消費者信頼感指数",
     "UoM Inflation Expectations": "ミシガン大学 期待インフレ率",
+    "Inflation Expectations": "期待インフレ率",
     "Crude Oil Inventories": "原油在庫",
     "Federal Budget Balance": "財政収支",
     "Treasury Currency Report": "為替報告書",
@@ -131,6 +132,7 @@ NAMES = {
 # 発言する人の肩書き
 SPEAKERS = {
     "Fed Chair": "FRB議長",
+    "Fed Chairman": "FRB議長",
     "FOMC Member": "FOMC委員",
     "Fed Vice Chair": "FRB副議長",
     "ECB President": "ECB総裁",
@@ -158,7 +160,7 @@ def ja(title):
     if m:
         who = m.group(1)
         for k in sorted(SPEAKERS, key=len, reverse=True):
-            if who.startswith(k):
+            if who == k or who.startswith(k + " "):
                 name = who[len(k):].strip()
                 return f"{SPEAKERS[k]}{'(' + name + ')' if name else ''} 発言"
         return f"{who} 発言"
