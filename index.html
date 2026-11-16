@@ -69,6 +69,10 @@ a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:
 .gold { color:#facc15; font-weight:bold; text-shadow:0 0 8px rgba(250,204,21,.45); }
 .calendar .cal-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .calendar .upd { font-size:.75rem; color:var(--muted); }
+.cal-tabs { display:flex; gap:6px; margin-top:12px; }
+.cal-tabs button { font:inherit; font-size:.85rem; font-weight:bold; padding:6px 18px; border-radius:999px; cursor:pointer;
+  border:1px solid var(--accent); background:transparent; color:var(--accent); }
+.cal-tabs button[aria-selected="true"] { background:var(--accent); color:#0f172a; }
 .cal-day { margin:16px 0 6px; font-weight:bold; color:var(--accent); font-size:.95rem; }
 .cal-day.today::after { content:"今日"; margin-left:8px; padding:1px 8px; border-radius:999px; font-size:.75rem; color:#0f172a; background:var(--accent); }
 .cal-row { display:grid; grid-template-columns:3.4em 5.2em 1fr 5em 5em; gap:8px; align-items:center;
@@ -108,7 +112,11 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   <a class="card link" href="money.html"><h2>資金管理</h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算、ATRが自動で入るタートルズ方式のロット計算、バルサラの破産確率の計算・早見表つき。</p></a>
   <section class="card calendar" id="calendar">
     <div class="cal-head"><h2>経済指標カレンダー</h2><span class="upd" id="cal-upd"></span></div>
-    <p>アメリカと日本の重要度の高い指標だけを日本時間で表示しています。発表の前後は値動きが荒くなりやすいので要チェック。</p>
+    <p>アメリカ・日本・ユーロ圏の重要度の高い指標だけを日本時間で表示しています。発表の前後は値動きが荒くなりやすいので要チェック。</p>
+    <div class="cal-tabs" role="tablist">
+      <button type="button" role="tab" data-range="today" aria-selected="true">今日</button>
+      <button type="button" role="tab" data-range="week" aria-selected="false">今週</button>
+    </div>
     <div id="cal-body"><p class="cal-msg">読みこみ中…</p></div>
     <p class="cal-note">データ: Forex Factory(15分ごとに自動更新)。予定は変わることがあります。</p>
   </section>
@@ -288,15 +296,25 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   const upd = document.getElementById('cal-upd');
   const jst = (d, o) => new Intl.DateTimeFormat('ja-JP', Object.assign({ timeZone:'Asia/Tokyo' }, o)).format(d);
   const dayKey = d => jst(d, { year:'numeric', month:'2-digit', day:'2-digit' });
+  let range = 'today';
+  // 今週(日本時間の月曜〜日曜)の範囲を YYYY/MM/DD で返す
+  function weekRange(now) {
+    const j = new Date(now.getTime() + 9 * 3600e3);          // 日本時間の日付をUTCの値で扱う
+    const dow = (j.getUTCDay() + 6) % 7;                    // 月曜=0
+    const mon = new Date(j.getTime() - dow * 86400e3), sun = new Date(mon.getTime() + 6 * 86400e3);
+    const f = d => d.toISOString().slice(0, 10).replace(/-/g, '/');
+    return [f(mon), f(sun)];
+  }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 
   function render(data) {
     const now = new Date();
     const today = dayKey(now);
+    const [wFrom, wTo] = weekRange(now);
     const evs = (data.events || []).map(e => Object.assign({}, e, { d: new Date(e.date) }))
-      .filter(e => dayKey(e.d) >= today);
+      .filter(e => { const k = dayKey(e.d); return range === 'today' ? k === today : (k >= wFrom && k <= wTo); });
     if (data.updated) upd.textContent = jst(new Date(data.updated), { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }) + ' 更新';
-    if (!evs.length) { body.innerHTML = '<p class="cal-msg">今日から先の重要指標はまだありません。</p>'; return; }
+    if (!evs.length) { body.innerHTML = '<p class="cal-msg">' + (range === 'today' ? '今日は重要指標はありません。「今週」で先の予定を見られます。' : '今週の重要指標はありません。') + '</p>'; return; }
     const next = evs.find(e => !e.holiday && e.d > now);
     let html = '', cur = '';
     for (const e of evs) {
@@ -322,6 +340,11 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   }
 
   let last = null;
+  document.querySelectorAll('.cal-tabs button').forEach(b => b.addEventListener('click', () => {
+    range = b.dataset.range;
+    document.querySelectorAll('.cal-tabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    if (last) render(last);
+  }));
   function load() {
     fetch(URL + '?t=' + Date.now()).then(r => { if (!r.ok) throw r.status; return r.json(); })
       .then(d => { last = d; render(d); })
