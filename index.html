@@ -67,7 +67,8 @@ a.card.link { display:block; color:inherit; text-decoration:none; border:1px sol
 a.card.link h2::after { content:" →"; font-size:.9em; opacity:.6; }
 a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:var(--accent); transform:translateY(-2px); outline:none; }
 .gold { color:#facc15; font-weight:bold; text-shadow:0 0 8px rgba(250,204,21,.45); }
-.calendar .tv { margin-top:14px; height:560px; }
+.calendar .tv { margin-top:14px; height:560px; border-radius:8px; overflow:hidden; }
+.calendar .tradingview-widget-container__widget { height:100%; }
 @media (max-width:560px){ .calendar .tv { height:480px; } }
 .calendar .tradingview-widget-copyright { margin-top:6px; font-size:.75rem; color:var(--muted); }
 .calendar .tradingview-widget-copyright a { color:var(--muted); }
@@ -96,7 +97,7 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
       <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
       {
         "colorTheme": "dark",
-        "isTransparent": true,
+        "isTransparent": false,
         "width": "100%",
         "height": "100%",
         "locale": "ja",
