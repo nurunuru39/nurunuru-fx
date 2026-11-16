@@ -2,7 +2,9 @@ name: 押し目スキャン
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # 15分ごと(GitHubの混み具合で数分遅れることがあります)
+    # ふだんは外のタイマー(cron-job.org)が15分ごとに workflow_dispatch で動かす。
+    # GitHub のタイマーは遅れや抜けが多いので、外のタイマーが止まったとき用の保険として1時間に1回だけ。
+    - cron: "37 * * * *"
   workflow_dispatch:          # 「Run workflow」ボタンで手動実行もできる
 
 permissions:
@@ -10,7 +12,7 @@ permissions:
 
 concurrency:
   group: scan
-  cancel-in-progress: true
+  cancel-in-progress: false   # 重なったら途中で止めずに、順番待ちにする
 
 jobs:
   scan:
