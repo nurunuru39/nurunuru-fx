@@ -47,7 +47,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <main>
   <div class="card">
     <h2>銘柄を切り替えて見る</h2>
-    <p class="note">ボタンを押すと銘柄が切り替わります。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <p class="note">ボタンを押すと銘柄が切り替わります。最初は15分足です。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
     <div class="syms" id="syms" role="group" aria-label="銘柄"></div>
     <div id="chart"></div>
   </div>
@@ -83,7 +83,8 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     s.textContent = JSON.stringify({
       autosize: true,
       symbol: sym.tv,
-      interval: '60',
+      interval: '15',
+      hide_volume: true,
       timezone: 'Asia/Tokyo',
       theme: 'dark',
       style: '1',
