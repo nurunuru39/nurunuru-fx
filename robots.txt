@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nurunuru39.github.io/nurunuru-fx/sitemap.xml

@@ -23,6 +23,8 @@ FXのトレードの記録と学びをまとめた静的サイト。キャッチ
 | `ojisan-spin.svg` | 背景なしのヌルヌルおじさん。押し目スキャナーに「エントリー候補」があるとき、トップの押し目スキャナーのカードの右で厚みのある横回転をする(`#oji-alert`。同じ絵を30枚ずらして重ねて立体にしている) |
 | `scan.py` | 押し目スキャナー本体(Python, yfinance + pandas)。各銘柄の日足ATR(20)・1時間足ATR(20)・今日の値動きも `scan.json` の `atr` に入れる |
 | `cal.py` | 経済指標カレンダーのデータ作り。Forex Factory の今週・来週の予定を取り、指標名を日本語にして `calendar.json` に書く。日本語にできなかった指標名は英語のまま出るので、`NAMES` に足していく |
+| `sitemap.xml` | サイトマップ(検索エンジン向けのページ一覧)。トップは末尾スラッシュのアドレス。`.html` ページを足したら `<url>` を足し、`lastmod` を更新する(古い `ob.htm` は入れない) |
+| `robots.txt` | 全ページのクロールを許可し、`Sitemap:` 行でサイトマップの場所を書いている |
 | `.github/workflows/scan.yml` | `scan.py`・`cal.py` を動かす GitHub Actions。ふだんは外のタイマー(cron-job.org)が15分ごとに `workflow_dispatch` で動かす。GitHub のタイマーは保険で1時間に1回 |
 
 ## しくみ
