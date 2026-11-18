@@ -108,6 +108,11 @@ a.card.link:hover, a.card.link:focus-visible { background:#273449; border-color:
   .cal-row .c { grid-column:2; grid-row:1; justify-self:start; }
   .cal-row .n { grid-column:1 / -1; grid-row:2; }
 }
+.ev-alert { background:linear-gradient(90deg,#b91c1c,#dc2626); color:#fff; border-radius:12px; padding:14px 18px; font-weight:bold; line-height:1.6;
+  border:2px solid #fca5a5; box-shadow:0 0 16px rgba(220,38,38,.45); }
+.ev-alert small { display:block; font-weight:normal; font-size:.82rem; color:#fee2e2; }
+#ev-alerts { display:flex; flex-direction:column; gap:8px; }
+#ev-alerts[hidden] { display:none; }
 footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16px; }
 </style>
 </head>
@@ -126,6 +131,7 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   <a class="card link" href="pullback.html"><span class="oji-alert" id="oji-alert" hidden><span class="ring"><span class="oji3d" id="oji3d"></span></span><b id="oji-count">候補あり</b></span><h2>ヌルヌル押し目スキャナー<span class="new">NEW</span></h2><p>今の狙い目の通貨が一発でわかる<span class="gold">神機能</span>。15分ごとに自動でスキャンして、押し目買い・戻り売りのチャンスを見つけます。</p></a>
   <a class="card link" href="chart.html"><h2>チャート</h2><p>ドル円・ユーロドル・ゴールドなどのチャートを、ボタンひとつで切り替えて見られます。</p></a>
   <a class="card link" href="money.html"><h2>資金管理</h2><p>損切り幅からロットを決めるシンプルな考え方。主要通貨ペアとゴールドのロット計算、ATRが自動で入るタートルズ方式のロット計算、バルサラの破産確率の計算・早見表つき。</p></a>
+  <div id="ev-alerts" hidden></div>
   <section class="card calendar" id="calendar">
     <div class="cal-head"><h2>経済指標カレンダー</h2><span class="upd" id="cal-upd"></span></div>
     <p>アメリカ・日本・ユーロ圏の重要度の高い指標だけを日本時間で表示しています。発表の前後は値動きが荒くなりやすいので要チェック。</p>
@@ -395,6 +401,29 @@ footer { text-align:center; font-size:.8rem; color:var(--muted); padding:20px 16
   load();
   setInterval(() => last && render(last), 60 * 1000);   // 終わった指標を薄くする
   setInterval(load, 15 * 60 * 1000);
+})();
+</script>
+<script src="events.js"></script>
+<script>
+// ===== 重要指標の日の赤い帯(日程は events.js) =====
+(function () {
+  var box = document.getElementById('ev-alerts');
+  if (!window.NuruEvents) return;
+  var E = window.NuruEvents;
+  function draw() {
+    var now = new Date(), evs = E.today(now);
+    box.hidden = !evs.length;
+    box.innerHTML = evs.map(function (e) {
+      var t = E.jstTime(e.at);
+      var line = e.at > now
+        ? '今日は' + e.full + '!発表は日本時間' + t + 'ごろ。急な値動きに注意'
+        : '今日は' + e.full + 'の日。発表(日本時間' + t + ')のあとは値動きが荒れやすいので注意';
+      var sub = e.key === 'fomc' ? '<small>アメリカでは前の日の14:00の発表なので、日本時間では今日の早朝になります。</small>' : '';
+      return '<div class="ev-alert" role="alert">' + line + sub + '</div>';
+    }).join('');
+  }
+  draw();
+  setInterval(draw, 60 * 1000);   // ページを開いたままでも日付が変わったら出し直す
 })();
 </script>
 </body>

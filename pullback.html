@@ -68,6 +68,10 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 tr.blink td { animation:flash 1s ease-in-out infinite; font-weight:bold; }
 tr.blink .badge { animation:pulse 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { tr.blink td { animation:none; background:rgba(74,222,128,.25); } tr.blink .badge { animation:none; } }
+.ev-warn { margin-top:12px; padding:12px 14px; border-radius:10px; border:2px solid #f87171; background:rgba(220,38,38,.22); color:#fee2e2; font-weight:bold; }
+.ev-warn .nw { white-space:nowrap; }
+.ev-warn small { display:block; font-size:.78rem; font-weight:normal; color:#fecaca; }
+.ev-warn .cd { display:block; margin-top:4px; font-size:1.15rem; color:#fca5a5; font-variant-numeric:tabular-nums; }
 footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 @media (max-width:560px){ .row3 { grid-template-columns:1fr; } }
 </style>
@@ -103,6 +107,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <span class="live-time" id="liveTime">読み込み中…</span>
     </div>
     <p class="note">15分ごとに自動更新。28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。<b>エントリー候補</b>が出ると、その行がチカチカ光ります。</p>
+    <div id="evWarn"></div>
     <div class="tabs">
       <button class="on" data-f="pick">狙い目だけ</button>
       <button data-f="watch">監視も表示</button>
@@ -212,6 +217,32 @@ document.querySelectorAll('.tabs button').forEach(function(btn){
 });
 loadLive();
 setInterval(loadLive, 5 * 60 * 1000);
+</script>
+<script src="events.js"></script>
+<script>
+// ===== 重要指標の前後30分の注意(日程は events.js) =====
+(function () {
+  var box = document.getElementById('evWarn');
+  if (!window.NuruEvents) return;
+  var E = window.NuruEvents;
+  function mmss(ms) {
+    var s = Math.max(0, Math.round(ms / 1000)), m = Math.floor(s / 60);
+    return (m ? m + '分' : '') + String(s % 60).padStart(m ? 2 : 1, '0') + '秒';
+  }
+  function draw() {
+    var now = new Date(), evs = E.around(now, 30, 30);
+    box.innerHTML = evs.map(function (e) {
+      var left = e.at - now, t = E.jstTime(e.at);
+      return left > 0
+        ? '<div class="ev-warn">まもなく' + e.name + 'の発表です。急な値動きに注意して、エントリーは慎重に'
+          + '<span class="cd">発表(日本時間' + t + ')まで <span class="nw">あと' + mmss(left) + '</span></span></div>'
+        : '<div class="ev-warn">' + e.name + 'が発表されました。急な値動きに注意して、エントリーは慎重に'
+          + '<span class="cd">発表(日本時間' + t + ')から <span class="nw">' + mmss(-left) + 'たちました</span><small>(発表の30分後まで表示)</small></span></div>';
+    }).join('');
+  }
+  draw();
+  setInterval(draw, 1000);   // ページを開いたままでも、時間になったら自動で出たり消えたりする
+})();
 </script>
 </body>
 </html>
