@@ -28,6 +28,24 @@ main { max-width:800px; margin:auto; padding:20px 16px; }
 .syms button:hover { background:rgba(56,189,248,.12); }
 .syms button[aria-pressed="true"] { background:#38bdf8; color:#0f172a; }
 .syms button small { font-weight:normal; opacity:.8; margin-left:4px; }
+.picks-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; margin-top:4px; }
+.picks-head b { color:#7dd3fc; font-size:.95rem; }
+.picks-head span { font-size:.75rem; color:#94a3b8; }
+.picks { display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 10px; }
+.picks .msg { font-size:.85rem; color:#94a3b8; margin:2px 0; }
+.picks button { font:inherit; font-size:.9rem; font-weight:bold; padding:5px 14px; border-radius:12px; cursor:pointer; line-height:1.4;
+  border:1px solid #38bdf8; background:rgba(56,189,248,.08); color:#7dd3fc; text-align:left; }
+.picks button small { font-weight:normal; opacity:.8; margin-left:4px; }
+.picks button .dir { display:block; font-size:.72rem; font-weight:normal; }
+.picks button .dir.up { color:#4ade80; } .picks button .dir.down { color:#f87171; }
+.picks button.entry { border-color:#4ade80; color:#bbf7d0; animation:flash 1s ease-in-out infinite, pulse 1s ease-in-out infinite; }
+.picks button[aria-pressed="true"] { background:#38bdf8; color:#0f172a; animation:none; }
+.picks button[aria-pressed="true"] .dir { color:#0f172a; }
+.picks button.entry[aria-pressed="true"] { background:#4ade80; }
+@keyframes flash { 0%,100% { background:rgba(74,222,128,.32); } 50% { background:rgba(74,222,128,0); } }
+@keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(74,222,128,.9); } 50% { box-shadow:0 0 10px 3px rgba(74,222,128,.9); } }
+@media (prefers-reduced-motion: reduce) { .picks button.entry { animation:none; background:rgba(74,222,128,.25); } }
+.syms-head { font-size:.95rem; font-weight:bold; color:#7dd3fc; margin-top:6px; }
 #chart { height:70vh; min-height:440px; border-radius:8px; overflow:hidden; background:#0f172a; }
 #chart .tradingview-widget-container, #chart .tradingview-widget-container__widget { height:100%; }
 @media (max-width:560px){
@@ -47,7 +65,10 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <main>
   <div class="card">
     <h2>銘柄を切り替えて見る</h2>
-    <p class="note">ボタンを押すと銘柄が切り替わります。最初は15分足です。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <p class="note">ボタンを押すと銘柄が切り替わります。上の「押し目スキャナーの狙い目」には、押し目スキャナーで<b>エントリー候補</b>(チカチカ光ります)と<b>押し目ゾーン</b>の銘柄が出ます(5分ごとに更新)。最初は15分足です。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <div class="picks-head"><b>押し目スキャナーの狙い目</b><span id="picksTime"></span></div>
+    <div class="picks" id="picks" role="group" aria-label="押し目スキャナーの狙い目"><p class="msg">読みこみ中…</p></div>
+    <div class="syms-head">いつもの銘柄</div>
     <div class="syms" id="syms" role="group" aria-label="銘柄"></div>
     <div id="chart"></div>
   </div>
@@ -67,7 +88,19 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     { key:'GBPUSD', label:'ポンドドル',  tv:'FX:GBPUSD' },
     { key:'AUDJPY', label:'豪ドル円',    tv:'FX:AUDJPY' },
   ];
+  // 押し目スキャナーの銘柄を TradingView の銘柄にする(SYMBOLS にない銘柄用)
+  const CCY = { USD:'ドル', JPY:'円', EUR:'ユーロ', GBP:'ポンド', AUD:'豪ドル', NZD:'NZドル', CAD:'カナダ', CHF:'フラン' };
+  const SPECIAL = { XAUUSD:'ゴールド', XAGUSD:'シルバー' };
+  function symFor(key) {
+    const known = SYMBOLS.find(x => x.key === key);
+    if (known) return known;
+    if (!/^[A-Z]{6}$/.test(key)) return null;
+    const label = SPECIAL[key] || ((CCY[key.slice(0, 3)] || key.slice(0, 3)) + (CCY[key.slice(3)] || key.slice(3)));
+    return { key, label, tv: 'OANDA:' + key };
+  }
   const box = document.getElementById('syms');
+  const picks = document.getElementById('picks');
+  let current = null;
   const chart = document.getElementById('chart');
 
   function draw(sym) {
@@ -99,7 +132,8 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     wrap.appendChild(inner);
     wrap.appendChild(s);
     chart.appendChild(wrap);
-    box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === sym.key)));
+    current = sym.key;
+    document.querySelectorAll('#syms button, #picks button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === sym.key)));
     try { localStorage.setItem('nuru-chart', sym.key); } catch (e) {}
     history.replaceState(null, '', '?s=' + sym.key);
   }
@@ -116,7 +150,45 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   // 最初に出す銘柄: URLの ?s=USDJPY → 前回見ていた銘柄 → ドル円
   let first = new URLSearchParams(location.search).get('s');
   if (!first) { try { first = localStorage.getItem('nuru-chart'); } catch (e) {} }
-  draw(SYMBOLS.find(x => x.key === (first || '').toUpperCase()) || SYMBOLS[0]);
+  draw(symFor((first || '').toUpperCase()) || SYMBOLS[0]);
+
+  // ===== 押し目スキャナーの狙い目ボタン(data ブランチの scan.json を5分ごとに読む) =====
+  const SCAN_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/scan.json';
+  const pTime = document.getElementById('picksTime');
+  let loaded = false;
+  function msg(t) { picks.innerHTML = ''; const p = document.createElement('p'); p.className = 'msg'; p.textContent = t; picks.appendChild(p); }
+  function drawPicks(d) {
+    const items = (d.items || []).filter(x => x.status === 'エントリー候補' || x.status === '押し目ゾーン');
+    items.sort((a, b) => (a.status === 'エントリー候補' ? 0 : 1) - (b.status === 'エントリー候補' ? 0 : 1));
+    let t = '最終更新 ' + d.updated;
+    if ((Date.now() / 1000 - d.updated_ts) / 60 > 60) t += '(市場が閉まっているか、更新が止まっています)';
+    pTime.textContent = t;
+    if (!items.length) { msg('今は押し目ゾーンの銘柄はありません'); return; }
+    picks.innerHTML = '';
+    items.forEach(x => {
+      const sym = symFor(x.name);
+      if (!sym) return;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.key = sym.key;
+      if (x.status === 'エントリー候補') b.className = 'entry';
+      b.title = x.status;
+      b.setAttribute('aria-pressed', String(sym.key === current));
+      const dir = x.dir === 'up' ? '押し目買い' : x.dir === 'down' ? '戻り売り' : '';
+      b.innerHTML = sym.label + '<small>' + sym.key + '</small>'
+        + '<span class="dir ' + (x.dir || '') + '">' + (x.status === 'エントリー候補' ? 'エントリー候補・' : '') + dir + '</span>';
+      b.addEventListener('click', () => draw(sym));
+      picks.appendChild(b);
+    });
+  }
+  function loadPicks() {
+    fetch(SCAN_URL + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(d => { loaded = true; drawPicks(d); })
+      .catch(() => { if (!loaded) { msg('スキャン結果を読みこめませんでした。少し時間をおいて開き直してください。'); pTime.textContent = ''; } });
+  }
+  loadPicks();
+  setInterval(loadPicks, 5 * 60 * 1000);
 })();
 </script>
 </body>
