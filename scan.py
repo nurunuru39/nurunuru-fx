@@ -15,6 +15,17 @@
   h1    1時間足ATR(20)(確定した1時間足だけで計算)
   today 今日の値動き(今日の日足の真の値幅)
   ratio today ÷ d1(1.5を超えたら「荒れている」注意)
+
+日足ピボット(クラシック)も全銘柄で計算して、各銘柄の "pivot" に入れる:
+  前日 = FXでふつうの区切り(ニューヨーク時間17時)で区切った1日。1時間足から作る。
+  P  = (高値 + 安値 + 終値) / 3
+  R1 = 2P - 安値          S1 = 2P - 高値
+  R2 = P + (高値 - 安値)   S2 = P - (高値 - 安値)
+  R3 = 高値 + 2(P - 安値)  S3 = 安値 - 2(高値 - P)
+  現在値にいちばん近いピボットの名前・値・距離(距離 ÷ 1時間足ATR も)を入れ、
+  1時間足ATR(20)の PIVOT_NEAR 倍以内なら「ピボット付近」(near)とする。
+  押し目ゾーン/エントリー候補で、押し目方向のピボット(買いは P・S1〜S3、売りは P・R1〜R3)の
+  付近なら「根拠重なり」(confluence)とする。判定(状態)そのものは変えない。
 """
 import json
 import math
@@ -29,6 +40,9 @@ RET_MIN = 50.0        # 押し目ゾーンの下限(%)
 RET_MAX = 78.6        # 押し目ゾーンの上限(%)
 SWING_BARS = 48       # 押し目を測る15分足の本数(48本=12時間)
 ATR_N = 20            # タートルズのN(ATR)の期間
+PIVOT_NEAR = 0.3      # ピボット付近とみなす距離(1時間足ATRの何倍以内か)
+PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
+NY = "America/New_York"
 
 PAIRS = [
     "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCHF", "USDCAD",
@@ -142,6 +156,55 @@ def signal(prev, bar, direction):
     return None
 
 
+def session_day(idx):
+    """ニューヨーク時間17時で日付が変わるようにした「1日」の日付(NY時間を7時間進めた日付)"""
+    t = idx.tz_localize("UTC") if idx.tz is None else idx
+    return (t.tz_convert(NY) + pd.Timedelta(hours=7)).date
+
+
+def pivot_levels(h, l, c):
+    p = (h + l + c) / 3
+    return {
+        "R3": h + 2 * (p - l), "R2": p + (h - l), "R1": 2 * p - l,
+        "P": p,
+        "S1": 2 * p - h, "S2": p - (h - l), "S3": l - 2 * (h - p),
+    }
+
+
+def pivot_info(d1h, price, now=None):
+    """前日(NY17時区切り)の高安終からピボットを出し、現在値にいちばん近いものを返す。足りなければ None"""
+    if now is None:
+        now = datetime.now(timezone.utc)
+    df = d1h.assign(day=session_day(d1h.index))
+    cur = session_day(pd.DatetimeIndex([pd.Timestamp(now)]))[0]   # いまいる1日
+    done = df[df["day"] < cur]                                     # もう終わった日だけ
+    prev = None
+    for day in sorted(done["day"].unique(), reverse=True)[:5]:
+        d = done[done["day"] == day]
+        if len(d) >= PIVOT_MIN_BARS:
+            prev = (day, d)
+            break
+    if prev is None:
+        return None
+    day, d = prev
+    h, l, c = float(d["High"].max()), float(d["Low"].min()), float(d["Close"].iloc[-1])
+    lv = pivot_levels(h, l, c)
+    a_h, _ = atr(d1h)
+    h1 = float(a_h.iloc[-2])       # 最後の1時間足は作成中のことがあるので除く
+    name = min(lv, key=lambda k: abs(price - lv[k]))
+    dist = price - lv[name]        # プラスなら現在値がピボットより上
+    ratio = abs(dist) / h1 if h1 > 0 else float("nan")
+    return {
+        "from": str(day),
+        "levels": {k: sig5(v) for k, v in lv.items()},
+        "name": name, "level": sig5(lv[name]),
+        "dist": sig5(dist),
+        "dist_atr": None if math.isnan(ratio) else round(ratio, 2),
+        "near": bool(ratio <= PIVOT_NEAR),
+        "atr_h1": sig5(h1),
+    }
+
+
 def analyze(name, d1h, d15):
     d1h = d1h[["Open", "High", "Low", "Close"]].dropna()
     d15 = d15[["Open", "High", "Low", "Close"]].dropna()
@@ -159,7 +222,12 @@ def analyze(name, d1h, d15):
         "adx4": round(a4, 1), "adx1": round(a1, 1),
         "dir": t4 if (t4 and t4 == t1) else None,
         "ret": None, "signal": None, "status": "対象外",
+        "pivot": None, "confluence": False,
     }
+    try:
+        item["pivot"] = pivot_info(d1h, price)
+    except Exception as e:  # ピボットが出せなくても押し目スキャンは続ける
+        print(name, "pivot error:", e, file=sys.stderr)
     if not item["dir"]:
         item["reason"] = "4時間足と1時間足の向きがそろっていない"
         return item
@@ -196,6 +264,12 @@ def analyze(name, d1h, d15):
         item["status"] = "エントリー候補" if sig else "押し目ゾーン"
     else:
         item["status"] = "監視"
+
+    # 根拠重なり:押し目ゾーン/エントリー候補で、押し目方向のピボットの付近
+    pv = item["pivot"]
+    if pv and pv["near"] and item["status"] in ("エントリー候補", "押し目ゾーン"):
+        side = ("P", "S1", "S2", "S3") if item["dir"] == "up" else ("P", "R1", "R2", "R3")
+        item["confluence"] = pv["name"] in side
     return item
 
 
@@ -239,7 +313,7 @@ def main(out="scan.json"):
     data = {
         "updated": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
-        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX},
+        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR},
         "items": items, "errors": errors,
         "atr_n": ATR_N, "atr": atrs,
     }
