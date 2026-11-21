@@ -1,0 +1,42 @@
+{
+ "updated": "2026-11-21T14:30:54Z",
+ "source": "Forex Factory",
+ "events": [
+  {
+   "date": "2026-11-16T12:00:00-05:00",
+   "country": "USD",
+   "title": "Fed Chairman Warsh Speaks",
+   "title_ja": "FRB議長(Warsh) 発言",
+   "holiday": false,
+   "forecast": "",
+   "previous": ""
+  },
+  {
+   "date": "2026-11-17T08:30:00-05:00",
+   "country": "USD",
+   "title": "Core Retail Sales m/m",
+   "title_ja": "コア小売売上高(前月比)",
+   "holiday": false,
+   "forecast": "0.4%",
+   "previous": "0.9%"
+  },
+  {
+   "date": "2026-11-17T08:30:00-05:00",
+   "country": "USD",
+   "title": "Retail Sales m/m",
+   "title_ja": "小売売上高(前月比)",
+   "holiday": false,
+   "forecast": "0.1%",
+   "previous": "0.8%"
+  },
+  {
+   "date": "2026-11-18T14:00:00-05:00",
+   "country": "USD",
+   "title": "FOMC Meeting Minutes",
+   "title_ja": "FOMC議事録",
+   "holiday": false,
+   "forecast": "",
+   "previous": ""
+  }
+ ]
+}
