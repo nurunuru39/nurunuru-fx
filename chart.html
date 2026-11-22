@@ -118,6 +118,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     { key:'60',  label:'1時間', sma:800 },
     { key:'240', label:'4時間', sma:200 },
   ];
+  const SMA_COLOR = '#facc15';   // 200SMAの線の色(黄色)
   let tf = TFS[0];
   let currentSym = null;
 
@@ -159,12 +160,19 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
         allow_symbol_change: true,
         hide_side_toolbar: false,
         // 4時間足の200SMAにあたる線(黄色)
-        studies: [{ id: 'MASimple@tv-basicstudies', inputs: { length: tf.sma } }],
-        // 線の色(黄色)と太さ。名前の書き方が版によってちがうので、両方の書き方で入れておく
-        studies_overrides: {
-          'moving average.plot.color': '#facc15', 'moving average.plot.color.0': '#facc15', 'moving average.plot.linewidth': 2,
-          'MASimple@tv-basicstudies.plot.color': '#facc15', 'MASimple@tv-basicstudies.plot.color.0': '#facc15', 'MASimple@tv-basicstudies.plot.linewidth': 2,
-        },
+        // 線の色(黄色)と太さ。TradingView の決まった書き方がはっきりしないので、考えられる書き方をまとめて入れておく
+        // (合わない書き方は無視されるだけ)
+        studies: [{
+          id: 'MASimple@tv-basicstudies',
+          inputs: { length: tf.sma },
+          overrides: { 'plot.color': SMA_COLOR, 'plot.color.0': SMA_COLOR, 'plot.linewidth': 2 },
+        }],
+        studies_overrides: Object.fromEntries(
+          ['moving average', 'MASimple@tv-basicstudies', 'MASimple', 'sma']
+            .flatMap(n => ['plot', 'plot_0', 'ma'].flatMap(pl => [
+              [n + '.' + pl + '.color', SMA_COLOR], [n + '.' + pl + '.color.0', SMA_COLOR], [n + '.' + pl + '.linewidth', 2],
+            ]))
+        ),
         overrides: { 'paneProperties.background': '#0f172a', 'paneProperties.backgroundType': 'solid' },
       });
     });
