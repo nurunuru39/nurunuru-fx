@@ -26,6 +26,14 @@
   1時間足ATR(20)の PIVOT_NEAR 倍以内なら「ピボット付近」(near)とする。
   押し目ゾーン/エントリー候補で、押し目方向のピボット(買いは P・S1〜S3、売りは P・R1〜R3)の
   付近なら「根拠重なり」(confluence)とする。判定(状態)そのものは変えない。
+
+4時間足のSMA200(200本の単純移動平均)も全銘柄で計算して、各銘柄の "sma200" に入れる:
+  4時間足は1時間足から作る(to_4h)。終値200本の平均。
+  現在値との距離(距離 ÷ 1時間足ATR も)を入れ、ピボットと同じく
+  1時間足ATR(20)の PIVOT_NEAR 倍以内なら「200SMA付近」(near)とする。
+  押し目ゾーン/エントリー候補で、買いなら SMA200 の少し上(現在値 ≧ SMA200)、
+  売りなら SMA200 の少し下(現在値 ≦ SMA200)の付近にいるときも「根拠重なり」とする。
+  根拠重なりの元になったもの(例 ["S1", "SMA200"])は "confluence_by" に入れる。
 """
 import json
 import math
@@ -40,7 +48,8 @@ RET_MIN = 50.0        # 押し目ゾーンの下限(%)
 RET_MAX = 78.6        # 押し目ゾーンの上限(%)
 SWING_BARS = 48       # 押し目を測る15分足の本数(48本=12時間)
 ATR_N = 20            # タートルズのN(ATR)の期間
-PIVOT_NEAR = 0.3      # ピボット付近とみなす距離(1時間足ATRの何倍以内か)
+PIVOT_NEAR = 0.3      # ピボット・SMA200の付近とみなす距離(1時間足ATRの何倍以内か)
+SMA_N = 200           # 4時間足の単純移動平均の本数
 PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
 NY = "America/New_York"
 
@@ -171,7 +180,13 @@ def pivot_levels(h, l, c):
     }
 
 
-def pivot_info(d1h, price, now=None):
+def h1_atr(d1h):
+    """確定した1時間足のATR(20)。最後の1時間足は作成中のことがあるので除く"""
+    a_h, _ = atr(d1h)
+    return float(a_h.iloc[-2])
+
+
+def pivot_info(d1h, price, h1, now=None):
     """前日(NY17時区切り)の高安終からピボットを出し、現在値にいちばん近いものを返す。足りなければ None"""
     if now is None:
         now = datetime.now(timezone.utc)
@@ -189,8 +204,6 @@ def pivot_info(d1h, price, now=None):
     day, d = prev
     h, l, c = float(d["High"].max()), float(d["Low"].min()), float(d["Close"].iloc[-1])
     lv = pivot_levels(h, l, c)
-    a_h, _ = atr(d1h)
-    h1 = float(a_h.iloc[-2])       # 最後の1時間足は作成中のことがあるので除く
     name = min(lv, key=lambda k: abs(price - lv[k]))
     dist = price - lv[name]        # プラスなら現在値がピボットより上
     ratio = abs(dist) / h1 if h1 > 0 else float("nan")
@@ -205,6 +218,23 @@ def pivot_info(d1h, price, now=None):
     }
 
 
+def sma_info(d4h, price, h1):
+    """4時間足の終値のSMA200と、現在値からの距離。本数が足りなければ None"""
+    c = d4h["Close"]
+    if len(c) < SMA_N:
+        return None
+    v = float(c.rolling(SMA_N).mean().iloc[-1])
+    dist = price - v               # プラスなら現在値がSMA200より上
+    ratio = abs(dist) / h1 if h1 > 0 else float("nan")
+    return {
+        "value": sig5(v),
+        "dist": sig5(dist),
+        "dist_atr": None if math.isnan(ratio) else round(ratio, 2),
+        "near": bool(ratio <= PIVOT_NEAR),
+        "above": bool(dist >= 0),
+    }
+
+
 def analyze(name, d1h, d15):
     d1h = d1h[["Open", "High", "Low", "Close"]].dropna()
     d15 = d15[["Open", "High", "Low", "Close"]].dropna()
@@ -213,6 +243,7 @@ def analyze(name, d1h, d15):
     d4h = to_4h(d1h)
     if len(d4h) < 60:
         return None
+    h1 = h1_atr(d1h)
 
     t4, t1 = trend(d4h), trend(d1h)
     a4, a1 = float(adx(d4h).iloc[-1]), float(adx(d1h).iloc[-1])
@@ -222,12 +253,16 @@ def analyze(name, d1h, d15):
         "adx4": round(a4, 1), "adx1": round(a1, 1),
         "dir": t4 if (t4 and t4 == t1) else None,
         "ret": None, "signal": None, "status": "対象外",
-        "pivot": None, "confluence": False,
+        "pivot": None, "sma200": None, "confluence": False, "confluence_by": [],
     }
     try:
-        item["pivot"] = pivot_info(d1h, price)
+        item["pivot"] = pivot_info(d1h, price, h1)
     except Exception as e:  # ピボットが出せなくても押し目スキャンは続ける
         print(name, "pivot error:", e, file=sys.stderr)
+    try:
+        item["sma200"] = sma_info(d4h, price, h1)
+    except Exception as e:  # SMA200が出せなくても押し目スキャンは続ける
+        print(name, "sma200 error:", e, file=sys.stderr)
     if not item["dir"]:
         item["reason"] = "4時間足と1時間足の向きがそろっていない"
         return item
@@ -265,11 +300,19 @@ def analyze(name, d1h, d15):
     else:
         item["status"] = "監視"
 
-    # 根拠重なり:押し目ゾーン/エントリー候補で、押し目方向のピボットの付近
-    pv = item["pivot"]
-    if pv and pv["near"] and item["status"] in ("エントリー候補", "押し目ゾーン"):
-        side = ("P", "S1", "S2", "S3") if item["dir"] == "up" else ("P", "R1", "R2", "R3")
-        item["confluence"] = pv["name"] in side
+    # 根拠重なり:押し目ゾーン/エントリー候補で、押し目方向のピボットかSMA200の付近
+    if item["status"] in ("エントリー候補", "押し目ゾーン"):
+        by = []
+        pv = item["pivot"]
+        if pv and pv["near"]:
+            side = ("P", "S1", "S2", "S3") if item["dir"] == "up" else ("P", "R1", "R2", "R3")
+            if pv["name"] in side:
+                by.append(pv["name"])
+        sm = item["sma200"]
+        if sm and sm["near"] and sm["above"] == (item["dir"] == "up"):
+            by.append("SMA200")      # 買いは少し上、売りは少し下にいるときだけ
+        item["confluence_by"] = by
+        item["confluence"] = bool(by)
     return item
 
 
@@ -277,7 +320,8 @@ def fetch():
     import yfinance as yf
     tickers = list(SYMBOLS.values())
     kw = dict(group_by="ticker", progress=False, auto_adjust=True, threads=True)
-    h1 = yf.download(tickers, period="60d", interval="1h", **kw)
+    # 4時間足のSMA200に200本以上いるので、1時間足は120日分とる(4時間足でおよそ500本)
+    h1 = yf.download(tickers, period="120d", interval="1h", **kw)
     m15 = yf.download(tickers, period="5d", interval="15m", **kw)
     try:
         d1 = yf.download(tickers, period="6mo", interval="1d", **kw)
@@ -313,7 +357,7 @@ def main(out="scan.json"):
     data = {
         "updated": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
-        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR},
+        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N},
         "items": items, "errors": errors,
         "atr_n": ATR_N, "atr": atrs,
     }

@@ -62,6 +62,7 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .b-conf { background:#facc15; color:#0f172a; margin-top:3px; }
 .pv-near { font-weight:bold; color:#fde68a; }
 .pv-far { color:#94a3b8; font-size:.82rem; }
+.pv-list span { display:block; white-space:nowrap; }
 .up { color:#4ade80; } .down { color:#f87171; }
 .tabs { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
 .tabs button { width:auto; margin:0; padding:6px 14px; font-size:.85rem; background:#0f172a; color:#cbd5e1; border:1px solid #334155; }
@@ -118,11 +119,11 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <div class="live-wrap">
       <table>
-        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>戻り率</th><th>サイン</th><th>ピボット</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
+        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>戻り率</th><th>サイン</th><th>反発根拠</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
         <tbody id="liveBody"><tr><td colspan="8" class="note">読み込み中…</td></tr></tbody>
       </table>
     </div>
-    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>ピボットの見方:いちばん近い日足ピボットを出します。1時間足ATRの0.3倍以内なら「S1付近」、はなれていれば「S1(ATR×1.2)」のように距離を出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットの付近にいるしるしです(下の「ピボットの見方」)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるしるしです(下の「反発根拠の見方」)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -147,7 +148,8 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   </div>
 
   <div class="card">
-    <h2>ピボットの見方</h2>
+    <h2>反発根拠の見方(ピボット・200SMA)</h2>
+    <h3>日足ピボット</h3>
     <p>ピボットは、前の日の高値・安値・終値から計算する、その日の目安の値段です。多くのトレーダーが見ているので、止まったり反発したりしやすいといわれます。ここでは「クラシック」と呼ばれる計算を使っています。</p>
     <table>
       <tr><th>名前</th><th>計算</th></tr>
@@ -157,9 +159,17 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <tr><td>R3 / S3</td><td>高値 + 2(P − 安値) / 安値 − 2(高値 − P)</td></tr>
     </table>
     <p class="note">R はレジスタンス(上の壁)、S はサポート(下の床)です。「前の日」は、FXでふつうに使われるニューヨーク時間17時(日本時間の朝7時、アメリカの夏時間は朝6時)で区切っています。</p>
+    <h3>4時間足の200SMA</h3>
+    <p>SMAは単純移動平均(決まった本数の終値の平均)です。4時間足の200本の平均は、長い目で見た流れの境目として多くのトレーダーが見ているので、押し目で止まりやすい場所のひとつです。4時間足は1時間足から作っています。</p>
     <h3>「付近」と「根拠重なり」</h3>
-    <p>銘柄によって動く幅がちがうので、「近い」かどうかは1時間足のATR(1本の足が平均でどれくらい動くか)で決めています。現在値とピボットの差が<b>1時間足ATRの0.3倍以内</b>なら「付近」です。</p>
-    <p>押し目買いなら下の床(P・S1〜S3)、戻り売りなら上の壁(P・R1〜R3)の付近で押し目ゾーンに入っていると、戻り率とピボットの2つの理由が重なります。これを<span class="badge b-conf">根拠重なり</span>として印を付けています。</p>
+    <p>銘柄によって動く幅がちがうので、「近い」かどうかは1時間足のATR(1本の足が平均でどれくらい動くか)で決めています。現在値とピボット・200SMAの差が<b>1時間足ATRの0.3倍以内</b>なら「付近」です。</p>
+    <p>押し目ゾーンかエントリー候補で、次のどれかにいると、戻り率と反発根拠の2つの理由が重なります。これを<span class="badge b-conf">根拠重なり</span>として印を付けています。</p>
+    <table>
+      <tr><th>方向</th><th>重なる場所</th></tr>
+      <tr><td>押し目買い</td><td>下の床(P・S1〜S3)の付近、または200SMAの少し上</td></tr>
+      <tr><td>戻り売り</td><td>上の壁(P・R1〜R3)の付近、または200SMAの少し下</td></tr>
+    </table>
+    <p class="note">200SMAは「少し上(下)」のときだけ数えます。買いなのに200SMAの下にいるときは、流れが崩れかけていることもあるので重なりにしません。</p>
   </div>
 
   <div class="card">
@@ -177,18 +187,29 @@ var LIVE_URL = 'https://raw.githubusercontent.com/nurunuru39/nurunuru-fx/data/sc
 var liveData = null, liveFilter = 'pick';
 
 function cell(text, cls){ var td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; return td; }
-// ピボット列:付近なら「S1付近」、はなれていれば「S1(ATR×1.2)」。押し目方向のピボット付近なら「根拠重なり」
+// 反発根拠の列:付近なら「S1付近」「200SMA付近」(太字)、はなれていれば「S1(ATR×1.2)」。押し目方向なら「根拠重なり」
 function pivotCell(x){
-  var td = document.createElement('td'), pv = x.pivot;
-  if (!pv) { td.textContent = '-'; return td; }
-  var s = document.createElement('span');
-  if (pv.near) { s.className = 'pv-near'; s.textContent = pv.name + '付近'; }
-  else { s.className = 'pv-far'; s.textContent = pv.name + (pv.dist_atr != null ? '(ATR×' + pv.dist_atr + ')' : ''); }
-  s.title = pv.name + ' = ' + fmtPrice(pv.level) + '(前日 ' + pv.from + ' の高値・安値・終値から計算)';
-  td.appendChild(s);
+  var td = document.createElement('td'), pv = x.pivot, sm = x.sma200;
+  if (!pv && !sm) { td.textContent = '-'; return td; }
+  var list = document.createElement('div'), firstFar = null;
+  list.className = 'pv-list';
+  function add(near, nearText, farText, title){
+    var s = document.createElement('span');
+    s.className = near ? 'pv-near' : 'pv-far';
+    s.textContent = near ? nearText : farText;
+    s.title = title;
+    list.insertBefore(s, near ? firstFar : null);   // 付近のものを上に出す
+    if (!near && !firstFar) firstFar = s;
+  }
+  if (pv) add(pv.near, pv.name + '付近', pv.name + (pv.dist_atr != null ? '(ATR×' + pv.dist_atr + ')' : ''),
+    pv.name + ' = ' + fmtPrice(pv.level) + '(前日 ' + pv.from + ' の高値・安値・終値から計算)');
+  if (sm) add(sm.near, '200SMA付近', '200SMA' + (sm.dist_atr != null ? '(ATR×' + sm.dist_atr + ')' : ''),
+    '4時間足200SMA = ' + fmtPrice(sm.value) + '(いまは' + (sm.above ? '上' : '下') + ')');
+  td.appendChild(list);
   if (x.confluence) {
     var b = document.createElement('span'); b.className = 'badge b-conf'; b.textContent = '根拠重なり';
-    td.appendChild(document.createElement('br')); td.appendChild(b);
+    if (x.confluence_by && x.confluence_by.length) b.title = x.confluence_by.map(function(k){ return k === 'SMA200' ? '200SMA' : k; }).join('・') + ' と押し目ゾーンが重なっています';
+    td.appendChild(b);
   }
   return td;
 }

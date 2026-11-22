@@ -45,6 +45,13 @@ main { max-width:800px; margin:auto; padding:20px 16px; }
 @keyframes flash { 0%,100% { background:rgba(74,222,128,.32); } 50% { background:rgba(74,222,128,0); } }
 @keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(74,222,128,.9); } 50% { box-shadow:0 0 10px 3px rgba(74,222,128,.9); } }
 @media (prefers-reduced-motion: reduce) { .picks button.entry { animation:none; background:rgba(74,222,128,.25); } }
+.tfs { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:0 0 10px; }
+.tfs b { font-size:.85rem; color:#94a3b8; font-weight:normal; margin-right:2px; }
+.tfs button { font:inherit; font-size:.85rem; padding:4px 12px; border-radius:8px; cursor:pointer;
+  border:1px solid #334155; background:#0f172a; color:#cbd5e1; }
+.tfs button[aria-pressed="true"] { background:#facc15; border-color:#facc15; color:#0f172a; font-weight:bold; }
+.tfs .sma { font-size:.78rem; color:#fde68a; margin-left:4px; }
+.tfs button[aria-pressed="true"] .sma { color:#0f172a; }
 .syms-head { font-size:.95rem; font-weight:bold; color:#7dd3fc; margin-top:6px; }
 #chart { height:70vh; min-height:440px; border-radius:8px; overflow:hidden; background:#0f172a; }
 #chart .tradingview-widget-container, #chart .tradingview-widget-container__widget { height:100%; }
@@ -65,11 +72,13 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
 <main>
   <div class="card">
     <h2>銘柄を切り替えて見る</h2>
-    <p class="note">ボタンを押すと銘柄が切り替わります。上の「押し目スキャナーの狙い目」には、押し目スキャナーで<b>エントリー候補</b>(チカチカ光ります)と<b>押し目ゾーン</b>の銘柄が出ます(5分ごとに更新)。最初は15分足です。時間足(1時間・4時間・日足など)はチャートの左上で変えられます。時刻は日本時間です。</p>
+    <p class="note">ボタンを押すと銘柄が切り替わります。上の「押し目スキャナーの狙い目」には、押し目スキャナーで<b>エントリー候補</b>(チカチカ光ります)と<b>押し目ゾーン</b>の銘柄が出ます(5分ごとに更新)。時刻は日本時間です。</p>
+    <p class="note">黄色の線は<b>4時間足の200SMA</b>(200本の単純移動平均)にあたる線です。どの時間足でも同じ線になるように、本数を変えています(15分足は3200本、1時間足は800本、4時間足は200本)。時間足は下の黄色のボタンで変えてください(チャートの左上で変えると、線の本数が合わなくなります)。</p>
     <div class="picks-head"><b>押し目スキャナーの狙い目</b><span id="picksTime"></span></div>
     <div class="picks" id="picks" role="group" aria-label="押し目スキャナーの狙い目"><p class="msg">読みこみ中…</p></div>
     <div class="syms-head">主要銘柄</div>
     <div class="syms" id="syms" role="group" aria-label="銘柄"></div>
+    <div class="tfs" id="tfs" role="group" aria-label="時間足"><b>時間足</b></div>
     <div id="chart"></div>
   </div>
 </main>
@@ -103,7 +112,17 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   let current = null;
   const chart = document.getElementById('chart');
 
+  // 時間足と、4時間足の200SMAにあたる本数(4時間 = 15分×16 = 1時間×4)
+  const TFS = [
+    { key:'15',  label:'15分',  sma:3200 },
+    { key:'60',  label:'1時間', sma:800 },
+    { key:'240', label:'4時間', sma:200 },
+  ];
+  let tf = TFS[0];
+  let currentSym = null;
+
   function draw(sym) {
+    currentSym = sym;
     // ウィジェットは作り直さないと銘柄が変わらないので、毎回入れ直す
     chart.innerHTML = '';
     const wrap = document.createElement('div');
@@ -116,7 +135,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     s.textContent = JSON.stringify({
       autosize: true,
       symbol: sym.tv,
-      interval: '15',
+      interval: tf.key,
       hide_volume: true,
       timezone: 'Asia/Tokyo',
       theme: 'dark',
@@ -127,6 +146,9 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       allow_symbol_change: true,
       hide_side_toolbar: false,
       calendar: false,
+      // 4時間足の200SMAにあたる線(黄色)
+      studies: [{ id: 'MASimple@tv-basicstudies', inputs: { length: tf.sma } }],
+      studies_overrides: { 'moving average.plot.color': '#facc15', 'moving average.plot.linewidth': 2 },
       support_host: 'https://www.tradingview.com'
     });
     wrap.appendChild(inner);
@@ -135,8 +157,20 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     current = sym.key;
     document.querySelectorAll('#syms button, #picks button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === sym.key)));
     try { localStorage.setItem('nuru-chart', sym.key); } catch (e) {}
-    history.replaceState(null, '', '?s=' + sym.key);
+    document.querySelectorAll('#tfs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tf === tf.key)));
+    try { localStorage.setItem('nuru-chart-tf', tf.key); } catch (e) {}
+    history.replaceState(null, '', '?s=' + sym.key + '&tf=' + tf.key);
   }
+
+  const tfBox = document.getElementById('tfs');
+  TFS.forEach(t => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.tf = t.key;
+    b.innerHTML = t.label + '<span class="sma">SMA' + t.sma + '</span>';
+    b.addEventListener('click', () => { tf = t; draw(currentSym); });
+    tfBox.appendChild(b);
+  });
 
   SYMBOLS.forEach(sym => {
     const b = document.createElement('button');
@@ -146,6 +180,11 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     b.addEventListener('click', () => draw(sym));
     box.appendChild(b);
   });
+
+  // 最初の時間足: URLの &tf=60 → 前回の時間足 → 15分足
+  let firstTf = new URLSearchParams(location.search).get('tf');
+  if (!firstTf) { try { firstTf = localStorage.getItem('nuru-chart-tf'); } catch (e) {} }
+  tf = TFS.find(t => t.key === firstTf) || TFS[0];
 
   // 最初に出す銘柄: URLの ?s=USDJPY → 前回見ていた銘柄 → ドル円
   let first = new URLSearchParams(location.search).get('s');
