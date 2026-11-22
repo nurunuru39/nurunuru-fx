@@ -54,7 +54,7 @@ main { max-width:800px; margin:auto; padding:20px 16px; }
 .tfs button[aria-pressed="true"] .sma { color:#0f172a; }
 .syms-head { font-size:.95rem; font-weight:bold; color:#7dd3fc; margin-top:6px; }
 #chart { height:70vh; min-height:440px; border-radius:8px; overflow:hidden; background:#0f172a; }
-#chart .tradingview-widget-container, #chart .tradingview-widget-container__widget { height:100%; }
+#chart #tvchart, #chart iframe { height:100%; }
 @media (max-width:560px){
   .card { padding:14px; }
   .syms button { padding:5px 11px; font-size:.85rem; }
@@ -121,39 +121,46 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   let tf = TFS[0];
   let currentSym = null;
 
+  // tv.js は1回だけ読みこむ
+  let tvLoading = null;
+  function loadTv(cb) {
+    if (window.TradingView && TradingView.widget) { cb(); return; }
+    if (!tvLoading) {
+      tvLoading = new Promise((ok, ng) => {
+        const s = document.createElement('script');
+        s.src = 'https://s3.tradingview.com/tv.js';
+        s.onload = ok; s.onerror = ng;
+        document.head.appendChild(s);
+      });
+    }
+    tvLoading.then(cb, () => { chart.innerHTML = '<p class="note" style="padding:16px">チャートを読みこめませんでした。少し時間をおいて開き直してください。</p>'; tvLoading = null; });
+  }
+
   function draw(sym) {
     currentSym = sym;
-    // ウィジェットは作り直さないと銘柄が変わらないので、毎回入れ直す
-    chart.innerHTML = '';
-    const wrap = document.createElement('div');
-    wrap.className = 'tradingview-widget-container';
-    const inner = document.createElement('div');
-    inner.className = 'tradingview-widget-container__widget';
-    const s = document.createElement('script');
-    s.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    s.async = true;
-    s.textContent = JSON.stringify({
-      autosize: true,
-      symbol: sym.tv,
-      interval: tf.key,
-      hide_volume: true,
-      timezone: 'Asia/Tokyo',
-      theme: 'dark',
-      style: '1',
-      locale: 'ja',
-      backgroundColor: '#0f172a',
-      gridColor: 'rgba(148,163,184,0.08)',
-      allow_symbol_change: true,
-      hide_side_toolbar: false,
-      calendar: false,
-      // 4時間足の200SMAにあたる線(黄色)
-      studies: [{ id: 'MASimple@tv-basicstudies', inputs: { length: tf.sma } }],
-      studies_overrides: { 'moving average.plot.color': '#facc15', 'moving average.plot.linewidth': 2 },
-      support_host: 'https://www.tradingview.com'
+    // チャートは作り直さないと銘柄・時間足・線の本数が変わらないので、毎回入れ直す。
+    // 線の本数を指定できるように、埋めこみ用スクリプトではなく tv.js の TradingView.widget を使う
+    chart.innerHTML = '<div id="tvchart" style="height:100%"></div>';
+    loadTv(() => {
+      new TradingView.widget({
+        container_id: 'tvchart',
+        autosize: true,
+        symbol: sym.tv,
+        interval: tf.key,
+        timezone: 'Asia/Tokyo',
+        theme: 'dark',
+        style: '1',
+        locale: 'ja',
+        toolbar_bg: '#0f172a',
+        enable_publishing: false,
+        allow_symbol_change: true,
+        hide_side_toolbar: false,
+        // 4時間足の200SMAにあたる線(黄色)
+        studies: [{ id: 'MASimple@tv-basicstudies', inputs: { length: tf.sma } }],
+        studies_overrides: { 'moving average.plot.color': '#facc15', 'moving average.plot.linewidth': 2 },
+        overrides: { 'paneProperties.background': '#0f172a', 'paneProperties.backgroundType': 'solid' },
+      });
     });
-    wrap.appendChild(inner);
-    wrap.appendChild(s);
-    chart.appendChild(wrap);
     current = sym.key;
     document.querySelectorAll('#syms button, #picks button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === sym.key)));
     try { localStorage.setItem('nuru-chart', sym.key); } catch (e) {}
