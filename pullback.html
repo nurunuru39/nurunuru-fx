@@ -72,6 +72,21 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .st-bar.neg { right:50%; background:#f87171; }
 .st-val { text-align:right; font-variant-numeric:tabular-nums; color:#cbd5e1; }
 .st-cell { white-space:nowrap; font-size:.85rem; }
+.sr { margin-top:10px; padding:10px 12px; border-radius:10px; background:#0f172a; border:1px solid #334155; }
+.sr-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.sr-head b { color:#bae6fd; min-width:3.5em; }
+.sr-msg { padding:1px 10px; border-radius:999px; font-size:.8rem; font-weight:bold; color:#0f172a; }
+.sr-msg.up { background:#4ade80; color:#0f172a; } .sr-msg.down { background:#f87171; color:#0f172a; }
+.sr-count { font-size:.75rem; color:#94a3b8; }
+.sr-pairs { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.sr-pair { font-size:.8rem; padding:2px 8px; border-radius:6px; background:#1e293b; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.sr-pair i { font-style:normal; font-weight:bold; margin-left:3px; }
+.sr-pair.up i { color:#4ade80; } .sr-pair.down i { color:#f87171; } .sr-pair.flat i, .sr-pair.none i { color:#94a3b8; }
+.sr.glow-up { border-color:#4ade80; animation:srUp 1.6s ease-in-out infinite; }
+.sr.glow-down { border-color:#f87171; animation:srDown 1.6s ease-in-out infinite; }
+@keyframes srUp { 0%,100% { box-shadow:0 0 0 0 rgba(74,222,128,.7); } 50% { box-shadow:0 0 14px 3px rgba(74,222,128,.7); } }
+@keyframes srDown { 0%,100% { box-shadow:0 0 0 0 rgba(248,113,113,.7); } 50% { box-shadow:0 0 14px 3px rgba(248,113,113,.7); } }
+@media (prefers-reduced-motion: reduce) { .sr.glow-up { animation:none; box-shadow:0 0 10px rgba(74,222,128,.6); } .sr.glow-down { animation:none; box-shadow:0 0 10px rgba(248,113,113,.6); } }
 @media (max-width:560px){ .st-row { grid-template-columns:3.6em 1fr 3.8em; font-size:.82rem; } .st-name { white-space:normal; line-height:1.2; } .st-name .b-pb { display:block; width:max-content; margin-top:2px; font-size:.62rem; padding:0 4px; } }
 .badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:.78rem; font-weight:bold; white-space:nowrap; }
 .b-entry { background:#4ade80; color:#0f172a; }
@@ -129,6 +144,12 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <div id="stBars"><p class="note">読み込み中…</p></div>
     <p class="note" style="margin:8px 0 0">各通貨が入っている7つのペアの値動き(%)を、その通貨から見た向きにそろえて平均した点数です。右(緑)ほど強く、左(赤)ほど弱い通貨です。<span class="badge b-pb">押し目中?</span> は、24時間では強いのに、直近1時間は弱くなっている通貨です。</p>
+  </div>
+
+  <div class="card" id="srBox">
+    <h2>通貨シリーズ</h2>
+    <p class="note" style="margin:0">同じ通貨が入っているペアを並べて、直近24時間で上がった(<span class="up">↑</span>)か下がった(<span class="down">↓</span>)かを見ます。ほとんど動いていないペアは → です。シリーズの全部(または8割以上)が、その通貨から見て同じ向きなら、シリーズが光って「円が全面安」のように出ます。</p>
+    <div id="srList"><p class="note">読み込み中…</p></div>
   </div>
 
   <div class="card" id="live">
@@ -293,6 +314,32 @@ document.querySelectorAll('.st-tf button').forEach(function(btn){
   });
 });
 
+// 通貨シリーズ(各ペアの24時間の向き。そろっていれば光らせて「円が全面安」)
+function drawSeries(){
+  var box = document.getElementById('srList'), list = liveData && liveData.series;
+  box.innerHTML = '';
+  if (!list) { box.innerHTML = '<p class="note">通貨シリーズはまだありません。次のスキャンを待ってください。</p>'; return; }
+  var ARROW = { up: '↑', down: '↓', flat: '→' };
+  list.forEach(function(sr){
+    var d = document.createElement('div'); d.className = 'sr' + (sr.state ? ' glow-' + sr.state : '');
+    var h = document.createElement('div'); h.className = 'sr-head';
+    var b = document.createElement('b'); b.textContent = sr.label; h.appendChild(b);
+    if (sr.msg) { var m = document.createElement('span'); m.className = 'sr-msg ' + sr.state; m.textContent = sr.msg; h.appendChild(m); }
+    var c = document.createElement('span'); c.className = 'sr-count';
+    c.textContent = sr.label + 'から見て 高' + sr.up + '・安' + sr.down + '(' + sr.total + 'ペア)';
+    h.appendChild(c); d.appendChild(h);
+    var ps = document.createElement('div'); ps.className = 'sr-pairs';
+    sr.pairs.forEach(function(pr){
+      var e = document.createElement('span'); e.className = 'sr-pair ' + (pr.dir || 'none');
+      e.textContent = pr.name;
+      var i = document.createElement('i'); i.textContent = pr.dir ? ARROW[pr.dir] : '-'; e.appendChild(i);
+      e.title = pr.chg == null ? 'データなし' : '24時間で ' + (pr.chg > 0 ? '+' : '') + pr.chg.toFixed(2) + '%';
+      ps.appendChild(e);
+    });
+    d.appendChild(ps); box.appendChild(d);
+  });
+}
+
 function fmtPrice(p){ return p >= 100 ? p.toFixed(2) : p.toFixed(p >= 10 ? 3 : 5); }
 
 function drawLive(){
@@ -340,10 +387,12 @@ function loadLive(){
       document.getElementById('liveTime').textContent = t;
       drawLive();
       drawStrength();
+      drawSeries();
     })
     .catch(function(){
       document.getElementById('liveTime').textContent = 'スキャン結果を読み込めませんでした';
       if (!liveData) document.getElementById('stBars').innerHTML = '<p class="note">通貨の強さを読み込めませんでした。</p>';
+      if (!liveData) document.getElementById('srList').innerHTML = '<p class="note">通貨シリーズを読み込めませんでした。</p>';
       document.getElementById('liveBody').innerHTML = '<tr><td colspan="9" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
     });
 }

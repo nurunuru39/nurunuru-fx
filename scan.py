@@ -44,6 +44,12 @@
   押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のとき ok=true(強弱OK)を入れる。
   24時間で強いのに1時間の点数がマイナスの通貨は「押し目中?」(pullback)とする。
   強弱は表示用で、状態(エントリー候補など)の判定は変えない。
+
+通貨シリーズ(円・ドル・ユーロ・ポンド・豪ドル)を scan.json の "series" に入れる:
+  各ペアの直近24時間の変化率(15分足)から、上がった(up)・下がった(down)・ほとんど動いていない(flat)を出す。
+  ほとんど動いていない = 値動きの幅が日足ATR(20)の SERIES_FLAT 倍より小さい(ATRがなければ0.05%未満)。
+  その通貨の目線(左にあればペアの向きのまま、右にあれば逆)で、シリーズの SERIES_ALL 以上が
+  同じ向きなら「全面高」「全面安」とする(全部なら「全面高」、8割以上なら「ほぼ全面高」)。
 """
 import json
 import math
@@ -62,6 +68,15 @@ PIVOT_NEAR = 0.3      # ピボット・SMA200の付近とみなす距離(1時間
 SMA_N = 200           # 4時間足の単純移動平均の本数
 CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "NZD", "CAD", "CHF"]   # 通貨強弱の8通貨
 STRENGTH_TOP = 3      # 強弱の上位・下位それぞれ何通貨を「強い」「弱い」とするか
+SERIES = [            # 通貨シリーズ(通貨, 表示名, ペア)
+    ("JPY", "円", ["USDJPY", "EURJPY", "GBPJPY", "AUDJPY", "NZDJPY", "CADJPY", "CHFJPY"]),
+    ("USD", "ドル", ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCHF", "USDCAD"]),
+    ("EUR", "ユーロ", ["EURUSD", "EURJPY", "EURGBP", "EURAUD", "EURNZD", "EURCAD", "EURCHF"]),
+    ("GBP", "ポンド", ["GBPUSD", "GBPJPY", "EURGBP", "GBPAUD", "GBPNZD", "GBPCAD", "GBPCHF"]),
+    ("AUD", "豪ドル", ["AUDUSD", "AUDJPY", "EURAUD", "GBPAUD", "AUDNZD", "AUDCAD", "AUDCHF"]),
+]
+SERIES_FLAT = 0.1     # 24時間の値動きが日足ATRのこの倍より小さければ「ほとんど動いていない」(→)
+SERIES_ALL = 0.8      # シリーズのこの割合以上が同じ向きなら「全面高/全面安」
 PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
 NY = "America/New_York"
 
@@ -390,6 +405,45 @@ def strength_for(item, st):
     }
 
 
+def series_info(m15, atrs):
+    """通貨シリーズ。m15 は {ペア名: 15分足}、atrs は main の ATR({ペア名: {"d1", "close"}})"""
+    out = []
+    for cur, label, pairs in SERIES:
+        rows, up, down = [], 0, 0
+        for pair in pairs:
+            ch = None
+            try:
+                if pair in m15:
+                    ch = pct_change(m15[pair], 24)
+            except Exception as e:
+                print(pair, "series error:", e, file=sys.stderr)
+            if ch is None or math.isnan(ch):
+                rows.append({"name": pair, "chg": None, "dir": None})
+                continue
+            a = atrs.get(pair)
+            if a and a.get("d1") and a.get("close"):
+                flat = abs(ch) / 100 * a["close"] < a["d1"] * SERIES_FLAT
+            else:
+                flat = abs(ch) < 0.05
+            d = "flat" if flat else ("up" if ch > 0 else "down")
+            rows.append({"name": pair, "chg": round(ch, 3), "dir": d})
+            if d != "flat":
+                mine = d if pair[:3] == cur else ("down" if d == "up" else "up")   # その通貨の目線の向き
+                if mine == "up":
+                    up += 1
+                else:
+                    down += 1
+        n = len(pairs)
+        state, msg = None, None
+        for side, cnt, word in (("up", up, "高"), ("down", down, "安")):
+            if cnt >= math.ceil(n * SERIES_ALL - 1e-9):
+                state = side
+                msg = label + "が" + ("全面" if cnt == n else "ほぼ全面") + word
+        out.append({"cur": cur, "label": label, "pairs": rows, "up": up, "down": down,
+                    "total": n, "state": state, "all": state is not None and max(up, down) == n, "msg": msg})
+    return out
+
+
 def fetch():
     import yfinance as yf
     tickers = list(SYMBOLS.values())
@@ -433,15 +487,22 @@ def main(out="scan.json"):
         print("strength error:", e, file=sys.stderr)
     for x in items:
         x["strength"] = strength_for(x, st)
+    series = None
+    try:
+        series = series_info({n: m15[tk][["Close"]] for n, tk in SYMBOLS.items() if n in PAIRS}, atrs)
+    except Exception as e:  # シリーズが出せなくても押し目スキャンは続ける
+        print("series error:", e, file=sys.stderr)
     order = {"エントリー候補": 0, "押し目ゾーン": 1, "監視": 2, "対象外": 3}
     items.sort(key=lambda x: (order[x["status"]], -(x["adx4"] or 0)))
     data = {
         "updated": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
-        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N, "strength_top": STRENGTH_TOP},
+        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N, "strength_top": STRENGTH_TOP,
+                  "series_flat": SERIES_FLAT, "series_all": SERIES_ALL},
         "items": items, "errors": errors,
         "atr_n": ATR_N, "atr": atrs,
         "strength": st,
+        "series": series,
     }
     with open(out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
