@@ -75,7 +75,7 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .sr { margin-top:10px; padding:10px 12px; border-radius:10px; background:#0f172a; border:1px solid #334155; }
 .sr-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .sr-head b { color:#bae6fd; min-width:3.5em; }
-.sr-msg { padding:1px 10px; border-radius:999px; font-size:.8rem; font-weight:bold; color:#0f172a; }
+.sr-msg { white-space:nowrap; padding:1px 10px; border-radius:999px; font-size:.8rem; font-weight:bold; color:#0f172a; }
 .sr-msg.up { background:#4ade80; color:#0f172a; } .sr-msg.down { background:#f87171; color:#0f172a; }
 .sr-count { font-size:.75rem; color:#94a3b8; }
 .sr-pairs { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
@@ -143,12 +143,21 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <div class="st-tf"><button class="on" data-st="h24">24時間</button><button data-st="h1">1時間</button></div>
     </div>
     <div id="stBars"><p class="note">読み込み中…</p></div>
-    <p class="note" style="margin:8px 0 0">各通貨が入っている7つのペアの値動き(%)を、その通貨から見た向きにそろえて平均した点数です。右(緑)ほど強く、左(赤)ほど弱い通貨です。<span class="badge b-pb">押し目中?</span> は、24時間では強いのに、直近1時間は弱くなっている通貨です。</p>
+    <h3>通貨強弱・通貨シリーズの見方</h3>
+    <p>ドル円が上がるのは、ドルが強いからなのか、円が弱いからなのか。通貨強弱は、それを8つの通貨(USD・EUR・JPY・GBP・AUD・NZD・CAD・CHF)ごとに分けて見るものです。</p>
+    <p>たとえばユーロなら、ユーロが入っている7つのペア(ユーロドル・ユーロ円・ユーロポンド…)の値動き(%)を、ユーロから見た向きにそろえて平均します。ユーロドルが0.2%上がったら、ユーロは+0.2、ドルは−0.2と数えます。期間は「直近24時間」と「直近1時間」の2つです。グラフは右(緑)ほど強く、左(赤)ほど弱い通貨です。</p>
+    <p>下の「通貨シリーズ」は、同じ通貨が入っているペアを並べて、直近24時間で上がった(<span class="up">↑</span>)か下がった(<span class="down">↓</span>)かを見るものです。ほとんど動いていない(値動きが日足ATRの0.1倍より小さい)ペアは → です。</p>
+    <table>
+      <tr><th>しるし</th><th>意味</th></tr>
+      <tr><td><span class="badge b-st">強弱OK</span></td><td>24時間で強い順の上から3通貨を「強い」、下から3通貨を「弱い」として、押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のペア(押し目スキャナーの表の「強弱」の列)</td></tr>
+      <tr><td><span class="badge b-pb">押し目中?</span></td><td>24時間で強い3通貨のうち、直近1時間はマイナスになっている通貨。強い通貨が一休みしているところかもしれません</td></tr>
+      <tr><td><span class="sr-msg down">円が全面安</span></td><td>通貨シリーズの全部(または8割以上)が、その通貨から見て同じ向きのとき。シリーズが光ります(8割以上なら「ほぼ全面安」)</td></tr>
+    </table>
+    <p class="note">強い通貨を買って弱い通貨を売ると、流れに乗りやすいといわれます。通貨強弱と通貨シリーズは、判定(状態)には使っていない参考の情報です。</p>
   </div>
 
   <div class="card" id="srBox">
     <h2>通貨シリーズ</h2>
-    <p class="note" style="margin:0">同じ通貨が入っているペアを並べて、直近24時間で上がった(<span class="up">↑</span>)か下がった(<span class="down">↓</span>)かを見ます。ほとんど動いていないペアは → です。シリーズの全部(または8割以上)が、その通貨から見て同じ向きなら、シリーズが光って「円が全面安」のように出ます。</p>
     <div id="srList"><p class="note">読み込み中…</p></div>
   </div>
 
@@ -170,7 +179,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
         <tbody id="liveBody"><tr><td colspan="9" class="note">読み込み中…</td></tr></tbody>
       </table>
     </div>
-    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるしるしです(下の「反発根拠の見方」)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます(下の「通貨強弱の見方」)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるしるしです(下の「反発根拠の見方」)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます(上の「通貨強弱」カードの説明)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -217,18 +226,6 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <tr><td>戻り売り</td><td>上の壁(P・R1〜R3)の付近、または200SMAの少し下</td></tr>
     </table>
     <p class="note">200SMAは「少し上(下)」のときだけ数えます。買いなのに200SMAの下にいるときは、流れが崩れかけていることもあるので重なりにしません。</p>
-  </div>
-
-  <div class="card">
-    <h2>通貨強弱の見方</h2>
-    <p>ドル円が上がるのは、ドルが強いからなのか、円が弱いからなのか。通貨強弱は、それを8つの通貨(USD・EUR・JPY・GBP・AUD・NZD・CAD・CHF)ごとに分けて見るものです。</p>
-    <p>たとえばユーロなら、ユーロが入っている7つのペア(ユーロドル・ユーロ円・ユーロポンド…)の値動きを、ユーロから見た向きにそろえて平均します。ユーロドルが0.2%上がったら、ユーロは+0.2、ドルは−0.2と数えます。期間は「直近24時間」と「直近1時間」の2つです。</p>
-    <table>
-      <tr><th>しるし</th><th>意味</th></tr>
-      <tr><td><span class="badge b-st">強弱OK</span></td><td>24時間で強い順の上から3通貨を「強い」、下から3通貨を「弱い」として、押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のペア</td></tr>
-      <tr><td><span class="badge b-pb">押し目中?</span></td><td>24時間で強い3通貨のうち、直近1時間はマイナスになっている通貨。強い通貨が一休みしているところかもしれません</td></tr>
-    </table>
-    <p class="note">強い通貨を買って弱い通貨を売ると、流れに乗りやすいといわれます。強弱は判定(状態)には使っていない参考の情報です。</p>
   </div>
 
   <div class="card">
