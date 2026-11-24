@@ -57,16 +57,15 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .live-wrap table { min-width:720px; }
 .b-st { background:#a78bfa; color:#0f172a; margin-top:3px; }
 .b-pb { border:1px solid #fbbf24; color:#fbbf24; font-size:.7rem; padding:0 6px; font-weight:normal; }
-.st-box { margin-top:14px; padding:12px 14px; border-radius:10px; background:rgba(15,23,42,.55); }
 .st-head { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
-.st-head b { color:#bae6fd; }
+.st-head h2 { margin:0; }
 .st-tf { display:flex; gap:6px; }
 .st-tf button { width:auto; margin:0; padding:4px 12px; font-size:.8rem; background:#0f172a; color:#cbd5e1; border:1px solid #334155; }
 .st-tf button.on { background:#a78bfa; color:#0f172a; border-color:#a78bfa; }
 .st-row { display:grid; grid-template-columns:7.5em 1fr 4.2em; align-items:center; gap:8px; margin-top:6px; font-size:.88rem; }
 .st-name { white-space:nowrap; }
 .st-name b { display:inline-block; width:2.6em; }
-.st-track { position:relative; height:14px; background:#1e293b; border-radius:7px; }
+.st-track { position:relative; height:14px; background:#0f172a; border-radius:7px; }
 .st-track::before { content:""; position:absolute; left:50%; top:-3px; bottom:-3px; border-left:1px solid #64748b; }
 .st-bar { position:absolute; top:0; bottom:0; border-radius:7px; }
 .st-bar.pos { left:50%; background:#4ade80; }
@@ -124,6 +123,14 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
   </div>
 
+  <div class="card" id="stBox">
+    <div class="st-head"><h2>通貨強弱</h2>
+      <div class="st-tf"><button class="on" data-st="h24">24時間</button><button data-st="h1">1時間</button></div>
+    </div>
+    <div id="stBars"><p class="note">読み込み中…</p></div>
+    <p class="note" style="margin:8px 0 0">各通貨が入っている7つのペアの値動き(%)を、その通貨から見た向きにそろえて平均した点数です。右(緑)ほど強く、左(赤)ほど弱い通貨です。<span class="badge b-pb">押し目中?</span> は、24時間では強いのに、直近1時間は弱くなっている通貨です。</p>
+  </div>
+
   <div class="card" id="live">
     <div class="live-head">
       <h2 class="scan-title"><span class="scan-name">ヌルヌル押し目スキャナー</span><br>今の狙い目</h2>
@@ -131,13 +138,6 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <p class="note">15分ごとに自動更新。28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。<b>エントリー候補</b>が出ると、その行がチカチカ光ります。</p>
     <div id="evWarn"></div>
-    <div class="st-box" id="stBox">
-      <div class="st-head"><b>通貨の強さ</b>
-        <div class="st-tf"><button class="on" data-st="h24">24時間</button><button data-st="h1">1時間</button></div>
-      </div>
-      <div id="stBars"><p class="note">読み込み中…</p></div>
-      <p class="note" style="margin:8px 0 0">各通貨が入っている7つのペアの値動き(%)を、その通貨から見た向きにそろえて平均した点数です。右(緑)ほど強く、左(赤)ほど弱い通貨です。<span class="badge b-pb">押し目中?</span> は、24時間では強いのに、直近1時間は弱くなっている通貨です。</p>
-    </div>
     <div class="tabs">
       <button class="on" data-f="pick">狙い目だけ</button>
       <button data-f="watch">監視も表示</button>
