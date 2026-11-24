@@ -1,0 +1,33 @@
+name: NY反転バックテスト
+
+# 手動実行だけ(Actions の画面の「Run workflow」ボタン)。結果はサイトには出さない。
+# まとめは実行結果のページ(Summary)に出て、trades.csv はファイル(Artifacts)で取れる。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ライブラリを入れる
+        run: pip install --quiet yfinance pandas
+
+      - name: バックテストする
+        run: |
+          python backtest_ny.py out
+          cat out/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ny-backtest
+          path: out/

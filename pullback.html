@@ -57,6 +57,11 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .live-wrap table { min-width:720px; }
 .b-st { background:#a78bfa; color:#0f172a; margin-top:3px; }
 .b-pb { border:1px solid #fbbf24; color:#fbbf24; font-size:.7rem; padding:0 6px; font-weight:normal; }
+.b-ny { background:#f472b6; color:#0f172a; font-size:.7rem; padding:0 6px; }
+.ny-box { margin-top:12px; padding:10px 12px; border-radius:10px; background:#0f172a; border:1px solid #334155; font-size:.88rem; }
+.ny-box.hit { border-color:#f472b6; box-shadow:0 0 12px rgba(244,114,182,.45); }
+.ny-box b { color:#f9a8d4; }
+.ny-pick { display:inline-block; margin:4px 6px 0 0; padding:2px 10px; border-radius:8px; background:#1e293b; font-weight:bold; white-space:nowrap; }
 .st-head { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
 .st-head h2 { margin:0; }
 .st-tf { display:flex; gap:6px; }
@@ -87,7 +92,7 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 @keyframes srUp { 0%,100% { box-shadow:0 0 0 0 rgba(74,222,128,.7); } 50% { box-shadow:0 0 14px 3px rgba(74,222,128,.7); } }
 @keyframes srDown { 0%,100% { box-shadow:0 0 0 0 rgba(248,113,113,.7); } 50% { box-shadow:0 0 14px 3px rgba(248,113,113,.7); } }
 @media (prefers-reduced-motion: reduce) { .sr.glow-up { animation:none; box-shadow:0 0 10px rgba(74,222,128,.6); } .sr.glow-down { animation:none; box-shadow:0 0 10px rgba(248,113,113,.6); } }
-@media (max-width:560px){ .st-row { grid-template-columns:3.6em 1fr 3.8em; font-size:.82rem; } .st-name { white-space:normal; line-height:1.2; } .st-name .b-pb { display:block; width:max-content; margin-top:2px; font-size:.62rem; padding:0 4px; } }
+@media (max-width:560px){ .st-row { grid-template-columns:3.6em 1fr 3.8em; font-size:.82rem; } .st-name { white-space:normal; line-height:1.2; } .st-name .b-pb, .st-name .b-ny { display:block; width:max-content; margin-top:2px; font-size:.62rem; padding:0 4px; } }
 .badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:.78rem; font-weight:bold; white-space:nowrap; }
 .b-entry { background:#4ade80; color:#0f172a; }
 .b-zone { background:#38bdf8; color:#0f172a; }
@@ -143,6 +148,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <div class="st-tf"><button class="on" data-st="h24">24時間</button><button data-st="h1">1時間</button></div>
     </div>
     <div id="stBars"><p class="note">読み込み中…</p></div>
+    <div id="nyBox"></div>
     <h3>通貨強弱・通貨シリーズの見方</h3>
     <p>ドル円が上がるのは、ドルが強いからなのか、円が弱いからなのか。通貨強弱は、それを8つの通貨(USD・EUR・JPY・GBP・AUD・NZD・CAD・CHF)ごとに分けて見るものです。</p>
     <p>たとえばユーロなら、ユーロが入っている7つのペア(ユーロドル・ユーロ円・ユーロポンド…)の値動き(%)を、ユーロから見た向きにそろえて平均します。ユーロドルが0.2%上がったら、ユーロは+0.2、ドルは−0.2と数えます。期間は「直近24時間」と「直近1時間」の2つです。グラフは右(緑)ほど強く、左(赤)ほど弱い通貨です。</p>
@@ -150,6 +156,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     <table>
       <tr><th>しるし</th><th>意味</th></tr>
       <tr><td><span class="badge b-st">強弱OK</span></td><td>24時間で強い順の上から3通貨を「強い」、下から3通貨を「弱い」として、押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のペア(押し目スキャナーの表の「強弱」の列)</td></tr>
+      <tr><td><span class="badge b-ny">NY反転</span></td><td>24時間で強い2通貨のどれかが、ロンドンの開き〜NYの開きに売られて(強さがマイナス)、NYが開いたあと直近1時間でまた買われた(強さがプラス)とき。弱い2通貨は逆で、ロンドンで買い戻されて、NYでまた売られたとき。狙い目は、強い通貨なら最弱通貨に対して買い、弱い通貨なら最強通貨に対して売りのペアです。そのペアが押し目ゾーンかエントリー候補で方向も同じなら <span class="badge b-conf">根拠重なり</span> も付きます。ロンドンの開きはロンドン時間8時(日本時間17時、夏は16時)、NYの開きはニューヨーク時間8時(日本時間22時、夏は21時)で、NYが開いて1時間たってから、ニューヨーク時間17時(日本時間7時、夏は6時)まで判定します</td></tr>
       <tr><td><span class="badge b-pb">押し目中?</span></td><td>24時間で強い3通貨のうち、直近1時間はマイナスになっている通貨。強い通貨が一休みしているところかもしれません</td></tr>
       <tr><td><span class="sr-msg down">円が全面安</span></td><td>通貨シリーズの全部(または8割以上)が、その通貨から見て同じ向きのとき。シリーズが光ります(8割以上なら「ほぼ全面安」)</td></tr>
     </table>
@@ -179,7 +186,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
         <tbody id="liveBody"><tr><td colspan="9" class="note">読み込み中…</td></tr></tbody>
       </table>
     </div>
-    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるしるしです(下の「反発根拠の見方」)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます(上の「通貨強弱」カードの説明)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるか、NY反転の狙い目になっているしるしです(下の「反発根拠の見方」、上の「通貨強弱」カードの説明)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます。NY反転の狙い目のペアには <span class="badge b-ny">NY反転</span> を付けます(上の「通貨強弱」カードの説明)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -226,6 +233,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <tr><td>戻り売り</td><td>上の壁(P・R1〜R3)の付近、または200SMAの少し下</td></tr>
     </table>
     <p class="note">200SMAは「少し上(下)」のときだけ数えます。買いなのに200SMAの下にいるときは、流れが崩れかけていることもあるので重なりにしません。</p>
+    <p class="note">そのほか、通貨強弱の <span class="badge b-ny">NY反転</span> の狙い目のペアが、同じ方向で押し目ゾーンかエントリー候補に入っているときも <span class="badge b-conf">根拠重なり</span> にします(上の「通貨強弱」カードの説明)。</p>
   </div>
 
   <div class="card">
@@ -278,6 +286,12 @@ function strengthCell(x){
   d.title = '24時間の強さ ' + st.base + ' ' + st.base_score + ' / ' + st.quote + ' ' + st.quote_score;
   td.appendChild(d);
   if (st.ok) { var b = document.createElement('span'); b.className = 'badge b-st'; b.textContent = '強弱OK'; td.appendChild(b); }
+  if (x.ny_reversal) {
+    var n = document.createElement('span'); n.className = 'badge b-ny'; n.textContent = 'NY反転';
+    n.title = x.ny_reversal.cur + ' のNY反転の狙い目(' + (x.ny_reversal.dir === 'up' ? '買い' : '売り') + ')';
+    if (st.ok) td.appendChild(document.createTextNode(' '));
+    td.appendChild(n);
+  }
   return td;
 }
 
@@ -293,6 +307,8 @@ function drawStrength(){
     var row = document.createElement('div'); row.className = 'st-row';
     var nm = document.createElement('div'); nm.className = 'st-name';
     nm.innerHTML = '<b>' + c + '</b>';
+    var ny = st.ny && st.ny.hits ? st.ny.hits.filter(function(h){ return h.cur === c; }) : [];
+    if (ny.length) { var q = document.createElement('span'); q.className = 'badge b-ny'; q.textContent = 'NY反転'; nm.appendChild(q); }
     if (st.pullback && st.pullback.indexOf(c) >= 0) { var p = document.createElement('span'); p.className = 'badge b-pb'; p.textContent = '押し目中?'; nm.appendChild(p); }
     var tr = document.createElement('div'); tr.className = 'st-track';
     var bar = document.createElement('div'); bar.className = 'st-bar ' + (sc[c] >= 0 ? 'pos' : 'neg');
@@ -302,6 +318,28 @@ function drawStrength(){
     row.title = (i + 1) + '位 ' + c + '(' + (stTf === 'h24' ? '24時間' : '1時間') + ')';
     row.appendChild(nm); row.appendChild(tr); row.appendChild(v);
     box.appendChild(row);
+  });
+  drawNy(st.ny);
+}
+
+// NY反転の狙い目
+function drawNy(ny){
+  var box = document.getElementById('nyBox');
+  box.className = ''; box.innerHTML = '';
+  if (!ny) return;
+  box.className = 'ny-box';
+  if (!ny.active) {
+    box.innerHTML = '<b>NY反転</b> NYが開いて1時間たってから、NYの終わりまで判定します(日本時間 ' + ny.ny_open.slice(-5) + ' の1時間後 〜 ' + ny.ny_close.slice(-5) + ')。';
+    return;
+  }
+  if (!ny.hits.length) { box.innerHTML = '<b>NY反転</b> 判定中です。いまは当てはまる通貨はありません。'; return; }
+  box.className = 'ny-box hit';
+  box.innerHTML = '<b>NY反転の狙い目</b><br>';
+  ny.hits.forEach(function(h){
+    var e = document.createElement('span'); e.className = 'ny-pick ' + h.dir;
+    e.textContent = h.pair + ' ' + (h.dir === 'up' ? '買い' : '売り');
+    e.title = h.cur + 'が' + (h.side === 'strong' ? 'NYでまた買われた(相手は最弱の' : 'NYでまた売られた(相手は最強の') + h.partner + ')';
+    box.appendChild(e);
   });
 }
 document.querySelectorAll('.st-tf button').forEach(function(btn){

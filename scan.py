@@ -50,6 +50,19 @@
   ほとんど動いていない = 値動きの幅が日足ATR(20)の SERIES_FLAT 倍より小さい(ATRがなければ0.05%未満)。
   その通貨の目線(左にあればペアの向きのまま、右にあれば逆)で、シリーズの SERIES_ALL 以上が
   同じ向きなら「全面高」「全面安」とする(全部なら「全面高」、8割以上なら「ほぼ全面高」)。
+
+NY反転(scan.json の "strength" の "ny"):
+  ロンドンの開き = ロンドン時間8時、ニューヨークの開き = ニューヨーク時間8時、NYの終わり = ニューヨーク時間17時。
+  どれも夏時間に合わせて計算する(日本時間では、ロンドン16時/17時、NY21時/22時、NYの終わり6時/7時)。
+  判定するのは、NYが開いて1時間たってから、NYの終わりまで。強さはどれも「その通貨の7ペアの変化率の平均」。
+  強いほう:24時間の強さが上位 NYREV_TOP(2)通貨で、
+    ① ロンドンの開き → NYの開きの強さがマイナス(ロンドンで売られた)
+    ② 直近1時間の強さがプラス(NYでまた買われた)
+  弱いほう:24時間の強さが下位 NYREV_TOP(2)通貨で、上の①②の符号を逆にしたもの。
+  当てはまった通貨は「NY反転」。狙い目は、強いほうなら最弱通貨とのペアを買う向き、
+  弱いほうなら最強通貨とのペアを売る向き。そのペアが押し目ゾーン/エントリー候補で、
+  方向も同じなら「根拠重なり」(confluence_by に "NY反転")にする。
+  同じ判定を backtest_ny.py が過去の1時間足で確かめる(ny_reversal_check を共通で使う)。
 """
 import json
 import math
@@ -77,6 +90,8 @@ SERIES = [            # 通貨シリーズ(通貨, 表示名, ペア)
 ]
 SERIES_FLAT = 0.1     # 24時間の値動きが日足ATRのこの倍より小さければ「ほとんど動いていない」(→)
 SERIES_ALL = 0.8      # シリーズのこの割合以上が同じ向きなら「全面高/全面安」
+NYREV_TOP = 2         # NY反転を見る、24時間の強さの上位・下位の通貨の数
+LONDON = "Europe/London"
 PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
 NY = "America/New_York"
 
@@ -444,6 +459,103 @@ def series_info(m15, atrs):
     return out
 
 
+# ===== NY反転 =====
+def session_times(day):
+    """NYの日付 day の、ロンドンの開き・NYの開き・NYの終わり(UTC)。夏時間はタイムゾーンで自動"""
+    def at(tz, h):
+        return pd.Timestamp(datetime(day.year, day.month, day.day, h)).tz_localize(tz).tz_convert("UTC")
+    return at(LONDON, 8), at(NY, 8), at(NY, 17)
+
+
+def price_finder(frames, bar):
+    """frames = {ペア名: OHLC} から「時刻 t の値段」を返す関数を作る(t 以前に終わった足の終値)。
+    bar は足の長さ(15分足なら 15min)。足の時刻は始まりの時刻なので、終わり = 始まり + bar"""
+    closes = {}
+    for pair, df in frames.items():
+        c = df["Close"].dropna()
+        if c.empty:
+            continue
+        idx = c.index if c.index.tz is not None else c.index.tz_localize("UTC")
+        closes[pair] = pd.Series(c.values, index=idx.tz_convert("UTC") + bar)
+
+    def price_at(pair, t):
+        c = closes.get(pair)
+        if c is None:
+            return None
+        i = c.index.searchsorted(t, side="right") - 1
+        return float(c.iloc[i]) if i >= 0 else None
+    return price_at
+
+
+def strength_between(price_at, t0, t1):
+    """t0 → t1 の8通貨の強さ(各通貨の7ペアの変化率(%)を通貨の目線にそろえた平均)。足りなければ None"""
+    sums = {c: [] for c in CURRENCIES}
+    for pair in PAIRS:
+        a, b = price_at(pair, t0), price_at(pair, t1)
+        if not a or not b:
+            continue
+        ch = (b / a - 1) * 100
+        sums[pair[:3]].append(ch)
+        sums[pair[3:]].append(-ch)
+    if any(not v for v in sums.values()):
+        return None
+    return {c: sum(v) / len(v) for c, v in sums.items()}
+
+
+def pair_of(a, b):
+    """通貨 a と b のペア名と、a を買う向き(up/down)"""
+    if a + b in PAIRS:
+        return a + b, "up"
+    return b + a, "down"
+
+
+def ny_reversal_check(price_at, t):
+    """時刻 t(UTC)の NY反転の判定。NYの時間でなければ active=False"""
+    t = pd.Timestamp(t)
+    t = t.tz_localize("UTC") if t.tz is None else t.tz_convert("UTC")
+    day = t.tz_convert(NY).date()
+    lon, nyo, nyc = session_times(day)
+    out = {"day": str(day), "london": lon, "ny_open": nyo, "ny_close": nyc,
+           "active": day.weekday() < 5 and nyo + pd.Timedelta(hours=1) <= t <= nyc,
+           "cands": [], "hits": []}
+    if not out["active"]:
+        return out
+    s24 = strength_between(price_at, t - pd.Timedelta(hours=24), t)
+    slon = strength_between(price_at, lon, nyo)
+    s1 = strength_between(price_at, t - pd.Timedelta(hours=1), t)
+    if not (s24 and slon and s1):
+        out["active"] = False
+        return out
+    rank = sorted(CURRENCIES, key=lambda c: -s24[c])
+    seen = set()
+    for side, group in (("strong", rank[:NYREV_TOP]), ("weak", rank[-NYREV_TOP:])):
+        for c in group:
+            hit = slon[c] < 0 < s1[c] if side == "strong" else slon[c] > 0 > s1[c]
+            out["cands"].append({"cur": c, "side": side, "london": round(slon[c], 3), "h1": round(s1[c], 3), "hit": hit})
+            if not hit:
+                continue
+            partner = rank[-1] if side == "strong" else rank[0]
+            if partner == c:
+                continue
+            pair, buy_c = pair_of(c, partner)
+            d = buy_c if side == "strong" else ("down" if buy_c == "up" else "up")
+            if (pair, d) in seen:
+                continue
+            seen.add((pair, d))
+            out["hits"].append({"cur": c, "side": side, "partner": partner, "pair": pair, "dir": d})
+    out["rank"] = rank
+    return out
+
+
+def ny_reversal_live(m15, now=None):
+    """いまの NY反転(scan.json 用。時刻は日本時間の文字列にする)"""
+    now = pd.Timestamp(now or datetime.now(timezone.utc))
+    r = ny_reversal_check(price_finder(m15, pd.Timedelta(minutes=15)), now)
+    for k in ("london", "ny_open", "ny_close"):
+        r[k] = r[k].tz_convert("Asia/Tokyo").strftime("%m/%d %H:%M")
+    return r
+
+
 def fetch():
     import yfinance as yf
     tickers = list(SYMBOLS.values())
@@ -487,6 +599,20 @@ def main(out="scan.json"):
         print("strength error:", e, file=sys.stderr)
     for x in items:
         x["strength"] = strength_for(x, st)
+    if st:
+        try:
+            st["ny"] = ny_reversal_live({n: m15[tk] for n, tk in SYMBOLS.items() if n in PAIRS})
+        except Exception as e:  # NY反転が出せなくても押し目スキャンは続ける
+            print("ny reversal error:", e, file=sys.stderr)
+            st["ny"] = None
+        hits = {h["pair"]: h for h in ((st.get("ny") or {}).get("hits") or [])}
+        for x in items:
+            h = hits.get(x["name"])
+            x["ny_reversal"] = h
+            # 押し目ゾーン/エントリー候補で、方向もそろっていれば根拠重なり
+            if h and x["status"] in ("エントリー候補", "押し目ゾーン") and x["dir"] == h["dir"]:
+                x["confluence_by"] = x.get("confluence_by", []) + ["NY反転"]
+                x["confluence"] = True
     series = None
     try:
         series = series_info({n: m15[tk][["Close"]] for n, tk in SYMBOLS.items() if n in PAIRS}, atrs)
@@ -498,7 +624,7 @@ def main(out="scan.json"):
         "updated": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
         "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N, "strength_top": STRENGTH_TOP,
-                  "series_flat": SERIES_FLAT, "series_all": SERIES_ALL},
+                  "series_flat": SERIES_FLAT, "series_all": SERIES_ALL, "nyrev_top": NYREV_TOP},
         "items": items, "errors": errors,
         "atr_n": ATR_N, "atr": atrs,
         "strength": st,
