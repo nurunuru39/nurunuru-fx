@@ -63,6 +63,13 @@ NY反転(scan.json の "strength" の "ny"):
   弱いほうなら最強通貨とのペアを売る向き。そのペアが押し目ゾーン/エントリー候補で、
   方向も同じなら「根拠重なり」(confluence_by に "NY反転")にする。
   同じ判定を backtest_ny.py が過去の1時間足で確かめる(ny_reversal_check を共通で使う)。
+
+1日の通貨強弱(scan.json の "strength" の "day"):
+  その日の始まり(ニューヨーク時間17時 = 日本時間朝7時、夏は6時)から15分ごとに、
+  始まりからの8通貨の強さ(7ペアの変化率の平均)を、毎回15分足からまとめて計算する(過去の分は保存しない)。
+  東京(日本時間9時)・ロンドン(ロンドン時間8時)・ニューヨーク(ニューヨーク時間8時)の開く時刻も入れる。
+  ロンドンが開いたあと、ロンドンの開きの時点の最強通貨がいま最弱になったか、
+  最弱通貨がいま最強になったら「ロンドンで強弱が逆転」(flip)とする。
 """
 import json
 import math
@@ -547,6 +554,65 @@ def ny_reversal_check(price_at, t):
     return out
 
 
+def intraday_strength(m15, now=None):
+    """その日の始まり(NY17時)から15分ごとの8通貨の強さ。足りなければ None"""
+    q = pd.Timedelta(minutes=15)
+    price_at = price_finder(m15, q)
+    last = max((df["Close"].dropna().index[-1] for df in m15.values() if not df["Close"].dropna().empty), default=None)
+    if last is None:
+        return None
+    last = (last.tz_localize("UTC") if last.tz is None else last.tz_convert("UTC")) + q    # 最後の足の終わり
+    now = pd.Timestamp(now or datetime.now(timezone.utc))
+    now = now.tz_localize("UTC") if now.tz is None else now.tz_convert("UTC")
+    end = min(now, last).floor("15min")
+    ny_end = end.tz_convert(NY)
+    start = ny_end.normalize() + pd.Timedelta(hours=17)       # NY17時
+    if start >= ny_end:
+        start -= pd.Timedelta(days=1)
+    start = start.tz_convert("UTC")
+    trade_day = (start + pd.Timedelta(days=1)).tz_convert(NY).date()
+    lon, nyo, _ = session_times(trade_day)
+    tokyo = start.tz_convert("Asia/Tokyo").normalize() + pd.Timedelta(hours=9)
+    if tokyo <= start.tz_convert("Asia/Tokyo"):
+        tokyo += pd.Timedelta(days=1)
+    tokyo = tokyo.tz_convert("UTC")
+    times, series = [], {c: [] for c in CURRENCIES}
+    t = start
+    while t <= end:
+        sb = strength_between(price_at, start, t)
+        if sb:
+            times.append(t)
+            for c in CURRENCIES:
+                series[c].append(round(sb[c], 3))
+        t += q
+    if len(times) < 2:
+        return None
+    jst = lambda x: x.tz_convert("Asia/Tokyo").strftime("%H:%M")
+    out = {
+        "start": start.tz_convert("Asia/Tokyo").strftime("%m/%d %H:%M"),
+        "times": [jst(x) for x in times],
+        "series": series,
+        "marks": [{"name": n, "time": jst(m), "i": int((m - start) / q)}
+                  for n, m in (("東京", tokyo), ("ロンドン", lon), ("NY", nyo))],
+        "flip": None,
+    }
+    # ロンドンで強弱が逆転
+    li = int((lon - start) / q)
+    if li < len(times) - 1 and times[li] == lon:
+        at_lon = {c: series[c][li] for c in CURRENCIES}
+        now_v = {c: series[c][-1] for c in CURRENCIES}
+        s_lon, w_lon = max(at_lon, key=at_lon.get), min(at_lon, key=at_lon.get)
+        s_now, w_now = max(now_v, key=now_v.get), min(now_v, key=now_v.get)
+        msg = []
+        if s_now == w_lon:
+            msg.append(f"{w_lon}が最弱→最強")
+        if w_now == s_lon:
+            msg.append(f"{s_lon}が最強→最弱")
+        if msg:
+            out["flip"] = "ロンドンで強弱が逆転(" + "、".join(msg) + ")"
+    return out
+
+
 def ny_reversal_live(m15, now=None):
     """いまの NY反転(scan.json 用。時刻は日本時間の文字列にする)"""
     now = pd.Timestamp(now or datetime.now(timezone.utc))
@@ -613,6 +679,12 @@ def main(out="scan.json"):
             if h and x["status"] in ("エントリー候補", "押し目ゾーン") and x["dir"] == h["dir"]:
                 x["confluence_by"] = x.get("confluence_by", []) + ["NY反転"]
                 x["confluence"] = True
+    if st:
+        try:
+            st["day"] = intraday_strength({n: m15[tk] for n, tk in SYMBOLS.items() if n in PAIRS})
+        except Exception as e:  # 1日のグラフが出せなくても押し目スキャンは続ける
+            print("intraday error:", e, file=sys.stderr)
+            st["day"] = None
     series = None
     try:
         series = series_info({n: m15[tk][["Close"]] for n, tk in SYMBOLS.items() if n in PAIRS}, atrs)

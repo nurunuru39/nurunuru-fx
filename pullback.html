@@ -57,6 +57,20 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 .live-wrap table { min-width:720px; }
 .b-st { background:#a78bfa; color:#0f172a; margin-top:3px; }
 .b-pb { border:1px solid #fbbf24; color:#fbbf24; font-size:.7rem; padding:0 6px; font-weight:normal; }
+.day-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; }
+.day-head b { color:#bae6fd; }
+.day-flip { padding:2px 10px; border-radius:999px; font-size:.8rem; font-weight:bold; background:#facc15; color:#0f172a; }
+.day-legend { display:flex; flex-wrap:wrap; gap:4px 12px; margin:6px 0 2px; font-size:.78rem; color:#cbd5e1; }
+.day-legend span { display:inline-flex; align-items:center; gap:4px; }
+.day-legend i { display:inline-block; width:14px; height:3px; border-radius:2px; }
+.day-legend .dim { opacity:.55; }
+.day-wrap { position:relative; }
+.day-wrap svg { display:block; width:100%; touch-action:pan-y; }
+.day-tip { position:absolute; top:24px; pointer-events:none; background:#0f172a; border:1px solid #475569; border-radius:8px; padding:6px 8px; font-size:.75rem; line-height:1.45; white-space:nowrap; display:none; z-index:2; }
+.day-tip b { color:#e2e8f0; }
+.day-tip div { display:flex; gap:6px; align-items:center; justify-content:space-between; }
+.day-tip i { display:inline-block; width:8px; height:8px; border-radius:50%; }
+.day-tip em { font-style:normal; font-variant-numeric:tabular-nums; color:#cbd5e1; margin-left:8px; }
 .b-ny { background:#f472b6; color:#0f172a; font-size:.7rem; padding:0 6px; }
 .ny-box { margin-top:12px; padding:10px 12px; border-radius:10px; background:#0f172a; border:1px solid #334155; font-size:.88rem; }
 .ny-box.hit { border-color:#f472b6; box-shadow:0 0 12px rgba(244,114,182,.45); }
@@ -149,6 +163,10 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <div id="stBars"><p class="note">読み込み中…</p></div>
     <div id="nyBox"></div>
+    <div class="day-head"><b id="dayTitle">今日の動き</b><span id="dayFlip"></span></div>
+    <div class="day-legend" id="dayLegend"></div>
+    <div class="day-wrap" id="dayWrap"><p class="note">読み込み中…</p></div>
+    <p class="note" style="margin:4px 0 0">その日の始まり(ニューヨーク時間17時)からの、8通貨の強さの動きです。いまの最強・最弱の通貨の線を太くしています。縦の線は東京・ロンドン・ニューヨークが開く時刻(日本時間。ロンドンとニューヨークは夏時間に合わせています)。グラフをなぞると、その時刻の数字が出ます。</p>
     <h3>通貨強弱・通貨シリーズの見方</h3>
     <p>ドル円が上がるのは、ドルが強いからなのか、円が弱いからなのか。通貨強弱は、それを8つの通貨(USD・EUR・JPY・GBP・AUD・NZD・CAD・CHF)ごとに分けて見るものです。</p>
     <p>たとえばユーロなら、ユーロが入っている7つのペア(ユーロドル・ユーロ円・ユーロポンド…)の値動き(%)を、ユーロから見た向きにそろえて平均します。ユーロドルが0.2%上がったら、ユーロは+0.2、ドルは−0.2と数えます。期間は「直近24時間」と「直近1時間」の2つです。グラフは右(緑)ほど強く、左(赤)ほど弱い通貨です。</p>
@@ -157,6 +175,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
       <tr><th>しるし</th><th>意味</th></tr>
       <tr><td><span class="badge b-st">強弱OK</span></td><td>24時間で強い順の上から3通貨を「強い」、下から3通貨を「弱い」として、押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のペア(押し目スキャナーの表の「強弱」の列)</td></tr>
       <tr><td><span class="badge b-ny">NY反転</span></td><td>24時間で強い2通貨のどれかが、ロンドンの開き〜NYの開きに売られて(強さがマイナス)、NYが開いたあと直近1時間でまた買われた(強さがプラス)とき。弱い2通貨は逆で、ロンドンで買い戻されて、NYでまた売られたとき。狙い目は、強い通貨なら最弱通貨に対して買い、弱い通貨なら最強通貨に対して売りのペアです。そのペアが押し目ゾーンかエントリー候補で方向も同じなら <span class="badge b-conf">根拠重なり</span> も付きます。ロンドンの開きはロンドン時間8時(日本時間17時、夏は16時)、NYの開きはニューヨーク時間8時(日本時間22時、夏は21時)で、NYが開いて1時間たってから、ニューヨーク時間17時(日本時間7時、夏は6時)まで判定します</td></tr>
+      <tr><td><span class="day-flip">ロンドンで強弱が逆転</span></td><td>「今日の動き」のグラフで、ロンドンが開いた時点の最強通貨がいま最弱になったか、最弱通貨がいま最強になったとき</td></tr>
       <tr><td><span class="badge b-pb">押し目中?</span></td><td>24時間で強い3通貨のうち、直近1時間はマイナスになっている通貨。強い通貨が一休みしているところかもしれません</td></tr>
       <tr><td><span class="sr-msg down">円が全面安</span></td><td>通貨シリーズの全部(または8割以上)が、その通貨から見て同じ向きのとき。シリーズが光ります(8割以上なら「ほぼ全面安」)</td></tr>
     </table>
@@ -322,6 +341,99 @@ function drawStrength(){
   drawNy(st.ny);
 }
 
+// 1日の通貨強弱の折れ線グラフ
+var DAY_COLORS = { USD:'#3987e5', EUR:'#d95926', JPY:'#199e70', GBP:'#c98500', AUD:'#d55181', NZD:'#0ca30c', CAD:'#9085e9', CHF:'#e66767' };
+var DAY_CUR = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'NZD', 'CAD', 'CHF'];
+function drawDay(){
+  var wrap = document.getElementById('dayWrap'), st = liveData && liveData.strength, day = st && st.day;
+  var leg = document.getElementById('dayLegend'), flip = document.getElementById('dayFlip');
+  wrap.innerHTML = ''; leg.innerHTML = ''; flip.innerHTML = '';
+  if (!day) { wrap.innerHTML = '<p class="note">今日の動きはまだありません。次のスキャンを待ってください。</p>'; return; }
+  document.getElementById('dayTitle').textContent = '今日の動き(' + day.start + ' 〜 日本時間)';
+  if (day.flip) { var f = document.createElement('span'); f.className = 'day-flip'; f.textContent = day.flip; flip.appendChild(f); }
+  var n = day.times.length, last = {};
+  DAY_CUR.forEach(function(c){ last[c] = day.series[c][n - 1]; });
+  var order = DAY_CUR.slice().sort(function(a, b){ return last[b] - last[a]; });
+  var strong = order[0], weak = order[7];
+  function bold(c){ return c === strong || c === weak; }
+  order.forEach(function(c){
+    var e = document.createElement('span'); if (!bold(c)) e.className = 'dim';
+    e.innerHTML = '<i style="background:' + DAY_COLORS[c] + '"></i>' + c + (c === strong ? '(最強)' : c === weak ? '(最弱)' : '');
+    leg.appendChild(e);
+  });
+  var W = Math.max(300, wrap.clientWidth), small = W < 500, H = small ? 230 : 270;
+  var L = small ? 34 : 42, R = small ? 38 : 46, T = 34, B = 22, SLOTS = 96;
+  var lo = 0, hi = 0;
+  DAY_CUR.forEach(function(c){ day.series[c].forEach(function(v){ lo = Math.min(lo, v); hi = Math.max(hi, v); }); });
+  var pad = (hi - lo) * 0.08 || 0.05; lo -= pad; hi += pad;
+  function x(i){ return L + i / SLOTS * (W - L - R); }
+  function y(v){ return T + (hi - v) / (hi - lo) * (H - T - B); }
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(tag, at, parent){ var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); (parent || svg).appendChild(e); return e; }
+  var svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('height', H);
+  svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', '今日の8通貨の強さの動き。いまの最強は' + strong + '、最弱は' + weak);
+  // 横の目盛り(ゆるく)
+  var step = Math.pow(10, Math.floor(Math.log10((hi - lo) / 3))); if ((hi - lo) / step > 6) step *= 2; if ((hi - lo) / step > 6) step *= 2.5;
+  for (var g = Math.ceil(lo / step) * step; g <= hi; g += step) {
+    var gy = y(g), zero = Math.abs(g) < step / 1000;
+    el('line', { x1:L, x2:W - R, y1:gy, y2:gy, stroke: zero ? '#64748b' : '#1e293b', 'stroke-width':1 });
+    var t = el('text', { x:L - 6, y:gy + 4, 'text-anchor':'end', fill:'#94a3b8', 'font-size':11 }); t.textContent = (g > 0 ? '+' : '') + (+g.toFixed(2));
+  }
+  // 時刻(3時間ごと)
+  for (var i = 0; i <= SLOTS; i += 12) {
+    var h = (parseInt(day.start.slice(-5), 10) + i / 4) % 24;
+    var tt = el('text', { x:x(i), y:H - 6, 'text-anchor':'middle', fill:'#94a3b8', 'font-size':11 }); tt.textContent = h + '時';
+  }
+  // 東京・ロンドン・NY の縦線
+  var prevEnd = -1e9, row = 0;
+  day.marks.forEach(function(m){
+    if (m.i < 0 || m.i > SLOTS) return;
+    var mx = x(m.i), label = m.name + ' ' + m.time, wd = label.length * 7;
+    row = mx - wd / 2 < prevEnd + 4 ? 1 - row : 0;   // 前のラベルとぶつかるなら段をずらす
+    prevEnd = mx + wd / 2;
+    el('line', { x1:mx, x2:mx, y1:T - 4 - row * 13, y2:H - B, stroke:'#64748b', 'stroke-dasharray':'3 3', 'stroke-width':1 });
+    var t = el('text', { x:mx, y:T - 8 - row * 13, 'text-anchor':'middle', fill:'#cbd5e1', 'font-size':11 }); t.textContent = label;
+  });
+  // 線(細い線を先に、太い線をあとに描いて上に出す)
+  order.slice().sort(function(a, b){ return bold(a) - bold(b); }).forEach(function(c){
+    var d = day.series[c].map(function(v, i){ return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join('');
+    el('path', { d:d, fill:'none', stroke:DAY_COLORS[c], 'stroke-width': bold(c) ? 2.5 : 1.3, opacity: bold(c) ? 1 : .4, 'stroke-linejoin':'round', 'stroke-linecap':'round' });
+  });
+  // 線の右はしの通貨名(重ならないようにずらす)
+  var labs = order.map(function(c){ return { c:c, y:y(last[c]) }; }).sort(function(a, b){ return a.y - b.y; });
+  for (var k = 1; k < labs.length; k++) if (labs[k].y - labs[k - 1].y < 12) labs[k].y = labs[k - 1].y + 12;
+  var over = labs[labs.length - 1].y - (H - B); if (over > 0) labs.forEach(function(l){ l.y -= over; });
+  labs.forEach(function(l){
+    var t = el('text', { x:x(n - 1) + 5, y:l.y + 4, fill: bold(l.c) ? '#e2e8f0' : '#94a3b8', 'font-size': bold(l.c) ? 12 : 10, 'font-weight': bold(l.c) ? 'bold' : 'normal' });
+    t.textContent = l.c;
+  });
+  // なぞると数字が出る
+  var cross = el('line', { y1:T, y2:H - B, stroke:'#e2e8f0', 'stroke-width':1, opacity:0 });
+  var hit = el('rect', { x:L, y:0, width:W - L - R, height:H, fill:'transparent' });
+  wrap.appendChild(svg);
+  var tip = document.createElement('div'); tip.className = 'day-tip'; wrap.appendChild(tip);
+  function show(ev){
+    var r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) * W / r.width;
+    var i = Math.round((px - L) / (W - L - R) * SLOTS);
+    if (i < 0 || i > n - 1) { hide(); return; }
+    cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('opacity', .5);
+    var rows = DAY_CUR.slice().sort(function(a, b){ return day.series[b][i] - day.series[a][i]; });
+    tip.innerHTML = '<b>' + day.times[i] + '</b>' + rows.map(function(c){
+      var v = day.series[c][i];
+      return '<div><span><i style="background:' + DAY_COLORS[c] + '"></i> ' + c + '</span><em>' + (v > 0 ? '+' : '') + v.toFixed(2) + '</em></div>';
+    }).join('');
+    tip.style.display = 'block';
+    var left = x(i) * r.width / W + 12;
+    if (left + tip.offsetWidth > r.width) left = x(i) * r.width / W - tip.offsetWidth - 12;
+    tip.style.left = Math.max(0, left) + 'px';
+  }
+  function hide(){ tip.style.display = 'none'; cross.setAttribute('opacity', 0); }
+  hit.addEventListener('pointermove', show); hit.addEventListener('pointerdown', show); hit.addEventListener('pointerleave', hide);
+}
+var dayResize = null;
+window.addEventListener('resize', function(){ clearTimeout(dayResize); dayResize = setTimeout(function(){ if (liveData) drawDay(); }, 200); });
+
 // NY反転の狙い目
 function drawNy(ny){
   var box = document.getElementById('nyBox');
@@ -422,11 +534,13 @@ function loadLive(){
       document.getElementById('liveTime').textContent = t;
       drawLive();
       drawStrength();
+      drawDay();
       drawSeries();
     })
     .catch(function(){
       document.getElementById('liveTime').textContent = 'スキャン結果を読み込めませんでした';
       if (!liveData) document.getElementById('stBars').innerHTML = '<p class="note">通貨の強さを読み込めませんでした。</p>';
+      if (!liveData) document.getElementById('dayWrap').innerHTML = '<p class="note">今日の動きを読み込めませんでした。</p>';
       if (!liveData) document.getElementById('srList').innerHTML = '<p class="note">通貨シリーズを読み込めませんでした。</p>';
       document.getElementById('liveBody').innerHTML = '<tr><td colspan="9" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
     });
