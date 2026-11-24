@@ -51,18 +51,21 @@
   その通貨の目線(左にあればペアの向きのまま、右にあれば逆)で、シリーズの SERIES_ALL 以上が
   同じ向きなら「全面高」「全面安」とする(全部なら「全面高」、8割以上なら「ほぼ全面高」)。
 
-NY反転(scan.json の "strength" の "ny"):
+NY反転(scan.json の "strength" の "ny")は2段階で判定する:
   ロンドンの開き = ロンドン時間8時、ニューヨークの開き = ニューヨーク時間8時、NYの終わり = ニューヨーク時間17時。
   どれも夏時間に合わせて計算する(日本時間では、ロンドン16時/17時、NY21時/22時、NYの終わり6時/7時)。
-  判定するのは、NYが開いて1時間たってから、NYの終わりまで。強さはどれも「その通貨の7ペアの変化率の平均」。
-  強いほう:24時間の強さが上位 NYREV_TOP(2)通貨で、
-    ① ロンドンの開き → NYの開きの強さがマイナス(ロンドンで売られた)
-    ② 直近1時間の強さがプラス(NYでまた買われた)
-  弱いほう:24時間の強さが下位 NYREV_TOP(2)通貨で、上の①②の符号を逆にしたもの。
-  当てはまった通貨は「NY反転」。狙い目は、強いほうなら最弱通貨とのペアを買う向き、
-  弱いほうなら最強通貨とのペアを売る向き。そのペアが押し目ゾーン/エントリー候補で、
-  方向も同じなら「根拠重なり」(confluence_by に "NY反転")にする。
-  同じ判定を backtest_ny.py が過去の1時間足で確かめる(ny_reversal_check を共通で使う)。
+  強さはどれも「その通貨の7ペアの変化率の平均」。
+  対象:NYの開きの時点で、24時間の強さが上位 NYREV_TOP(2)通貨(弱いほうは下位2通貨)。
+  前提:ロンドンの開き → NYの開きの強さがマイナス(弱いほうはプラス。ロンドンで逆に動いた)。
+  NYの開きからの強さを NYREV_CHECKS(15・30・45・60分後)で見る:
+    第1段階「NY反転の兆し」:15分後に、NYの開きからの強さがプラス(弱いほうはマイナス)に戻った
+    第2段階「NY反転」    :NYREV_CONFIRM(30)分後も戻ったまま。1時間後まで続けば確定
+    ダマシ               :兆しのあと、1時間後までに強さがまた逆(0以下)に戻った。印を消す
+  1時間後の結果がそのまま NYの終わりまで残る。
+  狙い目は、強いほうなら最弱通貨とのペアを買う向き、弱いほうなら最強通貨とのペアを売る向き
+  (最強・最弱も NYの開きの時点の24時間の強さで決める)。そのペアが押し目ゾーン/エントリー候補で、
+  方向も同じなら「根拠重なり」(confluence_by に "NY反転" か "NY反転の兆し")にする。
+  同じ判定を backtest_ny.py が過去の15分足で確かめる(ny_reversal_check を共通で使う)。
 
 1日の通貨強弱(scan.json の "strength" の "day"):
   その日の始まり(ニューヨーク時間17時 = 日本時間朝7時、夏は6時)から15分ごとに、
@@ -98,6 +101,8 @@ SERIES = [            # 通貨シリーズ(通貨, 表示名, ペア)
 SERIES_FLAT = 0.1     # 24時間の値動きが日足ATRのこの倍より小さければ「ほとんど動いていない」(→)
 SERIES_ALL = 0.8      # シリーズのこの割合以上が同じ向きなら「全面高/全面安」
 NYREV_TOP = 2         # NY反転を見る、24時間の強さの上位・下位の通貨の数
+NYREV_CHECKS = [15, 30, 45, 60]   # NYの開きから何分後に強さを見るか(最初が兆し、最後で確定)
+NYREV_CONFIRM = 30    # この分数まで戻ったままなら「NY反転」(第2段階)
 LONDON = "Europe/London"
 PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
 NY = "America/New_York"
@@ -516,30 +521,53 @@ def pair_of(a, b):
     return b + a, "down"
 
 
-def ny_reversal_check(price_at, t):
-    """時刻 t(UTC)の NY反転の判定。NYの時間でなければ active=False"""
-    t = pd.Timestamp(t)
-    t = t.tz_localize("UTC") if t.tz is None else t.tz_convert("UTC")
-    day = t.tz_convert(NY).date()
+def ny_reversal_check(price_at, day, upto):
+    """NYの日付 day の NY反転(2段階)。upto(UTC)までに出ているデータで判定する。
+    NYの開き〜NYの終わりの間でなければ active=False"""
     lon, nyo, nyc = session_times(day)
+    upto = pd.Timestamp(upto)
+    upto = upto.tz_localize("UTC") if upto.tz is None else upto.tz_convert("UTC")
     out = {"day": str(day), "london": lon, "ny_open": nyo, "ny_close": nyc,
-           "active": day.weekday() < 5 and nyo + pd.Timedelta(hours=1) <= t <= nyc,
-           "cands": [], "hits": []}
+           "active": day.weekday() < 5 and nyo <= upto <= nyc,
+           "cands": [], "hits": [], "fakes": []}
     if not out["active"]:
         return out
-    s24 = strength_between(price_at, t - pd.Timedelta(hours=24), t)
+    s24 = strength_between(price_at, nyo - pd.Timedelta(hours=24), nyo)
     slon = strength_between(price_at, lon, nyo)
-    s1 = strength_between(price_at, t - pd.Timedelta(hours=1), t)
-    if not (s24 and slon and s1):
+    if not (s24 and slon):
         out["active"] = False
         return out
+    checks = []
+    for m in NYREV_CHECKS:
+        t = nyo + pd.Timedelta(minutes=m)
+        if t > upto:
+            break
+        sb = strength_between(price_at, nyo, t)
+        if not sb:
+            break
+        checks.append((m, sb))
     rank = sorted(CURRENCIES, key=lambda c: -s24[c])
     seen = set()
     for side, group in (("strong", rank[:NYREV_TOP]), ("weak", rank[-NYREV_TOP:])):
+        sign = 1 if side == "strong" else -1
         for c in group:
-            hit = slon[c] < 0 < s1[c] if side == "strong" else slon[c] > 0 > s1[c]
-            out["cands"].append({"cur": c, "side": side, "london": round(slon[c], 3), "h1": round(s1[c], 3), "hit": hit})
-            if not hit:
+            vals = [{"min": m, "v": round(sb[c], 3)} for m, sb in checks]
+            if slon[c] * sign >= 0:
+                state = "none"            # ロンドンで逆に動いていない
+            elif not vals:
+                state = "wait"            # NYの開き15分後を待っている
+            elif vals[0]["v"] * sign <= 0:
+                state = "none"            # 15分後に戻っていない
+            elif any(x["v"] * sign <= 0 for x in vals[1:]):
+                state = "fake"            # 兆しのあと、また逆に戻った
+            elif vals[-1]["min"] >= NYREV_CONFIRM:
+                state = "reversal"
+            else:
+                state = "sign"
+            out["cands"].append({"cur": c, "side": side, "london": round(slon[c], 3), "checks": vals, "state": state})
+            if state == "fake":
+                out["fakes"].append(c)
+            if state not in ("sign", "reversal"):
                 continue
             partner = rank[-1] if side == "strong" else rank[0]
             if partner == c:
@@ -549,8 +577,9 @@ def ny_reversal_check(price_at, t):
             if (pair, d) in seen:
                 continue
             seen.add((pair, d))
-            out["hits"].append({"cur": c, "side": side, "partner": partner, "pair": pair, "dir": d})
+            out["hits"].append({"cur": c, "side": side, "partner": partner, "pair": pair, "dir": d, "stage": state})
     out["rank"] = rank
+    out["checked"] = checks[-1][0] if checks else 0     # 何分後まで見たか
     return out
 
 
@@ -615,8 +644,15 @@ def intraday_strength(m15, now=None):
 
 def ny_reversal_live(m15, now=None):
     """いまの NY反転(scan.json 用。時刻は日本時間の文字列にする)"""
+    q = pd.Timedelta(minutes=15)
     now = pd.Timestamp(now or datetime.now(timezone.utc))
-    r = ny_reversal_check(price_finder(m15, pd.Timedelta(minutes=15)), now)
+    now = now.tz_localize("UTC") if now.tz is None else now.tz_convert("UTC")
+    # まだ終わっていない足で判定しないように、データの最後の足の終わりまでで見る
+    ends = [df["Close"].dropna().index[-1] for df in m15.values() if not df["Close"].dropna().empty]
+    if ends:
+        last = max(e.tz_localize("UTC") if e.tz is None else e.tz_convert("UTC") for e in ends) + q
+        now = min(now, last)
+    r = ny_reversal_check(price_finder(m15, q), now.tz_convert(NY).date(), now)
     for k in ("london", "ny_open", "ny_close"):
         r[k] = r[k].tz_convert("Asia/Tokyo").strftime("%m/%d %H:%M")
     return r
@@ -677,7 +713,7 @@ def main(out="scan.json"):
             x["ny_reversal"] = h
             # 押し目ゾーン/エントリー候補で、方向もそろっていれば根拠重なり
             if h and x["status"] in ("エントリー候補", "押し目ゾーン") and x["dir"] == h["dir"]:
-                x["confluence_by"] = x.get("confluence_by", []) + ["NY反転"]
+                x["confluence_by"] = x.get("confluence_by", []) + ["NY反転" if h["stage"] == "reversal" else "NY反転の兆し"]
                 x["confluence"] = True
     if st:
         try:
@@ -696,7 +732,8 @@ def main(out="scan.json"):
         "updated": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
         "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N, "strength_top": STRENGTH_TOP,
-                  "series_flat": SERIES_FLAT, "series_all": SERIES_ALL, "nyrev_top": NYREV_TOP},
+                  "series_flat": SERIES_FLAT, "series_all": SERIES_ALL, "nyrev_top": NYREV_TOP,
+                  "nyrev_checks": NYREV_CHECKS, "nyrev_confirm": NYREV_CONFIRM},
         "items": items, "errors": errors,
         "atr_n": ATR_N, "atr": atrs,
         "strength": st,

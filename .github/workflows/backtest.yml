@@ -1,6 +1,7 @@
 name: NY反転バックテスト
 
 # 手動実行だけ(Actions の画面の「Run workflow」ボタン)。結果はサイトには出さない。
+# Yahoo の15分足は直近60日分しか取れないので、期間は約60日。
 # まとめは実行結果のページ(Summary)に出て、trades.csv はファイル(Artifacts)で取れる。
 on:
   workflow_dispatch:
