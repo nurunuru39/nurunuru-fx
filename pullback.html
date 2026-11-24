@@ -54,7 +54,26 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 @media (max-width:560px){ .scan-name { font-size:1.4rem; } }
 .live-time { font-size:.82rem; color:#94a3b8; }
 .live-wrap { overflow-x:auto; }
-.live-wrap table { min-width:640px; }
+.live-wrap table { min-width:720px; }
+.b-st { background:#a78bfa; color:#0f172a; margin-top:3px; }
+.b-pb { border:1px solid #fbbf24; color:#fbbf24; font-size:.7rem; padding:0 6px; font-weight:normal; }
+.st-box { margin-top:14px; padding:12px 14px; border-radius:10px; background:rgba(15,23,42,.55); }
+.st-head { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+.st-head b { color:#bae6fd; }
+.st-tf { display:flex; gap:6px; }
+.st-tf button { width:auto; margin:0; padding:4px 12px; font-size:.8rem; background:#0f172a; color:#cbd5e1; border:1px solid #334155; }
+.st-tf button.on { background:#a78bfa; color:#0f172a; border-color:#a78bfa; }
+.st-row { display:grid; grid-template-columns:7.5em 1fr 4.2em; align-items:center; gap:8px; margin-top:6px; font-size:.88rem; }
+.st-name { white-space:nowrap; }
+.st-name b { display:inline-block; width:2.6em; }
+.st-track { position:relative; height:14px; background:#1e293b; border-radius:7px; }
+.st-track::before { content:""; position:absolute; left:50%; top:-3px; bottom:-3px; border-left:1px solid #64748b; }
+.st-bar { position:absolute; top:0; bottom:0; border-radius:7px; }
+.st-bar.pos { left:50%; background:#4ade80; }
+.st-bar.neg { right:50%; background:#f87171; }
+.st-val { text-align:right; font-variant-numeric:tabular-nums; color:#cbd5e1; }
+.st-cell { white-space:nowrap; font-size:.85rem; }
+@media (max-width:560px){ .st-row { grid-template-columns:3.6em 1fr 3.8em; font-size:.82rem; } .st-name { white-space:normal; line-height:1.2; } .st-name .b-pb { display:block; width:max-content; margin-top:2px; font-size:.62rem; padding:0 4px; } }
 .badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:.78rem; font-weight:bold; white-space:nowrap; }
 .b-entry { background:#4ade80; color:#0f172a; }
 .b-zone { background:#38bdf8; color:#0f172a; }
@@ -112,6 +131,13 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <p class="note">15分ごとに自動更新。28通貨ペアとゴールド・シルバーを、下の「判定の流れ」のルールで自動チェックした結果です。ページを開いたままでも5分ごとに読み直します。<b>エントリー候補</b>が出ると、その行がチカチカ光ります。</p>
     <div id="evWarn"></div>
+    <div class="st-box" id="stBox">
+      <div class="st-head"><b>通貨の強さ</b>
+        <div class="st-tf"><button class="on" data-st="h24">24時間</button><button data-st="h1">1時間</button></div>
+      </div>
+      <div id="stBars"><p class="note">読み込み中…</p></div>
+      <p class="note" style="margin:8px 0 0">各通貨が入っている7つのペアの値動き(%)を、その通貨から見た向きにそろえて平均した点数です。右(緑)ほど強く、左(赤)ほど弱い通貨です。<span class="badge b-pb">押し目中?</span> は、24時間では強いのに、直近1時間は弱くなっている通貨です。</p>
+    </div>
     <div class="tabs">
       <button class="on" data-f="pick">狙い目だけ</button>
       <button data-f="watch">監視も表示</button>
@@ -119,11 +145,11 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <div class="live-wrap">
       <table>
-        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>戻り率</th><th>サイン</th><th>反発根拠</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
-        <tbody id="liveBody"><tr><td colspan="8" class="note">読み込み中…</td></tr></tbody>
+        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>強弱</th><th>戻り率</th><th>サイン</th><th>反発根拠</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
+        <tbody id="liveBody"><tr><td colspan="9" class="note">読み込み中…</td></tr></tbody>
       </table>
     </div>
-    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるしるしです(下の「反発根拠の見方」)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるしるしです(下の「反発根拠の見方」)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます(下の「通貨強弱の見方」)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -173,6 +199,18 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
   </div>
 
   <div class="card">
+    <h2>通貨強弱の見方</h2>
+    <p>ドル円が上がるのは、ドルが強いからなのか、円が弱いからなのか。通貨強弱は、それを8つの通貨(USD・EUR・JPY・GBP・AUD・NZD・CAD・CHF)ごとに分けて見るものです。</p>
+    <p>たとえばユーロなら、ユーロが入っている7つのペア(ユーロドル・ユーロ円・ユーロポンド…)の値動きを、ユーロから見た向きにそろえて平均します。ユーロドルが0.2%上がったら、ユーロは+0.2、ドルは−0.2と数えます。期間は「直近24時間」と「直近1時間」の2つです。</p>
+    <table>
+      <tr><th>しるし</th><th>意味</th></tr>
+      <tr><td><span class="badge b-st">強弱OK</span></td><td>24時間で強い順の上から3通貨を「強い」、下から3通貨を「弱い」として、押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のペア</td></tr>
+      <tr><td><span class="badge b-pb">押し目中?</span></td><td>24時間で強い3通貨のうち、直近1時間はマイナスになっている通貨。強い通貨が一休みしているところかもしれません</td></tr>
+    </table>
+    <p class="note">強い通貨を買って弱い通貨を売ると、流れに乗りやすいといわれます。強弱は判定(状態)には使っていない参考の情報です。</p>
+  </div>
+
+  <div class="card">
     <h2>注意点</h2>
     <div class="warnbox">このツールは「見るべきチャートをしぼりこむ」ためのものです。条件がそろっても勝てるとは限りません。</div>
     <p>エントリーするときは、損切りを押し目の安値(戻りの高値)の少し外に置いて、その幅から<a href="money.html" style="color:#38bdf8;">資金管理ページ</a>でロットを計算してください。</p>
@@ -213,6 +251,48 @@ function pivotCell(x){
   }
   return td;
 }
+// 強弱の列:「EUR 1位 / JPY 8位」。組み合わせが押し目方向に合っていれば「強弱OK」
+function strengthCell(x){
+  var td = document.createElement('td'), st = x.strength;
+  if (!st) { td.textContent = '-'; return td; }
+  var d = document.createElement('div'); d.className = 'st-cell';
+  d.textContent = st.base + ' ' + st.base_rank + '位 / ' + st.quote + ' ' + st.quote_rank + '位';
+  d.title = '24時間の強さ ' + st.base + ' ' + st.base_score + ' / ' + st.quote + ' ' + st.quote_score;
+  td.appendChild(d);
+  if (st.ok) { var b = document.createElement('span'); b.className = 'badge b-st'; b.textContent = '強弱OK'; td.appendChild(b); }
+  return td;
+}
+
+// 通貨の強さの横棒グラフ(強い順)
+var stTf = 'h24';
+function drawStrength(){
+  var box = document.getElementById('stBars'), st = liveData && liveData.strength;
+  box.innerHTML = '';
+  if (!st) { box.innerHTML = '<p class="note">通貨の強さはまだありません。次のスキャンを待ってください。</p>'; return; }
+  var sc = st[stTf], cur = Object.keys(sc).sort(function(a, b){ return sc[b] - sc[a]; });
+  var max = Math.max.apply(null, cur.map(function(c){ return Math.abs(sc[c]); })) || 1;
+  cur.forEach(function(c, i){
+    var row = document.createElement('div'); row.className = 'st-row';
+    var nm = document.createElement('div'); nm.className = 'st-name';
+    nm.innerHTML = '<b>' + c + '</b>';
+    if (st.pullback && st.pullback.indexOf(c) >= 0) { var p = document.createElement('span'); p.className = 'badge b-pb'; p.textContent = '押し目中?'; nm.appendChild(p); }
+    var tr = document.createElement('div'); tr.className = 'st-track';
+    var bar = document.createElement('div'); bar.className = 'st-bar ' + (sc[c] >= 0 ? 'pos' : 'neg');
+    bar.style.width = (Math.abs(sc[c]) / max * 50) + '%';
+    tr.appendChild(bar);
+    var v = document.createElement('div'); v.className = 'st-val'; v.textContent = (sc[c] > 0 ? '+' : '') + sc[c].toFixed(2);
+    row.title = (i + 1) + '位 ' + c + '(' + (stTf === 'h24' ? '24時間' : '1時間') + ')';
+    row.appendChild(nm); row.appendChild(tr); row.appendChild(v);
+    box.appendChild(row);
+  });
+}
+document.querySelectorAll('.st-tf button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.st-tf button').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on'); stTf = btn.getAttribute('data-st'); drawStrength();
+  });
+});
+
 function fmtPrice(p){ return p >= 100 ? p.toFixed(2) : p.toFixed(p >= 10 ? 3 : 5); }
 
 function drawLive(){
@@ -224,7 +304,7 @@ function drawLive(){
   if (!rows.length) {
     var tr = document.createElement('tr');
     var td = cell('いまは条件にそろう銘柄がありません。焦らず待つのもトレードです。', 'note');
-    td.colSpan = 8; tr.appendChild(td); body.appendChild(tr); return;
+    td.colSpan = 9; tr.appendChild(td); body.appendChild(tr); return;
   }
   rows.forEach(function(x){
     var tr = document.createElement('tr');
@@ -238,6 +318,7 @@ function drawLive(){
     tr.appendChild(st);
     tr.appendChild(cell(x.name));
     tr.appendChild(x.dir ? cell(x.dir === 'up' ? '上昇(押し目買い)' : '下降(戻り売り)', x.dir) : cell('-'));
+    tr.appendChild(strengthCell(x));
     tr.appendChild(cell(x.ret == null ? '-' : x.ret < 0 ? (x.dir === 'up' ? '高値更新中' : '安値更新中') : x.ret + '%'));
     var zone = x.status === 'エントリー候補' || x.status === '押し目ゾーン';
     tr.appendChild(cell(zone && x.signal ? x.signal : '-'));
@@ -258,10 +339,12 @@ function loadLive(){
       if (age > 60) t += ' ― 市場が閉まっているか、更新が止まっています';
       document.getElementById('liveTime').textContent = t;
       drawLive();
+      drawStrength();
     })
     .catch(function(){
       document.getElementById('liveTime').textContent = 'スキャン結果を読み込めませんでした';
-      document.getElementById('liveBody').innerHTML = '<tr><td colspan="8" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
+      if (!liveData) document.getElementById('stBars').innerHTML = '<p class="note">通貨の強さを読み込めませんでした。</p>';
+      document.getElementById('liveBody').innerHTML = '<tr><td colspan="9" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
     });
 }
 

@@ -34,6 +34,16 @@
   押し目ゾーン/エントリー候補で、買いなら SMA200 の少し上(現在値 ≧ SMA200)、
   売りなら SMA200 の少し下(現在値 ≦ SMA200)の付近にいるときも「根拠重なり」とする。
   根拠重なりの元になったもの(例 ["S1", "SMA200"])は "confluence_by" に入れる。
+
+通貨強弱(8通貨 USD・EUR・JPY・GBP・AUD・NZD・CAD・CHF)を scan.json の "strength" に入れる:
+  各通貨が入っている7つのペアの変化率(%)を、その通貨の目線にそろえて平均したものが点数。
+  (EUR/USD が +0.2% なら、EUR は +0.2、USD は −0.2 として数える)
+  期間は「直近24時間」(h24)と「直近1時間」(h1)。15分足の最新の終値と、その時間前の終値をくらべる。
+  24時間の点数で強い順に並べ、上から STRENGTH_TOP 通貨を「強い」、下から STRENGTH_TOP 通貨を「弱い」とする。
+  各銘柄の "strength" には、2つの通貨の点数・順位と、
+  押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」のとき ok=true(強弱OK)を入れる。
+  24時間で強いのに1時間の点数がマイナスの通貨は「押し目中?」(pullback)とする。
+  強弱は表示用で、状態(エントリー候補など)の判定は変えない。
 """
 import json
 import math
@@ -50,6 +60,8 @@ SWING_BARS = 48       # 押し目を測る15分足の本数(48本=12時間)
 ATR_N = 20            # タートルズのN(ATR)の期間
 PIVOT_NEAR = 0.3      # ピボット・SMA200の付近とみなす距離(1時間足ATRの何倍以内か)
 SMA_N = 200           # 4時間足の単純移動平均の本数
+CURRENCIES = ["USD", "EUR", "JPY", "GBP", "AUD", "NZD", "CAD", "CHF"]   # 通貨強弱の8通貨
+STRENGTH_TOP = 3      # 強弱の上位・下位それぞれ何通貨を「強い」「弱い」とするか
 PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
 NY = "America/New_York"
 
@@ -316,6 +328,68 @@ def analyze(name, d1h, d15):
     return item
 
 
+def pct_change(d15, hours):
+    """15分足の最新の終値と、hours 時間前の終値をくらべた変化率(%)。足りなければ None"""
+    c = d15["Close"].dropna()
+    if len(c) < 2:
+        return None
+    base = c[c.index <= c.index[-1] - pd.Timedelta(hours=hours)]
+    if base.empty:
+        return None
+    b = float(base.iloc[-1])
+    return (float(c.iloc[-1]) / b - 1) * 100 if b > 0 else None
+
+
+def currency_strength(m15):
+    """8通貨の強弱。m15 は {ペア名: 15分足} 。通貨がそろわなければ None"""
+    out = {}
+    for key, hours in (("h24", 24), ("h1", 1)):
+        sums = {c: [] for c in CURRENCIES}
+        for pair, d15 in m15.items():
+            b, q = pair[:3], pair[3:]
+            if b not in sums or q not in sums:
+                continue
+            try:
+                ch = pct_change(d15, hours)
+            except Exception as e:
+                print(pair, "strength error:", e, file=sys.stderr)
+                ch = None
+            if ch is None or math.isnan(ch):
+                continue
+            sums[b].append(ch)        # ペアが上がる = 左の通貨が強い
+            sums[q].append(-ch)       # ペアが上がる = 右の通貨が弱い
+        if any(not v for v in sums.values()):
+            return None
+        out[key] = {c: round(sum(v) / len(v), 3) for c, v in sums.items()}
+        out[key + "_n"] = {c: len(v) for c, v in sums.items()}   # 使えたペアの数(ふつうは7)
+    order = sorted(CURRENCIES, key=lambda c: -out["h24"][c])
+    out["rank"] = order                                           # 24時間で強い順
+    out["strong"] = order[:STRENGTH_TOP]
+    out["weak"] = order[-STRENGTH_TOP:]
+    out["pullback"] = [c for c in out["strong"] if out["h1"][c] < 0]   # 押し目中?
+    return out
+
+
+def strength_for(item, st):
+    """銘柄ごとの強弱。通貨ペアでない(ゴールドなど)か、強弱がなければ None"""
+    b, q = item["name"][:3], item["name"][3:]
+    if not st or b not in st["h24"] or q not in st["h24"]:
+        return None
+    rank = st["rank"]
+    if item["dir"] == "up":
+        ok = b in st["strong"] and q in st["weak"]
+    elif item["dir"] == "down":
+        ok = b in st["weak"] and q in st["strong"]
+    else:
+        ok = False
+    return {
+        "base": b, "quote": q,
+        "base_score": st["h24"][b], "quote_score": st["h24"][q],
+        "base_rank": rank.index(b) + 1, "quote_rank": rank.index(q) + 1,
+        "ok": ok,
+    }
+
+
 def fetch():
     import yfinance as yf
     tickers = list(SYMBOLS.values())
@@ -352,14 +426,22 @@ def main(out="scan.json"):
                     atrs[name] = a
         except Exception as e:
             print(name, "atr error:", e, file=sys.stderr)
+    st = None
+    try:
+        st = currency_strength({n: m15[tk][["Close"]] for n, tk in SYMBOLS.items() if n in PAIRS})
+    except Exception as e:  # 強弱が出せなくても押し目スキャンは続ける
+        print("strength error:", e, file=sys.stderr)
+    for x in items:
+        x["strength"] = strength_for(x, st)
     order = {"エントリー候補": 0, "押し目ゾーン": 1, "監視": 2, "対象外": 3}
     items.sort(key=lambda x: (order[x["status"]], -(x["adx4"] or 0)))
     data = {
         "updated": datetime.now(JST).strftime("%Y-%m-%d %H:%M"),
         "updated_ts": int(datetime.now(timezone.utc).timestamp()),
-        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N},
+        "rules": {"adx_min": ADX_MIN, "ret_min": RET_MIN, "ret_max": RET_MAX, "pivot_near": PIVOT_NEAR, "sma_n": SMA_N, "strength_top": STRENGTH_TOP},
         "items": items, "errors": errors,
         "atr_n": ATR_N, "atr": atrs,
+        "strength": st,
     }
     with open(out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
