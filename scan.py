@@ -67,6 +67,22 @@ NY反転(scan.json の "strength" の "ny")は2段階で判定する:
   方向も同じなら「根拠重なり」(confluence_by に "NY反転" か "NY反転の兆し")にする。
   同じ判定を backtest_ny.py が過去の15分足で確かめる(ny_reversal_check を共通で使う)。
 
+通貨選びチェック(各銘柄の "pick"、審判ペアの値動きは scan.json の "pick"):
+  売るのは弱い通貨、相手に買うのは強い通貨。同じ仲間の通貨どうしの強弱を「審判ペア」で決める。
+    EURGBP:上がっていれば EUR が強い、下がっていれば GBP が強い
+    USDJPY:上がっていれば USD が強い、下がっていれば JPY が強い
+  見る期間は通貨強弱と同じ(直近24時間と直近1時間、15分足)。2つの期間の向きがそろったときだけ
+  強弱を決める(そろっていなければ、その審判はどちらとも言わない)。
+  戻り売り(押し目買いは上下を逆にして、売る通貨・買う通貨を入れかえる)で、
+    売る通貨が、審判で「強い側」になっている(例:GBPが弱いのにEURUSDを売る)
+    相手に買う通貨が、審判で「弱い側」になっている(例:USDJPYが上昇中なのにGBPJPYを売る)
+  ときは「通貨選びNG」。代わりに、その通貨を審判の相手の通貨に入れかえたペアを "alt" に入れる
+  (例:「EURUSD売りよりGBPUSD売り」)。
+  豪ドルのペアは、AUDJPY と AUDUSD の24時間の向きが同じときだけOK。ちがうときは
+  「豪ドル不一致・見送り」(label "見送り")。向きが同じなら、相手の通貨は審判で同じように見る。
+  押し目ゾーン/エントリー候補の通貨ペアは、通貨選びOKのときだけ「根拠重なり」にする
+  (ゴールド・シルバーはこのチェックをしない)。判定(状態)そのものは変えない。
+
 1日の通貨強弱(scan.json の "strength" の "day"):
   その日の始まり(ニューヨーク時間17時 = 日本時間朝7時、夏は6時)から15分ごとに、
   始まりからの8通貨の強さ(7ペアの変化率の平均)を、毎回15分足からまとめて計算する(過去の分は保存しない)。
@@ -104,6 +120,11 @@ SERIES_ALL = 0.8      # シリーズのこの割合以上が同じ向きなら�
 NYREV_TOP = 2         # NY反転を見る、24時間の強さの上位・下位の通貨の数
 NYREV_CHECKS = [15, 30, 45, 60]   # NYの開きから何分後に強さを見るか(最初が兆し、最後で確定)
 NYREV_CONFIRM = 30    # この分数まで戻ったままなら「NY反転」(第2段階)
+PICK_JUDGES = [       # 通貨選びチェックの審判ペア(ペア, 左の通貨, 右の通貨)。上がっていれば左が強い
+    ("EURGBP", "EUR", "GBP"),
+    ("USDJPY", "USD", "JPY"),
+]
+PICK_AUD = ("AUDJPY", "AUDUSD")   # 豪ドルのペアは、この2つの24時間の向きが同じときだけOK
 LONDON = "Europe/London"
 PIVOT_MIN_BARS = 12   # 前日の1時間足がこれより少ない日(祝日など)はとばして、その前の日を使う
 NY = "America/New_York"
@@ -433,6 +454,95 @@ def strength_for(item, st):
     }
 
 
+def judge_info(m15):
+    """通貨選びチェックで使うペア(審判ペアと豪ドル)の、直近24時間・1時間の変化率(%)。
+    m15 は {ペア名: 15分足}。取れなかった期間は None"""
+    out = {}
+    for pair in [j[0] for j in PICK_JUDGES] + list(PICK_AUD):
+        d = m15.get(pair)
+        row = {}
+        for key, hours in (("h24", 24), ("h1", 1)):
+            ch = None
+            if d is not None:
+                try:
+                    ch = pct_change(d, hours)
+                except Exception as e:
+                    print(pair, "pick error:", e, file=sys.stderr)
+            row[key] = None if ch is None or math.isnan(ch) else round(ch, 3)
+        out[pair] = row
+    return out
+
+
+def sign(v):
+    return 0 if not v else (1 if v > 0 else -1)
+
+
+def judge_winner(row):
+    """審判ペアの向き。+1 = 左の通貨が強い、-1 = 右の通貨が強い、
+    0 = 24時間と1時間で向きがちがう(どちらとも言わない)、None = データがない"""
+    if not row or row.get("h24") is None or row.get("h1") is None:
+        return None
+    a, b = sign(row["h24"]), sign(row["h1"])
+    return a if a == b else 0
+
+
+def currency_pick(item, jd):
+    """通貨選びチェック。通貨ペアでない・方向がない・データがなければ None"""
+    name, d = item["name"], item["dir"]
+    b, q = name[:3], name[3:]
+    if b not in CURRENCIES or q not in CURRENCIES or d not in ("up", "down") or not jd:
+        return None
+    mark = {1: "↑", -1: "↓", 0: "→"}
+    # 豪ドルのペア:AUDJPY と AUDUSD の24時間の向きが同じときだけOK
+    if "AUD" in (b, q):
+        a1, a2 = (sign((jd.get(p) or {}).get("h24")) for p in PICK_AUD)
+        if not a1 or a1 != a2:
+            return {"ok": False, "label": "見送り", "reasons": [
+                "豪ドル不一致(" + " ".join(p + mark[x] for p, x in zip(PICK_AUD, (a1, a2))) + ")"], "alt": None}
+
+    sell, buy = (q, b) if d == "up" else (b, q)          # 押し目買いは右を売って左を買う
+    strong, partner, judge_of, missing = {}, {}, {}, []
+    for pair, l, r in PICK_JUDGES:
+        partner[l], partner[r] = r, l
+        judge_of[l] = judge_of[r] = pair
+        w = judge_winner(jd.get(pair))
+        if w is None:
+            if l in (sell, buy) or r in (sell, buy):
+                missing.append(pair)
+        elif w:
+            strong[l], strong[r] = w > 0, w < 0
+    if missing:
+        return None                                       # 審判ペアのデータがない
+
+    def arrow(c):
+        p = judge_of[c]
+        return p + mark[judge_winner(jd[p])]
+
+    reasons, new_sell, new_buy = [], sell, buy
+    if partner.get(sell) == buy:
+        # 審判ペアそのもの(EURGBP・USDJPY)を、審判と逆向きに取引している
+        if strong.get(sell) is True:
+            reasons.append(f"{buy}のほうが弱い({arrow(sell)})")
+    else:
+        if strong.get(sell) is True:                      # 強い側を売っている
+            new_sell = partner[sell]
+            reasons.append(f"{new_sell}のほうが弱い({arrow(sell)})")
+        if strong.get(buy) is False:                      # 弱い側を相手に買っている
+            new_buy = partner[buy]
+            reasons.append(f"{new_buy}のほうが強い({arrow(buy)})")
+    if not reasons:
+        return {"ok": True, "label": "OK", "reasons": [], "alt": None}
+
+    alt = None
+    if (new_sell, new_buy) != (sell, buy):
+        word = "買い" if d == "up" else "売り"
+        if new_sell + new_buy in PAIRS:
+            alt = f"{name}{word}より{new_sell + new_buy}売り"
+        elif new_buy + new_sell in PAIRS:
+            alt = f"{name}{word}より{new_buy + new_sell}買い"
+    return {"ok": False, "label": "NG", "reasons": reasons, "alt": alt}
+
+
 def series_info(m15, atrs):
     """通貨シリーズ。m15 は {ペア名: 15分足}、atrs は main の ATR({ペア名: {"d1", "close"}})"""
     out = []
@@ -760,6 +870,20 @@ def main(out="scan.json"):
             if h and x["status"] in ("エントリー候補", "押し目ゾーン") and x["dir"] == h["dir"]:
                 x["confluence_by"] = x.get("confluence_by", []) + ["NY反転" if h["stage"] == "reversal" else "NY反転の兆し"]
                 x["confluence"] = True
+    jd = None
+    try:
+        jd = judge_info({n: m15[tk][["Close"]] for n, tk in SYMBOLS.items() if n in PAIRS})
+    except Exception as e:  # 通貨選びが出せなくても押し目スキャンは続ける
+        print("pick error:", e, file=sys.stderr)
+    for x in items:
+        try:
+            x["pick"] = currency_pick(x, jd)
+        except Exception as e:
+            print(x["name"], "pick error:", e, file=sys.stderr)
+            x["pick"] = None
+        # 通貨ペアの根拠重なりは、通貨選びOKのときだけ(ゴールド・シルバーはこのチェックなし)
+        if x.get("confluence") and x["name"][:3] in CURRENCIES and not (x["pick"] and x["pick"]["ok"]):
+            x["confluence"] = False
     if st:
         try:
             st["day"] = intraday_strength({n: m15[tk] for n, tk in SYMBOLS.items() if n in PAIRS})
@@ -783,6 +907,7 @@ def main(out="scan.json"):
         "atr_n": ATR_N, "atr": atrs,
         "strength": st,
         "series": series,
+        "pick": jd,
     }
     with open(out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)

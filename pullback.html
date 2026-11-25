@@ -54,8 +54,13 @@ button { margin-top:16px; width:100%; padding:12px; border:0; border-radius:8px;
 @media (max-width:560px){ .scan-name { font-size:1.4rem; } }
 .live-time { font-size:.82rem; color:#94a3b8; }
 .live-wrap { overflow-x:auto; }
-.live-wrap table { min-width:720px; }
+.live-wrap table { min-width:820px; }
 .b-st { background:#a78bfa; color:#0f172a; margin-top:3px; }
+.b-pk-ok { border:1px solid #4ade80; color:#4ade80; }
+.b-pk-ng { background:#f87171; color:#0f172a; }
+.b-pk-skip { border:1px solid #94a3b8; color:#cbd5e1; }
+.pk-why { font-size:.78rem; color:#cbd5e1; margin-top:3px; white-space:nowrap; }
+.pk-alt { font-size:.78rem; color:#facc15; margin-top:2px; white-space:nowrap; }
 .b-pb { border:1px solid #fbbf24; color:#fbbf24; font-size:.7rem; padding:0 6px; font-weight:normal; }
 .day-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; }
 .day-head b { color:#bae6fd; }
@@ -204,11 +209,11 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </div>
     <div class="live-wrap">
       <table>
-        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>強弱</th><th>戻り率</th><th>サイン</th><th>反発根拠</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
-        <tbody id="liveBody"><tr><td colspan="9" class="note">読み込み中…</td></tr></tbody>
+        <thead><tr><th>状態</th><th>銘柄</th><th>方向</th><th>強弱</th><th>通貨選び</th><th>戻り率</th><th>サイン</th><th>反発根拠</th><th>ADX 4H/1H</th><th>価格</th></tr></thead>
+        <tbody id="liveBody"><tr><td colspan="10" class="note">読み込み中…</td></tr></tbody>
       </table>
     </div>
-    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるか、NY反転の狙い目になっているしるしです(下の「反発根拠の見方」、上の「通貨強弱」カードの説明)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます。NY反転の狙い目のペアには <span class="badge b-nys">NY反転の兆し</span> か <span class="badge b-ny">NY反転</span> を付けます(上の「通貨強弱」カードの説明)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
+    <p class="note">状態の見方:<span class="badge b-entry">エントリー候補</span> 押し目ゾーンで反転サインあり/<span class="badge b-zone">押し目ゾーン</span> サイン待ち/<span class="badge b-watch">監視</span> 流れはそろっていて押し待ち(サインは押し目ゾーンに入ったときだけ表示)。<br>反発根拠の見方:いちばん近い日足ピボットと、4時間足の200SMAを見ます。1時間足ATRの0.3倍以内なら「S1付近」「200SMA付近」と太字で出し、はなれていれば「S1(ATR×1.2)」のように距離を小さく出します。<span class="badge b-conf">根拠重なり</span> は、押し目ゾーンかエントリー候補で、しかも押し目方向のピボットか200SMAの付近にいるか、NY反転の狙い目になっているしるしです。通貨ペアは、さらに <span class="badge b-pk-ok">通貨選びOK</span> のときだけ付きます(下の「反発根拠の見方」「通貨選びチェック」、上の「通貨強弱」カードの説明)。<br>強弱の見方:2つの通貨の、24時間の強さの順位(1位がいちばん強い)です。押し目買いなら「強い通貨/弱い通貨」、戻り売りなら「弱い通貨/強い通貨」の組み合わせのとき <span class="badge b-st">強弱OK</span> を付けます。NY反転の狙い目のペアには <span class="badge b-nys">NY反転の兆し</span> か <span class="badge b-ny">NY反転</span> を付けます(上の「通貨強弱」カードの説明)。<br>通貨選びの見方:審判ペア(EURGBP・USDJPY)で決めた強弱にくらべて、強いほうを売っていたり、弱いほうを相手に買っていたりしたら <span class="badge b-pk-ng">通貨選びNG</span> で、代わりのペアを黄色の字で出します。豪ドルのペアで AUDJPY と AUDUSD の向きがちがうときは <span class="badge b-pk-skip">見送り</span> です(下の「通貨選びチェック」)。<br>※データは Yahoo Finance の無料データで、数分遅れることがあります。ゴールド・シルバーは先物の価格です。エントリーの前に、必ずご自身のチャートで確認してください。</p>
   </div>
 
   <div class="card">
@@ -248,7 +253,7 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     <p>SMAは単純移動平均(決まった本数の終値の平均)です。4時間足の200本の平均は、長い目で見た流れの境目として多くのトレーダーが見ているので、押し目で止まりやすい場所のひとつです。4時間足は1時間足から作っています。</p>
     <h3>「付近」と「根拠重なり」</h3>
     <p>銘柄によって動く幅がちがうので、「近い」かどうかは1時間足のATR(1本の足が平均でどれくらい動くか)で決めています。現在値とピボット・200SMAの差が<b>1時間足ATRの0.3倍以内</b>なら「付近」です。</p>
-    <p>押し目ゾーンかエントリー候補で、次のどれかにいると、戻り率と反発根拠の2つの理由が重なります。これを<span class="badge b-conf">根拠重なり</span>として印を付けています。</p>
+    <p>押し目ゾーンかエントリー候補で、次のどれかにいると、戻り率と反発根拠の2つの理由が重なります。これを<span class="badge b-conf">根拠重なり</span>として印を付けています。ただし通貨ペアは、下の「通貨選びチェック」が <span class="badge b-pk-ok">通貨選びOK</span> のときだけです(ゴールド・シルバーはこのチェックをしません)。</p>
     <table>
       <tr><th>方向</th><th>重なる場所</th></tr>
       <tr><td>押し目買い</td><td>下の床(P・S1〜S3)の付近、または200SMAの少し上</td></tr>
@@ -256,6 +261,24 @@ footer { text-align:center; font-size:.8rem; color:#94a3b8; padding:20px; }
     </table>
     <p class="note">200SMAは「少し上(下)」のときだけ数えます。買いなのに200SMAの下にいるときは、流れが崩れかけていることもあるので重なりにしません。</p>
     <p class="note">そのほか、通貨強弱の <span class="badge b-nys">NY反転の兆し</span>・<span class="badge b-ny">NY反転</span> の狙い目のペアが、同じ方向で押し目ゾーンかエントリー候補に入っているときも <span class="badge b-conf">根拠重なり</span> にします(上の「通貨強弱」カードの説明)。</p>
+  </div>
+
+  <div class="card">
+    <h2>通貨選びチェック</h2>
+    <p>売るのは弱い通貨、相手に買うのは強い通貨。同じ方向の狙い目でも、どの通貨ペアを選ぶかで伸び方が変わります。そこで、仲間どうしの通貨の強弱を「審判ペア」で決めて、選んだペアが合っているかを確かめます。</p>
+    <table>
+      <tr><th>審判ペア</th><th>決めること</th></tr>
+      <tr><td>EURGBP</td><td>上がっていればユーロ(EUR)が強い、下がっていればポンド(GBP)が強い</td></tr>
+      <tr><td>USDJPY</td><td>上がっていればドル(USD)が強い、下がっていれば円(JPY)が強い</td></tr>
+    </table>
+    <p>見る期間は通貨強弱と同じ、直近24時間と直近1時間です。<b>2つの期間の向きがそろったときだけ</b>強弱を決めます(そろっていないときは、その審判はどちらとも言いません)。</p>
+    <table>
+      <tr><th>しるし</th><th>どんなとき</th></tr>
+      <tr><td><span class="badge b-pk-ng">通貨選びNG</span></td><td>戻り売りで、強い側の通貨を売っている(例:ポンドのほうが弱いのに EURUSD を売る)か、弱い側の通貨を相手に買っている(例:USDJPY が上昇中なのに GBPJPY を売る)。押し目買いは上下を逆にして同じように見ます。代わりに選ぶとよいペアを「EURUSD売りよりGBPUSD売り」のように出します</td></tr>
+      <tr><td><span class="badge b-pk-skip">見送り</span></td><td>豪ドル(AUD)のペアで、AUDJPY と AUDUSD の24時間の向きがちがう(豪ドルそのものの強弱がはっきりしない)</td></tr>
+      <tr><td><span class="badge b-pk-ok">通貨選びOK</span></td><td>上のどちらにも当てはまらない。豪ドルのペアは AUDJPY と AUDUSD の向きが同じで、相手の通貨も審判ペアで NG にならないとき</td></tr>
+    </table>
+    <p class="note">状態(エントリー候補など)の判定は変えません。<span class="badge b-conf">根拠重なり</span> は、通貨ペアなら通貨選びOKのときだけ付きます。</p>
   </div>
 
   <div class="card">
@@ -315,6 +338,18 @@ function strengthCell(x){
     if (st.ok) td.appendChild(document.createTextNode(' '));
     td.appendChild(n);
   }
+  return td;
+}
+// 通貨選びの列:OK / NG(理由と、代わりのペア) / 見送り(豪ドル不一致)
+function pickCell(x){
+  var td = document.createElement('td'), pk = x.pick;
+  if (!pk) { td.textContent = '-'; return td; }
+  var b = document.createElement('span');
+  b.className = 'badge ' + (pk.ok ? 'b-pk-ok' : pk.label === '見送り' ? 'b-pk-skip' : 'b-pk-ng');
+  b.textContent = pk.ok ? '通貨選びOK' : pk.label === '見送り' ? '見送り' : '通貨選びNG';
+  td.appendChild(b);
+  (pk.reasons || []).forEach(function(r){ var d = document.createElement('div'); d.className = 'pk-why'; d.textContent = r; td.appendChild(d); });
+  if (pk.alt) { var a = document.createElement('div'); a.className = 'pk-alt'; a.textContent = pk.alt; td.appendChild(a); }
   return td;
 }
 
@@ -514,7 +549,7 @@ function drawLive(){
   if (!rows.length) {
     var tr = document.createElement('tr');
     var td = cell('いまは条件にそろう銘柄がありません。焦らず待つのもトレードです。', 'note');
-    td.colSpan = 9; tr.appendChild(td); body.appendChild(tr); return;
+    td.colSpan = 10; tr.appendChild(td); body.appendChild(tr); return;
   }
   rows.forEach(function(x){
     var tr = document.createElement('tr');
@@ -529,6 +564,7 @@ function drawLive(){
     tr.appendChild(cell(x.name));
     tr.appendChild(x.dir ? cell(x.dir === 'up' ? '上昇(押し目買い)' : '下降(戻り売り)', x.dir) : cell('-'));
     tr.appendChild(strengthCell(x));
+    tr.appendChild(pickCell(x));
     tr.appendChild(cell(x.ret == null ? '-' : x.ret < 0 ? (x.dir === 'up' ? '高値更新中' : '安値更新中') : x.ret + '%'));
     var zone = x.status === 'エントリー候補' || x.status === '押し目ゾーン';
     tr.appendChild(cell(zone && x.signal ? x.signal : '-'));
@@ -558,7 +594,7 @@ function loadLive(){
       if (!liveData) document.getElementById('stBars').innerHTML = '<p class="note">通貨の強さを読み込めませんでした。</p>';
       if (!liveData) document.getElementById('dayWrap').innerHTML = '<p class="note">今日の動きを読み込めませんでした。</p>';
       if (!liveData) document.getElementById('srList').innerHTML = '<p class="note">通貨シリーズを読み込めませんでした。</p>';
-      document.getElementById('liveBody').innerHTML = '<tr><td colspan="9" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
+      document.getElementById('liveBody').innerHTML = '<tr><td colspan="10" class="note">まだスキャン結果がないか、通信エラーです。少し待ってから開き直してください。</td></tr>';
     });
 }
 
