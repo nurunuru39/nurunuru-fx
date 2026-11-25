@@ -77,6 +77,7 @@ NY反転(scan.json の "strength" の "ny")は2段階で判定する:
 import json
 import math
 import sys
+import time
 from datetime import datetime, timezone, timedelta
 
 import pandas as pd
@@ -658,15 +659,59 @@ def ny_reversal_live(m15, now=None):
     return r
 
 
+FETCH_RETRIES = 2      # データ取得に失敗したら、やり直す回数(最初の1回とは別)
+FETCH_WAIT = 2         # やり直す前に待つ秒数(1回目は2秒、2回目は4秒)
+
+
+def _ok_count(df, tickers):
+    """取れた銘柄の数(中身が全部空の銘柄は数えない)。"""
+    if df is None or df.empty:
+        return 0
+    n = 0
+    for tk in tickers:
+        try:
+            if not df[tk]["Close"].dropna().empty:
+                n += 1
+        except KeyError:
+            pass
+    return n
+
+
+def download_retry(yf, tickers, label, **kw):
+    """yf.download を、失敗(エラー・空・取れない銘柄がある)したら少し待って
+    FETCH_RETRIES 回までやり直す。いちばん多く取れた結果を返す。全部エラーなら最後のエラーを出す。"""
+    best, best_n, err = None, -1, None
+    for i in range(FETCH_RETRIES + 1):
+        if i:
+            wait = FETCH_WAIT * i
+            print(f"{label}: retry {i}/{FETCH_RETRIES} after {wait}s", file=sys.stderr)
+            time.sleep(wait)
+        try:
+            df = yf.download(tickers, **kw)
+        except Exception as e:
+            err = e
+            print(f"{label} error:", e, file=sys.stderr)
+            continue
+        n = _ok_count(df, tickers)
+        if n > best_n:
+            best, best_n = df, n
+        if n == len(tickers):
+            break
+        print(f"{label}: got {n}/{len(tickers)} tickers", file=sys.stderr)
+    if best is None:
+        raise err
+    return best
+
+
 def fetch():
     import yfinance as yf
     tickers = list(SYMBOLS.values())
     kw = dict(group_by="ticker", progress=False, auto_adjust=True, threads=True)
     # 4時間足のSMA200に200本以上いるので、1時間足は120日分とる(4時間足でおよそ500本)
-    h1 = yf.download(tickers, period="120d", interval="1h", **kw)
-    m15 = yf.download(tickers, period="5d", interval="15m", **kw)
+    h1 = download_retry(yf, tickers, "1h", period="120d", interval="1h", **kw)
+    m15 = download_retry(yf, tickers, "15m", period="5d", interval="15m", **kw)
     try:
-        d1 = yf.download(tickers, period="6mo", interval="1d", **kw)
+        d1 = download_retry(yf, tickers, "1d", period="6mo", interval="1d", **kw)
     except Exception as e:  # 日足が取れなくても押し目スキャンは続ける
         print("daily error:", e, file=sys.stderr)
         d1 = None
