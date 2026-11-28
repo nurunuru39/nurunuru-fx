@@ -1,0 +1,42 @@
+{
+ "updated": "2026-11-28T16:01:01Z",
+ "source": "Forex Factory",
+ "events": [
+  {
+   "date": "2026-11-22T19:00:00-05:00",
+   "country": "JPY",
+   "title": "Bank Holiday",
+   "title_ja": "祝日(市場休場)",
+   "holiday": true,
+   "forecast": "",
+   "previous": ""
+  },
+  {
+   "date": "2026-11-25T08:30:00-05:00",
+   "country": "USD",
+   "title": "Core PCE Price Index m/m",
+   "title_ja": "コアPCEデフレーター(前月比)",
+   "holiday": false,
+   "forecast": "0.3%",
+   "previous": "0.3%"
+  },
+  {
+   "date": "2026-11-25T08:30:00-05:00",
+   "country": "USD",
+   "title": "Prelim GDP q/q",
+   "title_ja": "GDP(前期比・速報)",
+   "holiday": false,
+   "forecast": "3.5%",
+   "previous": "3.4%"
+  },
+  {
+   "date": "2026-11-26T08:00:00-05:00",
+   "country": "USD",
+   "title": "Bank Holiday",
+   "title_ja": "祝日(市場休場)",
+   "holiday": true,
+   "forecast": "",
+   "previous": ""
+  }
+ ]
+}

@@ -1,0 +1,2207 @@
+{
+ "updated": "2026-11-29 01:01",
+ "updated_ts": 1795881661,
+ "rules": {
+  "adx_min": 20,
+  "ret_min": 50.0,
+  "ret_max": 78.6,
+  "pivot_near": 0.3,
+  "sma_n": 200,
+  "strength_top": 3,
+  "series_flat": 0.1,
+  "series_all": 0.8,
+  "nyrev_top": 2,
+  "nyrev_checks": [
+   15,
+   30,
+   45,
+   60
+  ],
+  "nyrev_confirm": 30
+ },
+ "items": [
+  {
+   "name": "EURCAD",
+   "price": 1.5575400590896606,
+   "adx4": 36.6,
+   "adx1": 32.4,
+   "dir": "down",
+   "ret": 15.6,
+   "signal": null,
+   "status": "監視",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.5687,
+     "R2": 1.5661,
+     "R1": 1.5617,
+     "P": 1.559,
+     "S1": 1.5546,
+     "S2": 1.552,
+     "S3": 1.5475
+    },
+    "name": "P",
+    "level": 1.559,
+    "dist": -0.0015066,
+    "dist_atr": 0.98,
+    "near": false,
+    "atr_h1": 0.0015362
+   },
+   "sma200": {
+    "value": 1.5724,
+    "dist": -0.014899,
+    "dist_atr": 9.7,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "swing_hi": 1.5635000467300415,
+   "swing_lo": 1.556439995765686,
+   "strength": {
+    "base": "EUR",
+    "quote": "CAD",
+    "base_score": -0.229,
+    "quote_score": 0.101,
+    "base_rank": 8,
+    "quote_rank": 3,
+    "ok": true
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "GBPCAD",
+   "price": 1.8661600351333618,
+   "adx4": 31.0,
+   "adx1": 25.2,
+   "dir": "down",
+   "ret": 35.8,
+   "signal": null,
+   "status": "監視",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.8763,
+     "R2": 1.8734,
+     "R1": 1.8693,
+     "P": 1.8665,
+     "S1": 1.8624,
+     "S2": 1.8595,
+     "S3": 1.8554
+    },
+    "name": "P",
+    "level": 1.8665,
+    "dist": -0.00030665,
+    "dist_atr": 0.19,
+    "near": true,
+    "atr_h1": 0.0016202
+   },
+   "sma200": {
+    "value": 1.8785,
+    "dist": -0.012373,
+    "dist_atr": 7.64,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "swing_hi": 1.8705600500106812,
+   "swing_lo": 1.8637100458145142,
+   "strength": {
+    "base": "GBP",
+    "quote": "CAD",
+    "base_score": 0.035,
+    "quote_score": 0.101,
+    "base_rank": 4,
+    "quote_rank": 3,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": false,
+    "label": "NG",
+    "reasons": [
+     "EURのほうが弱い(EURGBP↓)"
+    ],
+    "alt": "GBPCAD売りよりEURCAD売り"
+   }
+  },
+  {
+   "name": "NZDCAD",
+   "price": 0.777999997138977,
+   "adx4": 24.2,
+   "adx1": 31.1,
+   "dir": "down",
+   "ret": 20.7,
+   "signal": null,
+   "status": "監視",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.78842,
+     "R2": 0.78592,
+     "R1": 0.7816,
+     "P": 0.7791,
+     "S1": 0.77478,
+     "S2": 0.77228,
+     "S3": 0.76796
+    },
+    "name": "P",
+    "level": 0.7791,
+    "dist": -0.0010967,
+    "dist_atr": 0.88,
+    "near": false,
+    "atr_h1": 0.0012431
+   },
+   "sma200": {
+    "value": 0.78971,
+    "dist": -0.011711,
+    "dist_atr": 9.42,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "swing_hi": 0.7834100127220154,
+   "swing_lo": 0.7765899896621704,
+   "strength": {
+    "base": "NZD",
+    "quote": "CAD",
+    "base_score": -0.055,
+    "quote_score": 0.101,
+    "base_rank": 5,
+    "quote_rank": 3,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "NZDCHF",
+   "price": 0.45642998814582825,
+   "adx4": 47.7,
+   "adx1": 13.2,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.46326,
+     "R2": 0.46109,
+     "R1": 0.45856,
+     "P": 0.45639,
+     "S1": 0.45386,
+     "S2": 0.45169,
+     "S3": 0.44916
+    },
+    "name": "P",
+    "level": 0.45639,
+    "dist": 4.3323e-05,
+    "dist_atr": 0.05,
+    "near": true,
+    "atr_h1": 0.00085094
+   },
+   "sma200": {
+    "value": 0.46295,
+    "dist": -0.0065247,
+    "dist_atr": 7.67,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "NZD",
+    "quote": "CHF",
+    "base_score": -0.055,
+    "quote_score": -0.129,
+    "base_rank": 5,
+    "quote_rank": 6,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "GBPCHF",
+   "price": 1.0947099924087524,
+   "adx4": 31.2,
+   "adx1": 13.3,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.1042,
+     "R2": 1.101,
+     "R1": 1.098,
+     "P": 1.0948,
+     "S1": 1.0917,
+     "S2": 1.0886,
+     "S3": 1.0855
+    },
+    "name": "P",
+    "level": 1.0948,
+    "dist": -0.00011337,
+    "dist_atr": 0.08,
+    "near": true,
+    "atr_h1": 0.0014931
+   },
+   "sma200": {
+    "value": 1.1013,
+    "dist": -0.0065686,
+    "dist_atr": 4.4,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "GBP",
+    "quote": "CHF",
+    "base_score": 0.035,
+    "quote_score": -0.129,
+    "base_rank": 4,
+    "quote_rank": 6,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "EURCHF",
+   "price": 0.9138200283050537,
+   "adx4": 30.4,
+   "adx1": 13.7,
+   "dir": "down",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.92032,
+     "R2": 0.91873,
+     "R1": 0.91652,
+     "P": 0.91493,
+     "S1": 0.91272,
+     "S2": 0.91113,
+     "S3": 0.90892
+    },
+    "name": "S1",
+    "level": 0.91272,
+    "dist": 0.0011034,
+    "dist_atr": 0.9,
+    "near": false,
+    "atr_h1": 0.001222
+   },
+   "sma200": {
+    "value": 0.92185,
+    "dist": -0.0080336,
+    "dist_atr": 6.57,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "EUR",
+    "quote": "CHF",
+    "base_score": -0.229,
+    "quote_score": -0.129,
+    "base_rank": 8,
+    "quote_rank": 6,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "AUDCAD",
+   "price": 0.9463099837303162,
+   "adx4": 27.5,
+   "adx1": 19.4,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.95873,
+     "R2": 0.95503,
+     "R1": 0.95063,
+     "P": 0.94693,
+     "S1": 0.94253,
+     "S2": 0.93883,
+     "S3": 0.93443
+    },
+    "name": "P",
+    "level": 0.94693,
+    "dist": -0.00062001,
+    "dist_atr": 0.34,
+    "near": false,
+    "atr_h1": 0.0018041
+   },
+   "sma200": {
+    "value": 0.97221,
+    "dist": -0.025895,
+    "dist_atr": 14.35,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "AUD",
+    "quote": "CAD",
+    "base_score": 0.355,
+    "quote_score": 0.101,
+    "base_rank": 1,
+    "quote_rank": 3,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "USDCAD",
+   "price": 1.4248000383377075,
+   "adx4": 26.1,
+   "adx1": 9.8,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.4309,
+     "R2": 1.4285,
+     "R1": 1.4265,
+     "P": 1.4242,
+     "S1": 1.4221,
+     "S2": 1.4198,
+     "S3": 1.4178
+    },
+    "name": "P",
+    "level": 1.4242,
+    "dist": 0.00064337,
+    "dist_atr": 0.43,
+    "near": false,
+    "atr_h1": 0.0014862
+   },
+   "sma200": {
+    "value": 1.4144,
+    "dist": 0.010351,
+    "dist_atr": 6.97,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "USD",
+    "quote": "CAD",
+    "base_score": 0.108,
+    "quote_score": 0.101,
+    "base_rank": 2,
+    "quote_rank": 3,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "AUDCHF",
+   "price": 0.5551300048828125,
+   "adx4": 24.8,
+   "adx1": 19.9,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.5657,
+     "R2": 0.56215,
+     "R1": 0.55881,
+     "P": 0.55526,
+     "S1": 0.55192,
+     "S2": 0.54837,
+     "S3": 0.54503
+    },
+    "name": "P",
+    "level": 0.55526,
+    "dist": -0.00013,
+    "dist_atr": 0.08,
+    "near": true,
+    "atr_h1": 0.0015385
+   },
+   "sma200": {
+    "value": 0.57006,
+    "dist": -0.014929,
+    "dist_atr": 9.7,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "AUD",
+    "quote": "CHF",
+    "base_score": 0.355,
+    "quote_score": -0.129,
+    "base_rank": 1,
+    "quote_rank": 6,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "XAUUSD",
+   "price": 3674.60009765625,
+   "adx4": 24.3,
+   "adx1": 24.4,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-25",
+    "levels": {
+     "R3": 3836.5,
+     "R2": 3727.1,
+     "R1": 3672.5,
+     "P": 3563.1,
+     "S1": 3508.5,
+     "S2": 3399.1,
+     "S3": 3344.5
+    },
+    "name": "R1",
+    "level": 3672.5,
+    "dist": 2.1334,
+    "dist_atr": 0.07,
+    "near": true,
+    "atr_h1": 28.844
+   },
+   "sma200": {
+    "value": 3969.1,
+    "dist": -294.47,
+    "dist_atr": 10.21,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": null,
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "USDCHF",
+   "price": 0.8356999754905701,
+   "adx4": 23.4,
+   "adx1": 25.1,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.84254,
+     "R2": 0.83997,
+     "R1": 0.83798,
+     "P": 0.83541,
+     "S1": 0.83342,
+     "S2": 0.83085,
+     "S3": 0.82886
+    },
+    "name": "P",
+    "level": 0.83541,
+    "dist": 0.00029329,
+    "dist_atr": 0.27,
+    "near": true,
+    "atr_h1": 0.0010825
+   },
+   "sma200": {
+    "value": 0.82912,
+    "dist": 0.0065779,
+    "dist_atr": 6.08,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "USD",
+    "quote": "CHF",
+    "base_score": 0.108,
+    "quote_score": -0.129,
+    "base_rank": 2,
+    "quote_rank": 6,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "AUDJPY",
+   "price": 106.07499694824219,
+   "adx4": 23.4,
+   "adx1": 18.6,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 107.71,
+     "R2": 107.13,
+     "R1": 106.56,
+     "P": 105.98,
+     "S1": 105.41,
+     "S2": 104.83,
+     "S3": 104.26
+    },
+    "name": "P",
+    "level": 105.98,
+    "dist": 0.090998,
+    "dist_atr": 0.55,
+    "near": false,
+    "atr_h1": 0.16639
+   },
+   "sma200": {
+    "value": 108.98,
+    "dist": -2.9001,
+    "dist_atr": 17.43,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "AUD",
+    "quote": "JPY",
+    "base_score": 0.355,
+    "quote_score": -0.186,
+    "base_rank": 1,
+    "quote_rank": 7,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "EURAUD",
+   "price": 1.6443099975585938,
+   "adx4": 23.1,
+   "adx1": 33.1,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.666,
+     "R2": 1.6602,
+     "R1": 1.652,
+     "P": 1.6463,
+     "S1": 1.638,
+     "S2": 1.6323,
+     "S3": 1.6241
+    },
+    "name": "P",
+    "level": 1.6463,
+    "dist": -0.0019633,
+    "dist_atr": 0.85,
+    "near": false,
+    "atr_h1": 0.002311
+   },
+   "sma200": {
+    "value": 1.6172,
+    "dist": 0.027129,
+    "dist_atr": 11.74,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "EUR",
+    "quote": "AUD",
+    "base_score": -0.229,
+    "quote_score": 0.355,
+    "base_rank": 8,
+    "quote_rank": 1,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "XAGUSD",
+   "price": 43.90999984741211,
+   "adx4": 22.9,
+   "adx1": 28.0,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-25",
+    "levels": {
+     "R3": 46.02,
+     "R2": 43.85,
+     "R1": 42.76,
+     "P": 40.59,
+     "S1": 39.5,
+     "S2": 37.33,
+     "S3": 36.24
+    },
+    "name": "R2",
+    "level": 43.85,
+    "dist": 0.059999,
+    "dist_atr": 0.09,
+    "near": true,
+    "atr_h1": 0.66177
+   },
+   "sma200": {
+    "value": 51.368,
+    "dist": -7.4582,
+    "dist_atr": 11.27,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": null,
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "EURGBP",
+   "price": 0.8348100185394287,
+   "adx4": 19.9,
+   "adx1": 42.0,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.83929,
+     "R2": 0.83827,
+     "R1": 0.83636,
+     "P": 0.83534,
+     "S1": 0.83343,
+     "S2": 0.83241,
+     "S3": 0.8305
+    },
+    "name": "P",
+    "level": 0.83534,
+    "dist": -0.00053332,
+    "dist_atr": 1.04,
+    "near": false,
+    "atr_h1": 0.0005146
+   },
+   "sma200": {
+    "value": 0.83701,
+    "dist": -0.0021985,
+    "dist_atr": 4.27,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "EUR",
+    "quote": "GBP",
+    "base_score": -0.229,
+    "quote_score": 0.035,
+    "base_rank": 8,
+    "quote_rank": 4,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "AUDUSD",
+   "price": 0.6650704741477966,
+   "adx4": 19.7,
+   "adx1": 23.8,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.67301,
+     "R2": 0.67066,
+     "R1": 0.66787,
+     "P": 0.66552,
+     "S1": 0.66272,
+     "S2": 0.66038,
+     "S3": 0.65758
+    },
+    "name": "P",
+    "level": 0.66552,
+    "dist": -0.0004494,
+    "dist_atr": 0.61,
+    "near": false,
+    "atr_h1": 0.00073181
+   },
+   "sma200": {
+    "value": 0.68779,
+    "dist": -0.022715,
+    "dist_atr": 31.04,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "AUD",
+    "quote": "USD",
+    "base_score": 0.355,
+    "quote_score": 0.108,
+    "base_rank": 1,
+    "quote_rank": 2,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "CADCHF",
+   "price": 0.5867999792098999,
+   "adx4": 19.2,
+   "adx1": 18.0,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.59079,
+     "R2": 0.58915,
+     "R1": 0.5878,
+     "P": 0.58616,
+     "S1": 0.58481,
+     "S2": 0.58317,
+     "S3": 0.58182
+    },
+    "name": "P",
+    "level": 0.58616,
+    "dist": 0.00064331,
+    "dist_atr": 0.5,
+    "near": false,
+    "atr_h1": 0.00128
+   },
+   "sma200": {
+    "value": 0.58611,
+    "dist": 0.00068583,
+    "dist_atr": 0.54,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "CAD",
+    "quote": "CHF",
+    "base_score": 0.101,
+    "quote_score": -0.129,
+    "base_rank": 3,
+    "quote_rank": 6,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "NZDJPY",
+   "price": 87.14399719238281,
+   "adx4": 18.9,
+   "adx1": 20.4,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 88.422,
+     "R2": 88.028,
+     "R1": 87.579,
+     "P": 87.185,
+     "S1": 86.736,
+     "S2": 86.342,
+     "S3": 85.893
+    },
+    "name": "P",
+    "level": 87.185,
+    "dist": -0.041336,
+    "dist_atr": 0.32,
+    "near": false,
+    "atr_h1": 0.12961
+   },
+   "sma200": {
+    "value": 88.507,
+    "dist": -1.3625,
+    "dist_atr": 10.51,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "NZD",
+    "quote": "JPY",
+    "base_score": -0.055,
+    "quote_score": -0.186,
+    "base_rank": 5,
+    "quote_rank": 7,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "CADJPY",
+   "price": 111.96299743652344,
+   "adx4": 18.6,
+   "adx1": 16.6,
+   "dir": "up",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 112.57,
+     "R2": 112.32,
+     "R1": 112.1,
+     "P": 111.86,
+     "S1": 111.64,
+     "S2": 111.39,
+     "S3": 111.18
+    },
+    "name": "P",
+    "level": 111.86,
+    "dist": 0.105,
+    "dist_atr": 0.78,
+    "near": false,
+    "atr_h1": 0.13435
+   },
+   "sma200": {
+    "value": 112.04,
+    "dist": -0.073258,
+    "dist_atr": 0.55,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "CAD",
+    "quote": "JPY",
+    "base_score": 0.101,
+    "quote_score": -0.186,
+    "base_rank": 3,
+    "quote_rank": 7,
+    "ok": true
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "AUDNZD",
+   "price": 1.216729998588562,
+   "adx4": 16.8,
+   "adx1": 12.7,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.2275,
+     "R2": 1.2226,
+     "R1": 1.219,
+     "P": 1.2141,
+     "S1": 1.2106,
+     "S2": 1.2057,
+     "S3": 1.2021
+    },
+    "name": "R1",
+    "level": 1.219,
+    "dist": -0.0022867,
+    "dist_atr": 1.32,
+    "near": false,
+    "atr_h1": 0.0017382
+   },
+   "sma200": {
+    "value": 1.2308,
+    "dist": -0.014073,
+    "dist_atr": 8.1,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "AUD",
+    "quote": "NZD",
+    "base_score": 0.355,
+    "quote_score": -0.055,
+    "base_rank": 1,
+    "quote_rank": 5,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "GBPAUD",
+   "price": 1.970170021057129,
+   "adx4": 16.7,
+   "adx1": 26.9,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.9874,
+     "R2": 1.9819,
+     "R1": 1.9754,
+     "P": 1.9699,
+     "S1": 1.9633,
+     "S2": 1.9578,
+     "S3": 1.9513
+    },
+    "name": "P",
+    "level": 1.9699,
+    "dist": 0.00029,
+    "dist_atr": 0.12,
+    "near": true,
+    "atr_h1": 0.0024032
+   },
+   "sma200": {
+    "value": 1.9324,
+    "dist": 0.037797,
+    "dist_atr": 15.73,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "GBP",
+    "quote": "AUD",
+    "base_score": 0.035,
+    "quote_score": 0.355,
+    "base_rank": 4,
+    "quote_rank": 1,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "GBPJPY",
+   "price": 208.99600219726562,
+   "adx4": 15.5,
+   "adx1": 15.8,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 210.39,
+     "R2": 209.94,
+     "R1": 209.41,
+     "P": 208.96,
+     "S1": 208.44,
+     "S2": 207.98,
+     "S3": 207.46
+    },
+    "name": "P",
+    "level": 208.96,
+    "dist": 0.034673,
+    "dist_atr": 0.17,
+    "near": true,
+    "atr_h1": 0.20225
+   },
+   "sma200": {
+    "value": 210.51,
+    "dist": -1.5096,
+    "dist_atr": 7.46,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "GBP",
+    "quote": "JPY",
+    "base_score": 0.035,
+    "quote_score": -0.186,
+    "base_rank": 4,
+    "quote_rank": 7,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "EURNZD",
+   "price": 2.001610040664673,
+   "adx4": 15.3,
+   "adx1": 18.9,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 2.0231,
+     "R2": 2.016,
+     "R1": 2.0078,
+     "P": 2.0007,
+     "S1": 1.9924,
+     "S2": 1.9854,
+     "S3": 1.9771
+    },
+    "name": "P",
+    "level": 2.0007,
+    "dist": 0.00089002,
+    "dist_atr": 0.36,
+    "near": false,
+    "atr_h1": 0.0024836
+   },
+   "sma200": {
+    "value": 1.9905,
+    "dist": 0.01113,
+    "dist_atr": 4.48,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "EUR",
+    "quote": "NZD",
+    "base_score": -0.229,
+    "quote_score": -0.055,
+    "base_rank": 8,
+    "quote_rank": 5,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "EURUSD",
+   "price": 1.0938525199890137,
+   "adx4": 14.0,
+   "adx1": 29.9,
+   "dir": "down",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.1026,
+     "R2": 1.1007,
+     "R1": 1.0972,
+     "P": 1.0953,
+     "S1": 1.0918,
+     "S2": 1.0899,
+     "S3": 1.0864
+    },
+    "name": "P",
+    "level": 1.0953,
+    "dist": -0.0014433,
+    "dist_atr": 1.79,
+    "near": false,
+    "atr_h1": 0.00080461
+   },
+   "sma200": {
+    "value": 1.1122,
+    "dist": -0.018349,
+    "dist_atr": 22.8,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "EUR",
+    "quote": "USD",
+    "base_score": -0.229,
+    "quote_score": 0.108,
+    "base_rank": 8,
+    "quote_rank": 2,
+    "ok": true
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "CHFJPY",
+   "price": 190.8300018310547,
+   "adx4": 13.8,
+   "adx1": 28.4,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 191.8,
+     "R2": 191.49,
+     "R1": 191.15,
+     "P": 190.84,
+     "S1": 190.5,
+     "S2": 190.18,
+     "S3": 189.85
+    },
+    "name": "P",
+    "level": 190.84,
+    "dist": -0.006663,
+    "dist_atr": 0.03,
+    "near": true,
+    "atr_h1": 0.23417
+   },
+   "sma200": {
+    "value": 191.11,
+    "dist": -0.27575,
+    "dist_atr": 1.18,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "CHF",
+    "quote": "JPY",
+    "base_score": -0.129,
+    "quote_score": -0.186,
+    "base_rank": 6,
+    "quote_rank": 7,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "NZDUSD",
+   "price": 0.5463585257530212,
+   "adx4": 13.2,
+   "adx1": 23.3,
+   "dir": "down",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 0.55422,
+     "R2": 0.55241,
+     "R1": 0.54962,
+     "P": 0.54781,
+     "S1": 0.54502,
+     "S2": 0.54321,
+     "S3": 0.54043
+    },
+    "name": "S1",
+    "level": 0.54502,
+    "dist": 0.0013339,
+    "dist_atr": 2.07,
+    "near": false,
+    "atr_h1": 0.0006433
+   },
+   "sma200": {
+    "value": 0.55864,
+    "dist": -0.012285,
+    "dist_atr": 19.1,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "NZD",
+    "quote": "USD",
+    "base_score": -0.055,
+    "quote_score": 0.108,
+    "base_rank": 5,
+    "quote_rank": 2,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "GBPUSD",
+   "price": 1.3098949193954468,
+   "adx4": 12.5,
+   "adx1": 22.0,
+   "dir": null,
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 1.3168,
+     "R2": 1.3152,
+     "R1": 1.3125,
+     "P": 1.3109,
+     "S1": 1.3082,
+     "S2": 1.3066,
+     "S3": 1.3039
+    },
+    "name": "P",
+    "level": 1.3109,
+    "dist": -0.0009586,
+    "dist_atr": 0.95,
+    "near": false,
+    "atr_h1": 0.0010102
+   },
+   "sma200": {
+    "value": 1.3284,
+    "dist": -0.018461,
+    "dist_atr": 18.27,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "4時間足と1時間足の向きがそろっていない",
+   "strength": {
+    "base": "GBP",
+    "quote": "USD",
+    "base_score": 0.035,
+    "quote_score": 0.108,
+    "base_rank": 4,
+    "quote_rank": 2,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": null
+  },
+  {
+   "name": "EURJPY",
+   "price": 174.47900390625,
+   "adx4": 12.1,
+   "adx1": 24.6,
+   "dir": "down",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 175.4,
+     "R2": 175.19,
+     "R1": 174.79,
+     "P": 174.58,
+     "S1": 174.18,
+     "S2": 173.97,
+     "S3": 173.57
+    },
+    "name": "P",
+    "level": 174.58,
+    "dist": -0.098002,
+    "dist_atr": 0.66,
+    "near": false,
+    "atr_h1": 0.14952
+   },
+   "sma200": {
+    "value": 176.21,
+    "dist": -1.7289,
+    "dist_atr": 11.56,
+    "near": false,
+    "above": false
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "EUR",
+    "quote": "JPY",
+    "base_score": -0.229,
+    "quote_score": -0.186,
+    "base_rank": 8,
+    "quote_rank": 7,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "USDJPY",
+   "price": 159.51499938964844,
+   "adx4": 12.0,
+   "adx1": 14.9,
+   "dir": "up",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 160.16,
+     "R2": 159.88,
+     "R1": 159.7,
+     "P": 159.42,
+     "S1": 159.24,
+     "S2": 158.96,
+     "S3": 158.78
+    },
+    "name": "P",
+    "level": 159.42,
+    "dist": 0.097336,
+    "dist_atr": 0.93,
+    "near": false,
+    "atr_h1": 0.10455
+   },
+   "sma200": {
+    "value": 158.48,
+    "dist": 1.0309,
+    "dist_atr": 9.86,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "USD",
+    "quote": "JPY",
+    "base_score": 0.108,
+    "quote_score": -0.186,
+    "base_rank": 2,
+    "quote_rank": 7,
+    "ok": true
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  },
+  {
+   "name": "GBPNZD",
+   "price": 2.397710084915161,
+   "adx4": 10.2,
+   "adx1": 11.1,
+   "dir": "up",
+   "ret": null,
+   "signal": null,
+   "status": "対象外",
+   "pivot": {
+    "from": "2026-11-27",
+    "levels": {
+     "R3": 2.4193,
+     "R2": 2.4096,
+     "R1": 2.402,
+     "P": 2.3923,
+     "S1": 2.3846,
+     "S2": 2.375,
+     "S3": 2.3673
+    },
+    "name": "R1",
+    "level": 2.402,
+    "dist": -0.0042532,
+    "dist_atr": 1.25,
+    "near": false,
+    "atr_h1": 0.0033975
+   },
+   "sma200": {
+    "value": 2.3783,
+    "dist": 0.019384,
+    "dist_atr": 5.71,
+    "near": false,
+    "above": true
+   },
+   "confluence": false,
+   "confluence_by": [],
+   "reason": "ADXが基準未満(レンジの可能性)",
+   "strength": {
+    "base": "GBP",
+    "quote": "NZD",
+    "base_score": 0.035,
+    "quote_score": -0.055,
+    "base_rank": 4,
+    "quote_rank": 5,
+    "ok": false
+   },
+   "ny_reversal": null,
+   "pick": {
+    "ok": true,
+    "label": "OK",
+    "reasons": [],
+    "alt": null
+   }
+  }
+ ],
+ "errors": [],
+ "atr_n": 20,
+ "atr": {
+  "EURUSD": {
+   "d1": 0.0069222,
+   "h1": 0.00080461,
+   "today": 0.0051301,
+   "ratio": 0.74,
+   "close": 1.0972,
+   "day": "2026-11-27"
+  },
+  "GBPUSD": {
+   "d1": 0.0082398,
+   "h1": 0.0010102,
+   "today": 0.0040246,
+   "ratio": 0.49,
+   "close": 1.3107,
+   "day": "2026-11-27"
+  },
+  "AUDUSD": {
+   "d1": 0.0058629,
+   "h1": 0.00073181,
+   "today": 0.001474,
+   "ratio": 0.25,
+   "close": 0.66507,
+   "day": "2026-11-28"
+  },
+  "NZDUSD": {
+   "d1": 0.0046667,
+   "h1": 0.0006433,
+   "today": 0.00071436,
+   "ratio": 0.15,
+   "close": 0.54636,
+   "day": "2026-11-28"
+  },
+  "USDJPY": {
+   "d1": 0.91238,
+   "h1": 0.10455,
+   "today": 0.23399,
+   "ratio": 0.26,
+   "close": 159.51,
+   "day": "2026-11-28"
+  },
+  "USDCHF": {
+   "d1": 0.0065769,
+   "h1": 0.0010825,
+   "today": 0.0012,
+   "ratio": 0.18,
+   "close": 0.8357,
+   "day": "2026-11-28"
+  },
+  "USDCAD": {
+   "d1": 0.0071928,
+   "h1": 0.0014862,
+   "today": 0.00027001,
+   "ratio": 0.04,
+   "close": 1.4248,
+   "day": "2026-11-28"
+  },
+  "EURJPY": {
+   "d1": 1.1812,
+   "h1": 0.14952,
+   "today": 0.32401,
+   "ratio": 0.27,
+   "close": 174.4,
+   "day": "2026-11-28"
+  },
+  "GBPJPY": {
+   "d1": 1.359,
+   "h1": 0.20225,
+   "today": 0.23401,
+   "ratio": 0.17,
+   "close": 209.0,
+   "day": "2026-11-28"
+  },
+  "AUDJPY": {
+   "d1": 1.0766,
+   "h1": 0.16639,
+   "today": 0.384,
+   "ratio": 0.36,
+   "close": 106.07,
+   "day": "2026-11-28"
+  },
+  "NZDJPY": {
+   "d1": 0.79341,
+   "h1": 0.12961,
+   "today": 0.024994,
+   "ratio": 0.03,
+   "close": 87.144,
+   "day": "2026-11-28"
+  },
+  "CADJPY": {
+   "d1": 0.71258,
+   "h1": 0.13435,
+   "today": 0.155,
+   "ratio": 0.22,
+   "close": 111.96,
+   "day": "2026-11-28"
+  },
+  "CHFJPY": {
+   "d1": 1.3194,
+   "h1": 0.23417,
+   "today": 0.0039978,
+   "ratio": 0.0,
+   "close": 190.83,
+   "day": "2026-11-28"
+  },
+  "EURGBP": {
+   "d1": 0.002709,
+   "h1": 0.0005146,
+   "today": 0.00261,
+   "ratio": 0.96,
+   "close": 0.83689,
+   "day": "2026-11-27"
+  },
+  "EURAUD": {
+   "d1": 0.01225,
+   "h1": 0.002311,
+   "today": 0.00854,
+   "ratio": 0.7,
+   "close": 1.6445,
+   "day": "2026-11-28"
+  },
+  "EURNZD": {
+   "d1": 0.011357,
+   "h1": 0.0024836,
+   "today": 0.0036602,
+   "ratio": 0.32,
+   "close": 2.0015,
+   "day": "2026-11-28"
+  },
+  "EURCAD": {
+   "d1": 0.0075765,
+   "h1": 0.0015362,
+   "today": 0.0046901,
+   "ratio": 0.62,
+   "close": 1.5579,
+   "day": "2026-11-28"
+  },
+  "EURCHF": {
+   "d1": 0.0051803,
+   "h1": 0.001222,
+   "today": 0.0053,
+   "ratio": 1.02,
+   "close": 0.9155,
+   "day": "2026-11-27"
+  },
+  "GBPAUD": {
+   "d1": 0.013602,
+   "h1": 0.0024032,
+   "today": 0.00494,
+   "ratio": 0.36,
+   "close": 1.9702,
+   "day": "2026-11-28"
+  },
+  "GBPNZD": {
+   "d1": 0.013945,
+   "h1": 0.0033975,
+   "today": 0.00194,
+   "ratio": 0.14,
+   "close": 2.3977,
+   "day": "2026-11-28"
+  },
+  "GBPCAD": {
+   "d1": 0.0087451,
+   "h1": 0.0016202,
+   "today": 0.00086999,
+   "ratio": 0.1,
+   "close": 1.8662,
+   "day": "2026-11-28"
+  },
+  "GBPCHF": {
+   "d1": 0.0066024,
+   "h1": 0.0014931,
+   "today": 0.00115,
+   "ratio": 0.17,
+   "close": 1.0947,
+   "day": "2026-11-28"
+  },
+  "AUDNZD": {
+   "d1": 0.0085721,
+   "h1": 0.0017382,
+   "today": 0.0037299,
+   "ratio": 0.44,
+   "close": 1.2167,
+   "day": "2026-11-28"
+  },
+  "AUDCAD": {
+   "d1": 0.0072333,
+   "h1": 0.0018041,
+   "today": 0.001042,
+   "ratio": 0.14,
+   "close": 0.94631,
+   "day": "2026-11-28"
+  },
+  "AUDCHF": {
+   "d1": 0.0059159,
+   "h1": 0.0015385,
+   "today": 0.001943,
+   "ratio": 0.33,
+   "close": 0.55513,
+   "day": "2026-11-28"
+  },
+  "NZDCAD": {
+   "d1": 0.0053876,
+   "h1": 0.0012431,
+   "today": 0.0011,
+   "ratio": 0.2,
+   "close": 0.778,
+   "day": "2026-11-28"
+  },
+  "NZDCHF": {
+   "d1": 0.0039174,
+   "h1": 0.00085094,
+   "today": 0.00017002,
+   "ratio": 0.04,
+   "close": 0.45643,
+   "day": "2026-11-28"
+  },
+  "CADCHF": {
+   "d1": 0.0037051,
+   "h1": 0.00128,
+   "today": 0.00098997,
+   "ratio": 0.27,
+   "close": 0.58605,
+   "day": "2026-11-28"
+  },
+  "XAUUSD": {
+   "d1": 106.19,
+   "h1": 28.844,
+   "today": 147.7,
+   "ratio": 1.39,
+   "close": 3639.6,
+   "day": "2026-11-27"
+  },
+  "XAGUSD": {
+   "d1": 1.6205,
+   "h1": 0.66177,
+   "today": 4.248,
+   "ratio": 2.62,
+   "close": 43.167,
+   "day": "2026-11-27"
+  }
+ },
+ "strength": {
+  "h24": {
+   "USD": 0.108,
+   "EUR": -0.229,
+   "JPY": -0.186,
+   "GBP": 0.035,
+   "AUD": 0.355,
+   "NZD": -0.055,
+   "CAD": 0.101,
+   "CHF": -0.129
+  },
+  "h24_n": {
+   "USD": 7,
+   "EUR": 7,
+   "JPY": 7,
+   "GBP": 7,
+   "AUD": 7,
+   "NZD": 7,
+   "CAD": 7,
+   "CHF": 7
+  },
+  "h1": {
+   "USD": -0.02,
+   "EUR": 0.004,
+   "JPY": 0.006,
+   "GBP": 0.013,
+   "AUD": -0.012,
+   "NZD": -0.035,
+   "CAD": 0.008,
+   "CHF": 0.038
+  },
+  "h1_n": {
+   "USD": 7,
+   "EUR": 7,
+   "JPY": 7,
+   "GBP": 7,
+   "AUD": 7,
+   "NZD": 7,
+   "CAD": 7,
+   "CHF": 7
+  },
+  "rank": [
+   "AUD",
+   "USD",
+   "CAD",
+   "GBP",
+   "NZD",
+   "CHF",
+   "JPY",
+   "EUR"
+  ],
+  "strong": [
+   "AUD",
+   "USD",
+   "CAD"
+  ],
+  "weak": [
+   "CHF",
+   "JPY",
+   "EUR"
+  ],
+  "pullback": [
+   "AUD",
+   "USD"
+  ],
+  "ny": {
+   "day": "2026-11-27",
+   "london": "11/27 17:00",
+   "ny_open": "11/27 22:00",
+   "ny_close": "11/28 07:00",
+   "active": false,
+   "cands": [],
+   "hits": [],
+   "fakes": []
+  },
+  "day": {
+   "start": "11/28 07:00",
+   "times": [
+    "07:00",
+    "07:15",
+    "07:30",
+    "07:45",
+    "08:00",
+    "08:15",
+    "08:30"
+   ],
+   "series": {
+    "USD": [
+     0.0,
+     0.005,
+     0.005,
+     0.005,
+     0.005,
+     0.008,
+     0.008
+    ],
+    "EUR": [
+     0.0,
+     0.031,
+     0.031,
+     0.031,
+     0.031,
+     0.031,
+     0.031
+    ],
+    "JPY": [
+     0.0,
+     -0.039,
+     -0.039,
+     -0.039,
+     -0.039,
+     -0.039,
+     -0.039
+    ],
+    "GBP": [
+     0.0,
+     0.035,
+     0.035,
+     0.035,
+     0.035,
+     0.036,
+     0.036
+    ],
+    "AUD": [
+     0.0,
+     0.004,
+     0.004,
+     0.004,
+     0.004,
+     0.005,
+     0.005
+    ],
+    "NZD": [
+     0.0,
+     -0.036,
+     -0.036,
+     -0.036,
+     -0.036,
+     -0.035,
+     -0.035
+    ],
+    "CAD": [
+     0.0,
+     -0.021,
+     -0.021,
+     -0.021,
+     -0.021,
+     -0.009,
+     -0.009
+    ],
+    "CHF": [
+     0.0,
+     0.022,
+     0.022,
+     0.022,
+     0.022,
+     0.004,
+     0.004
+    ]
+   },
+   "marks": [
+    {
+     "name": "東京",
+     "time": "09:00",
+     "i": 8
+    },
+    {
+     "name": "ロンドン",
+     "time": "17:00",
+     "i": 40
+    },
+    {
+     "name": "NY",
+     "time": "22:00",
+     "i": 60
+    }
+   ],
+   "flip": null
+  }
+ },
+ "series": [
+  {
+   "cur": "JPY",
+   "label": "円",
+   "pairs": [
+    {
+     "name": "USDJPY",
+     "chg": 0.185,
+     "dir": "up"
+    },
+    {
+     "name": "EURJPY",
+     "chg": -0.069,
+     "dir": "down"
+    },
+    {
+     "name": "GBPJPY",
+     "chg": 0.2,
+     "dir": "up"
+    },
+    {
+     "name": "AUDJPY",
+     "chg": 0.555,
+     "dir": "up"
+    },
+    {
+     "name": "NZDJPY",
+     "chg": 0.119,
+     "dir": "up"
+    },
+    {
+     "name": "CADJPY",
+     "chg": 0.216,
+     "dir": "up"
+    },
+    {
+     "name": "CHFJPY",
+     "chg": 0.094,
+     "dir": "up"
+    }
+   ],
+   "up": 1,
+   "down": 6,
+   "total": 7,
+   "state": "down",
+   "all": false,
+   "msg": "円がほぼ全面安"
+  },
+  {
+   "cur": "USD",
+   "label": "ドル",
+   "pairs": [
+    {
+     "name": "EURUSD",
+     "chg": -0.273,
+     "dir": "down"
+    },
+    {
+     "name": "GBPUSD",
+     "chg": -0.073,
+     "dir": "down"
+    },
+    {
+     "name": "AUDUSD",
+     "chg": 0.239,
+     "dir": "up"
+    },
+    {
+     "name": "NZDUSD",
+     "chg": -0.142,
+     "dir": "down"
+    },
+    {
+     "name": "USDCHF",
+     "chg": 0.289,
+     "dir": "up"
+    },
+    {
+     "name": "USDCAD",
+     "chg": 0.035,
+     "dir": "flat"
+    }
+   ],
+   "up": 4,
+   "down": 1,
+   "total": 6,
+   "state": null,
+   "all": false,
+   "msg": null
+  },
+  {
+   "cur": "EUR",
+   "label": "ユーロ",
+   "pairs": [
+    {
+     "name": "EURUSD",
+     "chg": -0.273,
+     "dir": "down"
+    },
+    {
+     "name": "EURJPY",
+     "chg": -0.069,
+     "dir": "down"
+    },
+    {
+     "name": "EURGBP",
+     "chg": -0.225,
+     "dir": "down"
+    },
+    {
+     "name": "EURAUD",
+     "chg": -0.523,
+     "dir": "down"
+    },
+    {
+     "name": "EURNZD",
+     "chg": -0.106,
+     "dir": "down"
+    },
+    {
+     "name": "EURCAD",
+     "chg": -0.269,
+     "dir": "down"
+    },
+    {
+     "name": "EURCHF",
+     "chg": -0.138,
+     "dir": "down"
+    }
+   ],
+   "up": 0,
+   "down": 7,
+   "total": 7,
+   "state": "down",
+   "all": true,
+   "msg": "ユーロが全面安"
+  },
+  {
+   "cur": "GBP",
+   "label": "ポンド",
+   "pairs": [
+    {
+     "name": "GBPUSD",
+     "chg": -0.073,
+     "dir": "down"
+    },
+    {
+     "name": "GBPJPY",
+     "chg": 0.2,
+     "dir": "up"
+    },
+    {
+     "name": "EURGBP",
+     "chg": -0.225,
+     "dir": "down"
+    },
+    {
+     "name": "GBPAUD",
+     "chg": -0.289,
+     "dir": "down"
+    },
+    {
+     "name": "GBPNZD",
+     "chg": 0.079,
+     "dir": "up"
+    },
+    {
+     "name": "GBPCAD",
+     "chg": -0.054,
+     "dir": "down"
+    },
+    {
+     "name": "GBPCHF",
+     "chg": 0.155,
+     "dir": "up"
+    }
+   ],
+   "up": 4,
+   "down": 3,
+   "total": 7,
+   "state": null,
+   "all": false,
+   "msg": null
+  },
+  {
+   "cur": "AUD",
+   "label": "豪ドル",
+   "pairs": [
+    {
+     "name": "AUDUSD",
+     "chg": 0.239,
+     "dir": "up"
+    },
+    {
+     "name": "AUDJPY",
+     "chg": 0.555,
+     "dir": "up"
+    },
+    {
+     "name": "EURAUD",
+     "chg": -0.523,
+     "dir": "down"
+    },
+    {
+     "name": "GBPAUD",
+     "chg": -0.289,
+     "dir": "down"
+    },
+    {
+     "name": "AUDNZD",
+     "chg": 0.351,
+     "dir": "up"
+    },
+    {
+     "name": "AUDCAD",
+     "chg": 0.14,
+     "dir": "up"
+    },
+    {
+     "name": "AUDCHF",
+     "chg": 0.387,
+     "dir": "up"
+    }
+   ],
+   "up": 7,
+   "down": 0,
+   "total": 7,
+   "state": "up",
+   "all": true,
+   "msg": "豪ドルが全面高"
+  }
+ ],
+ "pick": {
+  "EURGBP": {
+   "h24": -0.225,
+   "h1": -0.02
+  },
+  "USDJPY": {
+   "h24": 0.185,
+   "h1": -0.038
+  },
+  "AUDJPY": {
+   "h24": 0.555,
+   "h1": 0.01
+  },
+  "AUDUSD": {
+   "h24": 0.239,
+   "h1": 0.0
+  }
+ }
+}
